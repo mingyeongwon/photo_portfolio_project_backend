@@ -1,11 +1,14 @@
-HELP.md
+# 환경 변수 파일 무시
+.env
+
+# Gradle 관련 파일 무시
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-### STS ###
+# Spring Tool Suite (STS) 관련 파일 무시
 .apt_generated
 .classpath
 .factorypath
@@ -13,11 +16,13 @@ build/
 .settings
 .springBeans
 .sts4-cache
+
+# 이진 파일(bin) 디렉터리 무시
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
-### IntelliJ IDEA ###
+# IntelliJ IDEA 관련 파일 무시
 .idea
 *.iws
 *.iml
@@ -26,12 +31,12 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
-### NetBeans ###
+# NetBeans 관련 파일 무시
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
+# VS Code 관련 파일 무시
 .vscode/
