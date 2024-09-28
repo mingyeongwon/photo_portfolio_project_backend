@@ -1,6 +1,7 @@
 # 환경 변수 파일 무시
 .env
 /application-DB-KEY.properties
+/src/main/resources/application-DB-KEY.properties
 
 # Gradle 관련 파일 무시
 .gradle
