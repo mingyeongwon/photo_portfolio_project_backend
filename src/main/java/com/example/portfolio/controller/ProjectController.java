@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -17,8 +18,15 @@ public class ProjectController {
 	@Autowired
 	private CategoryService categoryService;
 	
+	//카테고리 페이지 데이터 전달
 	@GetMapping("/category")
 	public List<Category> getAllCategories() {
 		return categoryService.getAllCategories();
+	}
+	
+	//카테고리 생성
+	@PostMapping("/category")
+	public void createCategory(Category category) {
+		categoryService.createCategory(category);
 	}
 }
