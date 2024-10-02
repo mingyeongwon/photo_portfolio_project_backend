@@ -1,10 +1,13 @@
 package com.example.portfolio.model;
 
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
 @Entity
@@ -18,6 +21,10 @@ public class Category {
     @OneToOne
     @JoinColumn(name = "project_id")
     private Project project;
+    
+
+    @OneToMany(mappedBy = "category")
+    private List<SubCategory> subCategories; 
 
     // 단일 Project를 반환하므로 메소드 이름 수정
     public Project getProject() {
