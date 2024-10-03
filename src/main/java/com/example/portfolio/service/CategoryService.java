@@ -14,32 +14,12 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class CategoryService {
-
-	@Autowired
+	
 	private CategoryRepository categoryRepository;
 
-	@Autowired
-	private SubCategoryRepository subCategoryRepository;
-
-	
-	public List<Category> getAllCategories() {
+	public List<Category> getCategory() {
+		
 		return categoryRepository.findAll();
 	}
-	
-	// 여러 카테고리와 서브카테고리 저장
-	@Transactional
-	public void createCategories(List<Category> categories) {
-		for (Category category : categories) {
-			// 카테고리 저장
-			categoryRepository.save(category);
 
-			// 카테고리의 서브카테고리 저장
-			for (SubCategory subCategory : category.getSubCategories()) {
-				subCategory.setCategory(category);
-				subCategoryRepository.save(subCategory);
-			}
-		}
-	}
-	
-	
 }
