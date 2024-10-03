@@ -7,8 +7,6 @@ public class CategoryDto {
     private String name;
     private List<SubCategoryDto> subCategories;
 
-    // Getters and Setters
-
     public Long getId() {
         return id;
     }
