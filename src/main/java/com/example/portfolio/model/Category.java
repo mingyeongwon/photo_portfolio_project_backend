@@ -6,64 +6,69 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 
 @Entity
 public class Category {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    private String name;
+	private String name;
 
-    @OneToOne
-    @JoinColumn(name = "project_id")
-    private Project project;
-    
+	@OneToMany(mappedBy = "category")
+	private List<Project> projects;
 
-    @OneToMany(mappedBy = "category")
-    private List<SubCategory> subCategories; 
+	@OneToMany(mappedBy = "category")
+	private List<SubCategory> subCategories;
 
-    // 단일 Project를 반환하므로 메소드 이름 수정
-    public Project getProject() {
-        return project;
-    }
+	public Category() {
+	}
 
-    public void setProject(Project project) {
-        this.project = project;
-    }
+	public Category(Long id, String name, List<Project> projects, List<SubCategory> subCategories) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.projects = projects;
+		this.subCategories = subCategories;
+	}
 
-    public Category() {
-        super();
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public Category(Long id, String name, Project project) {
-        super();
-        this.id = id;
-        this.name = name;
-        this.project = project;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public List<Project> getProjects() {
+		return projects;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setProjects(List<Project> projects) {
+		this.projects = projects;
+	}
 
-    @Override
-    public String toString() {
-        return "Category [id=" + id + ", name=" + name + "]";
-    }
+	public List<SubCategory> getSubCategories() {
+		return subCategories;
+	}
+
+	public void setSubCategories(List<SubCategory> subCategories) {
+		this.subCategories = subCategories;
+	}
+
+	@Override
+	public String toString() {
+		return "Category [id=" + id + ", name=" + name + ", projects=" + projects + ", subCategories=" + subCategories
+				+ "]";
+	}
+
 }
