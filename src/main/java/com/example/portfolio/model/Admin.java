@@ -3,22 +3,23 @@ package com.example.portfolio.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
-@Entity(name="admin")
-public class AdminEntity {
-	
-	protected AdminEntity() {}
-	
-	public AdminEntity(String id, String password) {
-		super();
-		this.id = id;
-		this.password = password;
-	}
+@Entity
+public class Admin {
 	
 	@Id
 	private String id;
 	
 	private String password;
-
+	
+	public Admin() {}
+	
+	
+	public Admin(String id, String password) {
+		this.id = id;
+		this.password = password;
+	}
+	
+	// Getter & Setter
 	public String getId() {
 		return id;
 	}
@@ -33,10 +34,5 @@ public class AdminEntity {
 
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	@Override
-	public String toString() {
-		return "AdminEntity [id=" + id + ", password=" + password + "]";
 	}
 }

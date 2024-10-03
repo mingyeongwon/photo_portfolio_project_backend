@@ -1,41 +1,33 @@
 package com.example.portfolio.controller;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
+import com.example.portfolio.model.Admin;
 import com.example.portfolio.repository.AdminRepository;
+import com.example.portfolio.service.AdminService;
 
-@Controller
+@RestController
 public class LoginController {
 	@Autowired
 	private AdminRepository adminRepository;
-	@Autowired
+	private AdminService adminService;
 	private PasswordEncoder passwordEncoder;
+	
+	private Logger log = LoggerFactory.getLogger(getClass());
 
-	public LoginController(AdminRepository adminRepository) {
-		this.adminRepository = adminRepository;
+	public LoginController(AdminService adminService) {
+		this.adminService = adminService;
 	}
 	
-	@PostMapping("/Login")
-	public Map<String, String> adminLogin(String id, String password) {
-		
-		Map<String, String> map = new HashMap<>();
-		
-//		String encodedPassword = 
-//		boolean checkPasswordResult = passwordEncoder.matches(password, password);
-//		
-//		if(checkPasswordResult) {
-//			map.put("result", "success");
-//			map.put("id", "id");
-//		} else {
-//			map.put("result", "fail");
-//		}
-//		
-		return map;
+	@PostMapping("/signUp")
+	public String signUpAdmin(@RequestBody Admin admin) {
+		adminService.signUpAdmin(admin);
+		return "회원가입 성공";
 	}
 }

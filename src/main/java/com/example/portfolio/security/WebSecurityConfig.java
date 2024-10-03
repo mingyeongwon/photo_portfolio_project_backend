@@ -1,12 +1,9 @@
 package com.example.portfolio.security;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 import java.util.function.Function;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -24,44 +21,51 @@ public class WebSecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
+			.csrf(
+				(csrfConfig) -> csrfConfig
+										.disable()
+			)
 			.authorizeHttpRequests(
 				(auth) -> auth
-							.requestMatchers("/Admin/AdminUpload", "/Admin/ManageCategory", 
-									"/Admin/ManageImages").authenticated()
+							.requestMatchers("/Admin/**").authenticated()
 							.anyRequest().permitAll()
 			)
 			.formLogin(
 				(form) -> form
-			//					withDefaults()
-								.loginPage("/Admin/Login")
-//								.loginProcessingUrl(null)
+								.loginPage("/Adminlogin")
+								.usernameParameter("id")
+								.loginProcessingUrl("/api/login")
 								.defaultSuccessUrl("/Admin/ManageImages")
 								.permitAll()
-				);
-//			.logout((logout) -> logout.permitAll());
+			)
+			.logout(
+				(logoutConfig) -> logoutConfig
+												.logoutSuccessUrl("/")
+			);
 
 		return http.build();
 	}
 
-	@Bean
-	public UserDetailsService userDetailsService() {
-		UserDetails userDetails = createNewUser("user", "password");
-
-		return new InMemoryUserDetailsManager(userDetails);
-	}
-
-	private UserDetails createNewUser(String username, String password) {
-		Function<String, String> passwordEncoder
-				= input -> passwordEncoder().encode(input);
-
-		UserDetails userDetails = User.builder()
-									.username(username)
-									.password(password)
-									.passwordEncoder(str -> passwordEncoder().encode(str))
-									.build();
-		return userDetails;
-	}
+//	@Bean
+//	public UserDetailsService userDetailsService() {
+//		UserDetails userDetails = createNewUser("user", "password");
+//
+//		return new InMemoryUserDetailsManager(userDetails);
+//	}
+//
+//	private UserDetails createNewUser(String username, String password) {
+//		Function<String, String> passwordEncoder
+//				= input -> passwordEncoder().encode(input);
+//
+//		UserDetails userDetails = User.builder()
+//									.username(username)
+//									.password(password)
+//									.passwordEncoder(str -> passwordEncoder().encode(str))
+//									.build();
+//		return userDetails;
+//	}
 	
+	// 암호화 알고리즘
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
