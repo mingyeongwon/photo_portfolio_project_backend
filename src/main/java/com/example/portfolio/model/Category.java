@@ -2,6 +2,7 @@ package com.example.portfolio.model;
 
 import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,7 +20,7 @@ public class Category {
 	@OneToMany(mappedBy = "category")
 	private List<Project> projects;
 
-	@OneToMany(mappedBy = "category")
+	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<SubCategory> subCategories;
 
 	public Category() {
