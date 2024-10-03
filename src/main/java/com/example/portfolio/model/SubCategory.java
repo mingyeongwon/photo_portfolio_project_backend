@@ -1,5 +1,7 @@
 package com.example.portfolio.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,6 +22,7 @@ public class SubCategory {
 	private String name;
 
 	@ManyToOne
+	@JsonIgnore
 	private Category category;
 
 	@OneToOne
