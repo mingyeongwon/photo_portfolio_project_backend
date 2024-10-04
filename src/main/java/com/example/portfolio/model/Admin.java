@@ -15,6 +15,7 @@ public class Admin {
 	
 	
 	public Admin(String id, String password) {
+		super();
 		this.id = id;
 		this.password = password;
 	}
@@ -34,5 +35,10 @@ public class Admin {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+	
+	@Override
+	public String toString() {
+		return "Admin [id='" + id + "', password='" + password + "']";
 	}
 }
