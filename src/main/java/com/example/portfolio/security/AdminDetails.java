@@ -13,6 +13,8 @@ public class AdminDetails extends User {
 
     public AdminDetails(Admin admin) {
     	super(admin.getId(), admin.getPassword(), 
+    			// Collections.singleton() : Collection에 권한을 1개만 주는 방법
+    			// SimpleGrantedAuthority() : 사용자 권한 설정 
     			Collections.singleton(new SimpleGrantedAuthority("ROLE_ADMIN")));
         this.admin = admin;
     }

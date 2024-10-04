@@ -19,6 +19,7 @@ public class AdminService {
         this.passwordEncoder = passwordEncoder;
     }
 	
+    // 회원가입
 	public void signUpAdmin(Admin admin) {
 		// 비밀번호 암호화
 		admin.setPassword(passwordEncoder.encode(admin.getPassword()));
