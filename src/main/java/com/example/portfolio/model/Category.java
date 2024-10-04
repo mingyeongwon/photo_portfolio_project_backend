@@ -17,20 +17,16 @@ public class Category {
 
 	private String name;
 
-	@OneToMany(mappedBy = "category")
-	private List<Project> projects;
-
 	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<SubCategory> subCategories;
 
 	public Category() {
 	}
 
-	public Category(Long id, String name, List<Project> projects, List<SubCategory> subCategories) {
+	public Category(Long id, String name,  List<SubCategory> subCategories) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.projects = projects;
 		this.subCategories = subCategories;
 	}
 
@@ -50,26 +46,12 @@ public class Category {
 		this.name = name;
 	}
 
-	public List<Project> getProjects() {
-		return projects;
-	}
-
-	public void setProjects(List<Project> projects) {
-		this.projects = projects;
-	}
-
 	public List<SubCategory> getSubCategories() {
 		return subCategories;
 	}
 
 	public void setSubCategories(List<SubCategory> subCategories) {
 		this.subCategories = subCategories;
-	}
-
-	@Override
-	public String toString() {
-		return "Category [id=" + id + ", name=" + name + ", projects=" + projects + ", subCategories=" + subCategories
-				+ "]";
 	}
 
 }

@@ -16,7 +16,7 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class CategoryService {
-	
+	@Autowired
 	private CategoryRepository categoryRepository;
 
 	@Autowired
@@ -40,7 +40,6 @@ public class CategoryService {
 	    for (CategoryDto categoryDto : categoryDtos) {
 	        // DTO에서 Category로 변환
 	        Category category = mapDtoToEntity(categoryDto);
-	        
 	        // 카테고리 먼저 저장
 	        categoryRepository.save(category);
 	    }
@@ -67,7 +66,6 @@ public class CategoryService {
 					// 서브카테고리를 데이터베이스에서 찾거나 새로운 서브카테고리를 생성
 					SubCategory subCategory = subCategoryRepository.findById(subCategoryDto.getId())
 							.orElse(new SubCategory());
-
 					// 서브카테고리의 이름이 있으면 업데이트
 					if (subCategoryDto.getName() != null) {
 						subCategory.setName(subCategoryDto.getName());
@@ -94,7 +92,6 @@ public class CategoryService {
 					// 서브카테고리를 데이터베이스에서 찾음
 					SubCategory subCategory = subCategoryRepository.findById(subCategoryDto.getId())
 							.orElseThrow(() -> new RuntimeException("SubCategory not found"));
-
 					// 서브카테고리 삭제
 					subCategoryRepository.delete(subCategory);
 				}
