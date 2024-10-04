@@ -1,6 +1,6 @@
 package com.example.portfolio.controller;
 
-import java.io.IOException;
+
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.ThumbnailCreateDTO;
 import com.example.portfolio.model.Category;
+import com.example.portfolio.model.Thumbnail;
 import com.example.portfolio.service.CategoryService;
 import com.example.portfolio.service.ProjectService;
 import com.example.portfolio.service.ThumbnailService;
@@ -23,7 +24,7 @@ import com.example.portfolio.service.ThumbnailService;
 @RestController
 @RequestMapping("/api")
 public class ProjectController {
-
+	
 	@Autowired
 	private CategoryService categoryService;
 	private ProjectService projectService;
@@ -76,15 +77,9 @@ public class ProjectController {
 	
 	@PostMapping("/thumbnail")
 	public void saveThumbnail(ThumbnailCreateDTO thumbnailCreateDTO) {
-		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
-		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
-		thumbnailCreateDTO.setTimgtype(image.getContentType());
-		try {
-			thumbnailCreateDTO.setTimgdata(image.getBytes());
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
 		thumbnailService.insertThumbnail(thumbnailCreateDTO);
 	}
+
+	
 
 }
