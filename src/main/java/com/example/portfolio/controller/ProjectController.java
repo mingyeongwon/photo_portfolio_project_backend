@@ -11,12 +11,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.ThumbnailCreateDTO;
 import com.example.portfolio.model.Category;
-import com.example.portfolio.model.Thumbnail;
 import com.example.portfolio.service.CategoryService;
 import com.example.portfolio.service.ProjectService;
 import com.example.portfolio.service.ThumbnailService;

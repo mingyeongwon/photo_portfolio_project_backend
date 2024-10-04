@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
 	// Google Cloud Platform Storage(GCP Storage)
-implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter', version: '1.2.5.RELEASE'
+	implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-starter', version: '1.2.5.RELEASE'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-gcp-storage', version: '1.2.5.RELEASE'
 
 	// jpa 사용을 위한 의존성
