@@ -25,10 +25,6 @@ public class SubCategory {
 	@JsonIgnore
 	private Category category;
 
-	@OneToOne
-	@JoinColumn(name = "project_id", nullable = true)
-	private Project project;
-
 	public SubCategory() {
 		super();
 	}
@@ -55,19 +51,6 @@ public class SubCategory {
 
 	public void setCategory(Category category) {
 		this.category = category;
-	}
-
-	public Project getProject() {
-		return project;
-	}
-
-	public void setProject(Project project) {
-		this.project = project;
-	}
-
-	@Override
-	public String toString() {
-		return "SubCategory [id=" + id + ", name=" + name + ", category=" + category + ", project=" + project + "]";
 	}
 
 }
