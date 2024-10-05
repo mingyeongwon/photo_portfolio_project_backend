@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.CategoryDto;
+import com.example.portfolio.dto.ProjectCreateDTO;
 import com.example.portfolio.dto.ThumbnailCreateDTO;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
@@ -27,15 +30,14 @@ import com.example.portfolio.service.ThumbnailService;
 @RequestMapping("/api")
 public class ProjectController {
 
-	@Autowired
 	private CategoryService categoryService;
 	private ProjectService projectService;
 	private ThumbnailService thumbnailService;
 	private AdminRepository adminRepository;
 	private AdminService adminService;
 	
-	public ProjectController (CategoryService categoryService,ProjectService projectService, 
-			ThumbnailService thumbnailService, AdminService adminService) {
+	@Autowired
+	public ProjectController (CategoryService categoryService,ProjectService projectService, ThumbnailService thumbnailService) {
 		this.categoryService = categoryService;
 		this.projectService = projectService;
 		this.thumbnailService = thumbnailService;
@@ -48,14 +50,6 @@ public class ProjectController {
 		adminService.signUpAdmin(admin);
 		return "회원가입 성공";
 	}
-	
-	//카테고리 페이지 데이터 전달
-//	@GetMapping("/category")
-//	public List<Category> getAllCategories() {
-//		return categoryService.getAllCategories();
-//	}
-	
-	//카테고리 생성
     
     // 카테고리 전체 목록 가져오기
     @GetMapping("/categories")
@@ -64,7 +58,6 @@ public class ProjectController {
     }
     
     // 카테고리 생성
-
     @PostMapping("/categories")
     public void createCategories(@RequestBody List<CategoryDto> categoryDtos) {
         categoryService.createCategories(categoryDtos);
@@ -88,8 +81,9 @@ public class ProjectController {
 		return categoryService.getCategory();
 	}
 	
+	// 썸네일 저장
 	@PostMapping("/thumbnail")
-	public void saveThumbnail(ThumbnailCreateDTO thumbnailCreateDTO) {
+	public void createThumbnail(ThumbnailCreateDTO thumbnailCreateDTO) {
 		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
 		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
 		thumbnailCreateDTO.setTimgtype(image.getContentType());
@@ -100,5 +94,54 @@ public class ProjectController {
 		}
 		thumbnailService.insertThumbnail(thumbnailCreateDTO);
 	}
+	
+	// 썸네일 불러오기
+	@GetMapping("/thumbnail")
+	public void getThumbnail() {
+		//TODO: GCP에서 사진 받아오는 로직 구현해야함
+		
+		
+	}
+	
+	// 썸네일 업데이트
+	@PatchMapping("/thumbnail/{id}")
+	public void updateThumbnail(ThumbnailCreateDTO thumbnailCreateDTO, @PathVariable("id") Long id) {
+		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
+		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
+		thumbnailCreateDTO.setTimgtype(image.getContentType());
+		try {
+			thumbnailCreateDTO.setTimgdata(image.getBytes());
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		thumbnailService.updateThumbnail(thumbnailCreateDTO, id);
+		
+	}
+	
+	// 썸네일 삭제
+	@DeleteMapping("/thumbnail/{id}")
+	public void deleteThumbnail(@PathVariable("id") Long id) {
+		thumbnailService.deleteThumbnail(id);
+	}
+	
+	
+	// 프로젝트 생성
+	@PostMapping("/project")
+	public void createProject(ProjectCreateDTO projectCreateDTO) {
+		projectService.insertProject(projectCreateDTO);
+	}
+	
+	// 프로젝트 불러오기
+	
+	
+	// 프로젝트 업데이트
+	
+	
+	// 프로젝트 삭제
+	@DeleteMapping("/project/{id}")
+	public void deleteProject(@PathVariable("id") Long id) {
+		projectService.deleteProject(id);
+	}
+	
 
 }
