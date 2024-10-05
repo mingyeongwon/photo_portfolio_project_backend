@@ -1,15 +1,19 @@
 package com.example.portfolio.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 
 @Entity
 public class Project {
@@ -26,18 +30,33 @@ public class Project {
 	@ManyToOne
 	@JoinColumn(name = "category_id")
 	private Category category;
+	
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Photo> photos = new ArrayList<>();
+	
+	public List<Photo> getPhotos() {
+		return photos;
+	}
 
+	public void setPhotos(List<Photo> photos) {
+		this.photos = photos;
+	}
+
+	@ManyToOne
+	@JoinColumn(name = "sub_category_id")
+	private SubCategory subCategory;
 	public Project() {
 		super();
 	}
 
-	public Project(Long id, String title, Long view, Date created_at, Category category) {
+	public Project(Long id, String title, Long view, Date created_at, Category category,SubCategory subCategory) {
 		super();
 		this.id = id;
 		this.title = title;
 		this.view = view;
 		this.created_at = created_at;
 		this.category = category;
+		this.subCategory = subCategory;
 	}
 
 	public Long getId() {
@@ -78,6 +97,14 @@ public class Project {
 
 	public void setCategory(Category category) {
 		this.category = category;
+	}
+
+	public SubCategory getSubCategory() {
+		return subCategory;
+	}
+
+	public void setSubCategory(SubCategory subCategory) {
+		this.subCategory = subCategory;
 	}
 
 	@Override
