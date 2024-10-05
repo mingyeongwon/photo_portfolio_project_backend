@@ -1,6 +1,5 @@
 package com.example.portfolio.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +12,6 @@ public class AdminService {
     private AdminRepository adminRepository;
     private PasswordEncoder passwordEncoder; 
 
-    @Autowired
     public AdminService(AdminRepository adminRepository, PasswordEncoder passwordEncoder) {
         this.adminRepository = adminRepository;
         this.passwordEncoder = passwordEncoder;

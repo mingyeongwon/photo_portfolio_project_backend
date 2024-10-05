@@ -20,7 +20,6 @@ import com.example.portfolio.dto.ProjectCreateDTO;
 import com.example.portfolio.dto.ThumbnailCreateDTO;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
-import com.example.portfolio.repository.AdminRepository;
 import com.example.portfolio.service.AdminService;
 import com.example.portfolio.service.CategoryService;
 import com.example.portfolio.service.ProjectService;
@@ -33,11 +32,9 @@ public class ProjectController {
 	private CategoryService categoryService;
 	private ProjectService projectService;
 	private ThumbnailService thumbnailService;
-	private AdminRepository adminRepository;
 	private AdminService adminService;
 	
-	@Autowired
-	public ProjectController (CategoryService categoryService,ProjectService projectService, ThumbnailService thumbnailService) {
+	public ProjectController (CategoryService categoryService,ProjectService projectService, ThumbnailService thumbnailService, AdminService adminService) {
 		this.categoryService = categoryService;
 		this.projectService = projectService;
 		this.thumbnailService = thumbnailService;
