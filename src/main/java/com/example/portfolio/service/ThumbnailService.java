@@ -2,31 +2,21 @@ package com.example.portfolio.service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.ThumbnailCreateDTO;
 import com.example.portfolio.model.Thumbnail;
-import com.example.portfolio.repository.CategoryRepository;
 import com.example.portfolio.repository.ProjectRepository;
-import com.example.portfolio.repository.SubCategoryRepository;
 import com.example.portfolio.repository.ThumbnailRepository;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-
-
 
 import jakarta.transaction.Transactional;
 
@@ -68,10 +58,9 @@ public class ThumbnailService {
         return "https://storage.googleapis.com/"+ bucketName+"/"+objectName;
 	}
 	
+	@Transactional
 	public void insertThumbnail(ThumbnailCreateDTO thumbnailCreateDTO) {
-		
 		try {
-			MultipartFile image = thumbnailCreateDTO.getMultipartFile();
 			Long projectId= 3L; //이후 수정해야 함 
 			String projectName = projectRepository.findById(projectId).get().getTitle();
 			String url = uploadImageToGCS(thumbnailCreateDTO, projectName);
@@ -83,10 +72,8 @@ public class ThumbnailService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
-	
 	@Transactional
 	public void updateThumbnail(ThumbnailCreateDTO thumbnailCreateDTO, Long id) {
 		// TODO: 여기서 project 아이디를 먼저 저장하고 id 값을 받아와서 저장해줘야함
