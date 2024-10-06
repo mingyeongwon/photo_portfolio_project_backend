@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.portfolio.dto.ThumbnailCreateDTO;
 import com.example.portfolio.model.Thumbnail;
 import com.example.portfolio.repository.CategoryRepository;
+import com.example.portfolio.repository.ProjectRepository;
 import com.example.portfolio.repository.SubCategoryRepository;
 import com.example.portfolio.repository.ThumbnailRepository;
 import com.google.auth.oauth2.GoogleCredentials;
@@ -36,24 +37,22 @@ public class ThumbnailService {
 	private ThumbnailRepository thumbnailRepository;
 	
 	@Autowired
-	private CategoryRepository categoryRepository;
-
-	@Autowired
-	private SubCategoryRepository subCategoryRepository;
+	private ProjectRepository projectRepository;
+	
 
 	@Value("${spring.cloud.gcp.storage.credentials.location}") 
     private String keyFileName;
 	
-	@Value("${spring.cloud.gcp.storage.bucket}") // application.yml에 써둔 bucket 이름
+	@Value("${spring.cloud.gcp.storage.bucket}")
     private String bucketName;
 	
-	public String uploadImageToGCS(ThumbnailCreateDTO thumbnailDto,String category, String subCategory) throws IOException {
-
+	public String uploadImageToGCS(ThumbnailCreateDTO thumbnailDto,String projectName) throws IOException {
+		// Google Cloud 인증에 사용되는 서비스 계정 키 파일을 스트림 형태로 읽어야 동작
+		//fromStream() 메소드가 InputStream을 매개변수로 받기 때문에 키 파일을 스트림 형태로 읽어와야함
 		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
-		String uuid = UUID.randomUUID().toString(); // Google Cloud Storage에 저장될 파일 이름
-		String ext = thumbnailDto.getMultipartFile().getContentType();
-		String extension =ext.split("/")[1];
-		String objectName = String.format( "%s/%s/%s.%s",category, subCategory, uuid,extension);
+		String uuid = UUID.randomUUID().toString(); 
+		String extension = thumbnailDto.getMultipartFile().getContentType();
+		String objectName = projectName+"/"+uuid+"."+extension.split("/")[1];
 
         Storage storage = StorageOptions.newBuilder()
                 .setCredentials(GoogleCredentials.fromStream(keyFile))
@@ -61,29 +60,23 @@ public class ThumbnailService {
                 .getService();
 
         BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
-                .setContentType(thumbnailDto.getTimgtype())
+                .setContentType(extension)
                 .build();
         
         //이미지 데이터를 클라우드에 저장 
-        Blob blob = storage.createFrom(blobInfo, thumbnailDto.getMultipartFile().getInputStream());
-        return String.format("https://storage.googleapis.com/"+ bucketName+"/"+objectName);
+        storage.createFrom(blobInfo, thumbnailDto.getMultipartFile().getInputStream());
+        return "https://storage.googleapis.com/"+ bucketName+"/"+objectName;
 	}
 	
 	public void insertThumbnail(ThumbnailCreateDTO thumbnailCreateDTO) {
 		
 		try {
 			MultipartFile image = thumbnailCreateDTO.getMultipartFile();
-			
-			String category = categoryRepository.findById(8L).get().getName();
-			String subCategory = subCategoryRepository.findById(10L).get().getName();
-
-			String url = uploadImageToGCS(thumbnailCreateDTO,category,subCategory);
+			Long projectId= 3L; //이후 수정해야 함 
+			String projectName = projectRepository.findById(projectId).get().getTitle();
+			String url = uploadImageToGCS(thumbnailCreateDTO, projectName);
 			// 여기서 project 아이디를 먼저 저장하고 id 값을 받아와서 저장해줘야함
-			Thumbnail thumbnail = new Thumbnail();
-		
-			thumbnail.setImageUrl(url);
-			// 저장되어 있는 값 넣어줘야함 이후에
-			thumbnail.setProjectId(2L);
+			Thumbnail thumbnail = new Thumbnail(url, 3L);// 저장되어 있는 값 넣어줘야함 이후에
 			thumbnailRepository.save(thumbnail);
 			
 		} catch (IOException e) {
