@@ -7,7 +7,6 @@ public class ThumbnailCreateDTO {
 	private MultipartFile multipartFile;
 	private String timgoname;
 	private String timgtype;
-	private byte[] timgdata;
 	
 	public String getTimgoname() {
 		return timgoname;
@@ -23,14 +22,6 @@ public class ThumbnailCreateDTO {
 
 	public void setTimgtype(String timgtype) {
 		this.timgtype = timgtype;
-	}
-
-	public byte[] getTimgdata() {
-		return timgdata;
-	}
-
-	public void setTimgdata(byte[] timgdata) {
-		this.timgdata = timgdata;
 	}
 
 	public ThumbnailCreateDTO() {

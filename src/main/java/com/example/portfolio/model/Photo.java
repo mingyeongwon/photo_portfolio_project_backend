@@ -1,5 +1,7 @@
 package com.example.portfolio.model;
 
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,6 +21,9 @@ public class Photo {
 	@Column(name = "project_id")
     private Long projectId;
 	
+	private String imgoname;
+	private String imgtype;
+	
 	public Photo() {}
 
 	public Long getId() {
@@ -33,6 +38,7 @@ public class Photo {
 		return imageUrl;
 	}
 
+
 	public void setImageUrl(String imageUrl) {
 		this.imageUrl = imageUrl;
 	}
@@ -43,6 +49,42 @@ public class Photo {
 
 	public void setProjectId(Long projectId) {
 		this.projectId = projectId;
+	}
+	
+	public String getTimgoname() {
+		return imgoname;
+	}
+	
+	public void setTimgoname(String imgoname) {
+		this.imgoname = imgoname;
+	}
+	
+	public String getTimgtype() {
+		return imgtype;
+	}
+	
+	public void setTimgtype(String imgtype) {
+		this.imgtype = imgtype;
+	}
+	
+	// hash비교를 위해서 재구성
+	@Override
+	public int hashCode() {
+		return Objects.hash(imgoname, imgtype, projectId);
+	}
+	
+	// 동등성 비교를 위해서 재구성
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Photo other = (Photo) obj;
+		return Objects.equals(imgoname, other.imgoname) && Objects.equals(imgtype, other.imgtype)
+				&& Objects.equals(projectId, other.projectId);
 	}
 	
 }

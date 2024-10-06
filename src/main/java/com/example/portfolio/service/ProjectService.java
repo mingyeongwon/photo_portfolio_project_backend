@@ -29,10 +29,9 @@ public class ProjectService {
 	
 	public void insertProject(ProjectCreateDTO projectCreateDTO) {
 		
+		// 프로젝트 객체 생성
 		Project project = new Project();
-		
 		project.setTitle(projectCreateDTO.getTitle());
-		
 		Category category = categoryRepository.findById(projectCreateDTO.getCategoryId()).get();
 		project.setCategory(category);
 		
@@ -40,22 +39,19 @@ public class ProjectService {
 //		SubCategory subCategory = categoryRepository.findById(projectCreateDTO.getSubCategoryId()).get();
 //		project.setSubCategory(subCategory);
 		
+		// DB에 저장
 		Project savedProject = projectRepository.save(project);
-		
 		MultipartFile[] multipartFiles = projectCreateDTO.getMultipartFiles();
-		
 		System.out.println("사진 갯수: " + multipartFiles.length);
 		
+		// 사진 전체 저장
 		for(int i =0; i < multipartFiles.length; i++) {
 			System.out.println("for문 돈다");
 			Photo photo = new Photo();
 			
 			MultipartFile multipartFile = multipartFiles[i];
-			
 			photo.setImageUrl(multipartFile.getOriginalFilename());
-			
 			photo.setProjectId(savedProject.getId());
-			
 			photoRepository.save(photo);
 			
 		}

@@ -84,18 +84,14 @@ public class ProjectController {
 		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
 		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
 		thumbnailCreateDTO.setTimgtype(image.getContentType());
-		try {
-			thumbnailCreateDTO.setTimgdata(image.getBytes());
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
 		thumbnailService.insertThumbnail(thumbnailCreateDTO);
 	}
 	
 	// 썸네일 불러오기
 	@GetMapping("/thumbnail")
-	public void getThumbnail() {
+	public void getThumbnail(ThumbnailCreateDTO thumbnailCreateDTO) {
 		//TODO: GCP에서 사진 받아오는 로직 구현해야함
+		thumbnailService.insertThumbnail(thumbnailCreateDTO);
 		
 		
 	}
@@ -106,11 +102,6 @@ public class ProjectController {
 		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
 		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
 		thumbnailCreateDTO.setTimgtype(image.getContentType());
-		try {
-			thumbnailCreateDTO.setTimgdata(image.getBytes());
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
 		thumbnailService.updateThumbnail(thumbnailCreateDTO, id);
 		
 	}
