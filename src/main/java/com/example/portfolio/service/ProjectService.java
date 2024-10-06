@@ -2,6 +2,7 @@ package com.example.portfolio.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.portfolio.repository.ProjectRepository;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.ProjectCreateDTO;

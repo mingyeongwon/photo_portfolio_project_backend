@@ -1,5 +1,6 @@
 package com.example.portfolio.controller;
 
+
 import java.io.IOException;
 import java.util.List;
 
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.CategoryDto;
-import com.example.portfolio.dto.ProjectCreateDTO;
 import com.example.portfolio.dto.ThumbnailCreateDTO;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
@@ -25,10 +25,12 @@ import com.example.portfolio.service.CategoryService;
 import com.example.portfolio.service.ProjectService;
 import com.example.portfolio.service.ThumbnailService;
 
+
 @RestController
 @RequestMapping("/api")
 public class ProjectController {
 
+	@Autowired
 	private CategoryService categoryService;
 	private ProjectService projectService;
 	private ThumbnailService thumbnailService;
@@ -80,10 +82,7 @@ public class ProjectController {
 	
 	// 썸네일 저장
 	@PostMapping("/thumbnail")
-	public void createThumbnail(ThumbnailCreateDTO thumbnailCreateDTO) {
-		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
-		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
-		thumbnailCreateDTO.setTimgtype(image.getContentType());
+	public void saveThumbnail(ThumbnailCreateDTO thumbnailCreateDTO) {
 		thumbnailService.insertThumbnail(thumbnailCreateDTO);
 	}
 	
@@ -99,37 +98,12 @@ public class ProjectController {
 	// 썸네일 업데이트
 	@PatchMapping("/thumbnail/{id}")
 	public void updateThumbnail(ThumbnailCreateDTO thumbnailCreateDTO, @PathVariable("id") Long id) {
-		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
-		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
-		thumbnailCreateDTO.setTimgtype(image.getContentType());
-		thumbnailService.updateThumbnail(thumbnailCreateDTO, id);
 		
+		thumbnailService.updateThumbnail(thumbnailCreateDTO, id);
 	}
 	
-	// 썸네일 삭제
-	@DeleteMapping("/thumbnail/{id}")
-	public void deleteThumbnail(@PathVariable("id") Long id) {
-		thumbnailService.deleteThumbnail(id);
-	}
-	
-	
-	// 프로젝트 생성
-	@PostMapping("/project")
-	public void createProject(ProjectCreateDTO projectCreateDTO) {
-		projectService.insertProject(projectCreateDTO);
-	}
-	
-	// 프로젝트 불러오기
-	
-	
-	// 프로젝트 업데이트
-	
-	
-	// 프로젝트 삭제
-	@DeleteMapping("/project/{id}")
-	public void deleteProject(@PathVariable("id") Long id) {
-		projectService.deleteProject(id);
-	}
+
+
 	
 
 }
