@@ -111,7 +111,7 @@ public class ProjectController {
 	// 프로젝트 저장
 	@PostMapping("/project")
 	public void saveProject(ProjectCreateDto  projectCreateDto) {
-		projectService.insertProject(projectCreateDto);
+		projectService.createProject(projectCreateDto);
 	}
 	
 	// 프로젝트 불러오기
