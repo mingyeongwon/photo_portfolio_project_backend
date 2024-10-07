@@ -81,15 +81,6 @@ public class ThumbnailService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		// TODO: 여기서 project 아이디를 먼저 저장하고 id 값을 받아와서 저장해줘야함
-		Thumbnail thumbnail = new Thumbnail();
-	
-		thumbnail.setImageUrl(thumbnailCreateDTO.getTimgoname());
-		// 저장되어 있는 값 넣어줘야함 이후에
-		thumbnail.setProjectId(3L);
-		
-		thumbnailRepository.save(thumbnail);
 	}
 
 	@Transactional
