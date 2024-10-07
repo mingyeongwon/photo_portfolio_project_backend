@@ -1,6 +1,7 @@
 package com.example.portfolio.controller;
 
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -20,6 +21,7 @@ import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.ThumbnailCreateDTO;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
+import com.example.portfolio.model.Thumbnail;
 import com.example.portfolio.service.AdminService;
 import com.example.portfolio.service.CategoryService;
 import com.example.portfolio.service.ProjectService;
@@ -87,10 +89,9 @@ public class ProjectController {
 	}
 	
 	// 썸네일 불러오기
-	@GetMapping("/thumbnail")
-	public void getThumbnail() {
-		//TODO: GCP에서 사진 받아오는 로직 구현해야함
-		
+	@GetMapping("/thumbnail/{categoryId}")
+	public List<Thumbnail> getThumbnail(@PathVariable("categoryId") Long categoryId) {
+		return thumbnailService.getThumbnail(categoryId);
 		
 	}
 	
@@ -107,9 +108,11 @@ public class ProjectController {
 		}
 		thumbnailService.insertThumbnail(thumbnailCreateDTO);
 	}
-	
+	  //썸네일 삭제
+    @DeleteMapping("/thumbnail/{id}")
+    public void deleteThumbnail(@PathVariable("id") Long id) throws FileNotFoundException, IOException {
+        thumbnailService.deleteThumbnail(id);
+    }
 
-
-	
 
 }

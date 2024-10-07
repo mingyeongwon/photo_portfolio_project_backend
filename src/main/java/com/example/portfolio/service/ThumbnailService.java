@@ -1,7 +1,10 @@
 package com.example.portfolio.service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,10 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import com.example.portfolio.dto.ThumbnailCreateDTO;
+import com.example.portfolio.model.Project;
 import com.example.portfolio.model.Thumbnail;
 import com.example.portfolio.repository.ProjectRepository;
 import com.example.portfolio.repository.ThumbnailRepository;
 import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
@@ -29,7 +34,9 @@ public class ThumbnailService {
 	@Autowired
 	private ProjectRepository projectRepository;
 	
-
+	@Value("${spring.cloud.gcp.storage.project-id}") 
+    private String projectId;
+	
 	@Value("${spring.cloud.gcp.storage.credentials.location}") 
     private String keyFileName;
 	
@@ -65,7 +72,7 @@ public class ThumbnailService {
 			String projectName = projectRepository.findById(projectId).get().getTitle();
 			String url = uploadImageToGCS(thumbnailCreateDTO, projectName);
 			// 여기서 project 아이디를 먼저 저장하고 id 값을 받아와서 저장해줘야함
-			Thumbnail thumbnail = new Thumbnail(url, 3L);// 저장되어 있는 값 넣어줘야함 이후에
+			Thumbnail thumbnail = new Thumbnail(url, 2L);// 저장되어 있는 값 넣어줘야함 이후에
 			thumbnailRepository.save(thumbnail);
 			
 		} catch (IOException e) {
@@ -83,17 +90,46 @@ public class ThumbnailService {
 		// 저장되어 있는 값 넣어줘야함 이후에
 		thumbnail.setProjectId(thumbnail.getProjectId());
 	}
+
 	
 	@Transactional
-	public void deleteThumbnail(Long id) {
+	public void deleteThumbnail(Long id) throws FileNotFoundException, IOException {
+		
+		 Storage storage = StorageOptions.getDefaultInstance().getService();
+		 System.out.println(storage);
 		Thumbnail thumbnail = thumbnailRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Thumbnail not found"));
-		
+		String url= thumbnail.getImageUrl();
+		int index = url.indexOf("minography_gcs/") + "minography_gcs/".length();
+
+		//인덱스부터 끝까지 substring으로 추출
+		String objectName = url.substring(index);
+		System.out.println(objectName);
 		if(thumbnail.getId() != null) {
 			thumbnailRepository.deleteById(id);
 			System.out.println("삭제 완료");
 		}
+		  Blob blob = storage.get(bucketName, objectName);
+		  if(blob!=null) {
+				storage.delete(bucketName, objectName);
+		  }else {
+			  System.out.println("없음");
+		  }
+		   
 		
+	}
+	@Transactional
+	public List<Thumbnail> getThumbnail(Long categoryId) {
+		//categoryId로 프로젝트 찾아오기
+		 List<Project> projects = projectRepository.findByCategory_Id(categoryId);
+
+		    List<Thumbnail> thumbnails = new ArrayList<>();
+		    for (Project project : projects) {
+		    	//프로젝트 아이디로 썸네일 찾아오기
+		        thumbnails.addAll(thumbnailRepository.findByProjectId(project.getId()));
+		    }
+
+		return thumbnails.stream().toList();
 	}
 
 }
