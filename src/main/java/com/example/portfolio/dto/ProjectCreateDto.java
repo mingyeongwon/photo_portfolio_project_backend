@@ -2,7 +2,7 @@ package com.example.portfolio.dto;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class ProjectCreateDTO {
+public class ProjectCreateDto {
 	private Long id;
 	private String title;
 	private Long categoryId;
