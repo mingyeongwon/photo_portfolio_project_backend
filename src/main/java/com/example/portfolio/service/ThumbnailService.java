@@ -94,9 +94,14 @@ public class ThumbnailService {
 	
 	@Transactional
 	public void deleteThumbnail(Long id) throws FileNotFoundException, IOException {
+		//fromStream() 메소드가 InputStream을 매개변수로 받기 때문에 키 파일을 스트림 형태로 읽어와야함
+		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
 		
-		 Storage storage = StorageOptions.getDefaultInstance().getService();
-		 System.out.println(storage);
+        Storage storage = StorageOptions.newBuilder()
+                .setCredentials(GoogleCredentials.fromStream(keyFile))
+                .build()
+                .getService();
+        
 		Thumbnail thumbnail = thumbnailRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Thumbnail not found"));
 		String url= thumbnail.getImageUrl();
@@ -114,8 +119,7 @@ public class ThumbnailService {
 				storage.delete(bucketName, objectName);
 		  }else {
 			  System.out.println("없음");
-		  }
-		   
+		  }	   
 		
 	}
 	@Transactional
