@@ -107,7 +107,6 @@ public class ThumbnailService {
                 .build()
                 .getService();
         
-        
 		Thumbnail thumbnail = thumbnailRepository.findById(id)
 				.orElseThrow(() -> new RuntimeException("Thumbnail not found"));
 		String url= thumbnail.getImageUrl();

@@ -10,4 +10,6 @@ public interface PhotoRepository extends JpaRepository<Photo, Long>{
 
 	List<Photo> findByProjectId(Long id);
 
+	List<Photo> findAllByProjectId(Long id);
+
 }
