@@ -65,7 +65,7 @@ public class ProjectController {
         categoryService.createCategories(categoryDtos);
     }
     
-    // 카테고리 수정
+    // 카테고리 수정 
     @PutMapping("/categories")
     public void updateCategories(@RequestBody List<CategoryDto> categoryDtos) {
         categoryService.updateCategories(categoryDtos);
