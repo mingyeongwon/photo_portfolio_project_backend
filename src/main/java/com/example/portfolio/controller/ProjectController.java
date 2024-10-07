@@ -86,11 +86,14 @@ public class ProjectController {
 	// 썸네일 저장
 	@PostMapping("/thumbnail")
 	public void saveThumbnail(ThumbnailCreateDTO thumbnailCreateDTO) {
+	public void createThumbnail(ThumbnailCreateDTO thumbnailCreateDTO) {
+		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
+		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
+		thumbnailCreateDTO.setTimgtype(image.getContentType());
 		thumbnailService.insertThumbnail(thumbnailCreateDTO);
 	}
 	
 	// 썸네일 불러오기
-
 
 	@GetMapping("/thumbnail/{category}/{subCategory}")
 	public List<Thumbnail> getThumbnail(@PathVariable("categoryId") Long categoryId, @PathVariable("categoryId") Long subCategoryId) {
@@ -99,12 +102,23 @@ public class ProjectController {
 		}else {
 			return thumbnailService.getThumbnailBySubCategory(subCategoryId);
 		}
+	@GetMapping("/thumbnail")
+	public void getThumbnail(ThumbnailCreateDTO thumbnailCreateDTO) {
+		//TODO: GCP에서 사진 받아오는 로직 구현해야함
+		thumbnailService.insertThumbnail(thumbnailCreateDTO);
+		
 	}
+	
+	
 	// 썸네일 업데이트
 	@PatchMapping("/thumbnail/{id}")
 	public void updateThumbnail(ThumbnailCreateDTO thumbnailCreateDTO, @PathVariable("id") Long id) {
-		
+
+		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
+		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
+		thumbnailCreateDTO.setTimgtype(image.getContentType());
 		thumbnailService.updateThumbnail(thumbnailCreateDTO, id);
+		
 	}
 	  //썸네일 삭제
     @DeleteMapping("/thumbnail/{id}")
