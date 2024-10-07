@@ -51,23 +51,23 @@ public class Photo {
 		this.projectId = projectId;
 	}
 	
-	public String getTimgoname() {
+	public String getImgoname() {
 		return imgoname;
 	}
 	
-	public void setTimgoname(String imgoname) {
+	public void setImgoname(String imgoname) {
 		this.imgoname = imgoname;
 	}
 	
-	public String getTimgtype() {
+	public String getImgtype() {
 		return imgtype;
 	}
 	
-	public void setTimgtype(String imgtype) {
+	public void setImgtype(String imgtype) {
 		this.imgtype = imgtype;
 	}
 	
-	// hash비교를 위해서 재구성
+	// hashcode 비교를 위해서 재구성
 	@Override
 	public int hashCode() {
 		return Objects.hash(imgoname, imgtype, projectId);
@@ -83,7 +83,8 @@ public class Photo {
 		if (getClass() != obj.getClass())
 			return false;
 		Photo other = (Photo) obj;
-		return Objects.equals(imgoname, other.imgoname) && Objects.equals(imgtype, other.imgtype)
+		return Objects.equals(imgoname, other.imgoname) 
+				&& Objects.equals(imgtype, other.imgtype)
 				&& Objects.equals(projectId, other.projectId);
 	}
 	
