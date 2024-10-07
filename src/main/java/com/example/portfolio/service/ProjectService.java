@@ -81,7 +81,7 @@ public class ProjectService {
 	
 	// 프로젝트 생성
 	@Transactional
-	public void insertProject(ProjectCreateDto projectCreateDto) {
+	public void createProject(ProjectCreateDto projectCreateDto) {
 		
 		// 프로젝트 객체 생성
 		Project project = new Project();
