@@ -24,6 +24,7 @@ import com.example.portfolio.dto.ThumbnailCreateDto;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.model.Photo;
+import com.example.portfolio.model.SubCategory;
 import com.example.portfolio.model.Thumbnail;
 import com.example.portfolio.service.AdminService;
 import com.example.portfolio.service.CategoryService;
@@ -83,6 +84,11 @@ public class ProjectController {
 	@GetMapping("/category")
 	public List<Category> getCategory() {
 		return categoryService.getCategory();
+	}
+	
+	@GetMapping("/subCategory/{id}")
+	public List<SubCategory> getSubCategory(@PathVariable("id") Long categoryId) {
+		return categoryService.getSubCategory(categoryId);
 	}
 	
 	// 썸네일 저장

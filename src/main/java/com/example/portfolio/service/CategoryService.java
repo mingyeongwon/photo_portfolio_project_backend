@@ -138,4 +138,9 @@ public class CategoryService {
 		return categoryDto;
 	}
 
+
+	public List<SubCategory> getSubCategory(Long categoryId) {
+		return subCategoryRepository.findByCategory_id(categoryId);
+	}
+
 }
