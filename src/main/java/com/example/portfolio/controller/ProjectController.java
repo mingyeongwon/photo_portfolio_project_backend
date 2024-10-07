@@ -95,12 +95,11 @@ public class ProjectController {
 	// 썸네일 불러오기
 
 	@GetMapping("/thumbnail/{category}/{subCategory}")
-	public List<Thumbnail> getThumbnail(@PathVariable("categoryId") Long categoryId, @PathVariable("categoryId") Long subCategoryId) {
-		if(subCategoryId==null) {
-			return thumbnailService.getThumbnailByCategory(categoryId);
-		}else {
-			return thumbnailService.getThumbnailBySubCategory(subCategoryId);
-		}
+	public List<Thumbnail> getThumbnail(@PathVariable("category") Long categoryId,
+			@PathVariable("subCategory") Long subCategoryId) {
+		List<Thumbnail> lists= thumbnailService.getThumbnailByCategory(categoryId, subCategoryId);	
+		System.out.println(lists);
+		return lists;		
 	}
 	
 	

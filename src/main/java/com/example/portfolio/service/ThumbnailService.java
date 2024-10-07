@@ -75,7 +75,7 @@ public class ThumbnailService {
 			String url = uploadImageToGCS(thumbnailCreateDTO, projectName);
 			System.out.println(url);
 			// 여기서 project 아이디를 먼저 저장하고 id 값을 받아와서 저장해줘야함
-			Thumbnail thumbnail = new Thumbnail(url, 2L);// 저장되어 있는 값 넣어줘야함 이후에
+			Thumbnail thumbnail = new Thumbnail(url, 12L);// 저장되어 있는 값 넣어줘야함 이후에
 			thumbnailRepository.save(thumbnail);
 			
 		} catch (IOException e) {
@@ -129,29 +129,21 @@ public class ThumbnailService {
 		
 	}
 	@Transactional
-	public List<Thumbnail> getThumbnailByCategory(Long categoryId) {
-		//categoryId로 프로젝트 찾아오기
-		 List<Project> projects = projectRepository.findByCategory_Id(categoryId);
-
-		    List<Thumbnail> thumbnails = new ArrayList<>();
-		    for (Project project : projects) {
-		    	//프로젝트 아이디로 썸네일 찾아오기
-		        thumbnails.addAll(thumbnailRepository.findByProjectId(project.getId()));
-		    }
-
-		return thumbnails.stream().toList();
-	}
-	@Transactional
-	public List<Thumbnail> getThumbnailBySubCategory(Long subCategoryId) {
-		//categoryId로 프로젝트 찾아오기
-		 List<Project> projects = projectRepository.findByCategory_Id(subCategoryId);
-
-		    List<Thumbnail> thumbnails = new ArrayList<>();
-		    for (Project project : projects) {
-		    	//프로젝트 아이디로 썸네일 찾아오기
-		        thumbnails.addAll(thumbnailRepository.findByProjectId(project.getId()));
-		    }
-
+	public List<Thumbnail> getThumbnailByCategory(Long categoryId,Long subCategoryId) {
+		
+		List<Project> projects = new ArrayList<>();
+		if(subCategoryId==0) {
+			//categoryId로 프로젝트 찾아오기
+			 projects = projectRepository.findByCategory_Id(categoryId);
+		}else {
+			//subcategoryId로 프로젝트 찾아오기
+			projects = projectRepository.findBySubCategory_Id(subCategoryId);
+		}
+	    List<Thumbnail> thumbnails = new ArrayList<>();
+	    for (Project project : projects) {
+	    	//프로젝트 아이디로 썸네일 찾아오기
+	        thumbnails.addAll(thumbnailRepository.findByProjectId(project.getId()));
+	    }
 		return thumbnails.stream().toList();
 	}
 
