@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.dto.ThumbnailCreateDto;
 import com.example.portfolio.model.Project;
 import com.example.portfolio.model.Thumbnail;
@@ -68,7 +69,7 @@ public class ThumbnailService {
 	}
 	
 	@Transactional
-	public void insertThumbnail(ThumbnailCreateDto thumbnailCreateDTO) {
+	public void createThumbnail(ThumbnailCreateDto thumbnailCreateDTO) {
 		try {
 			Long projectId= 3L; //이후 수정해야 함 
 			String projectName = projectRepository.findById(projectId).get().getTitle();
@@ -84,7 +85,7 @@ public class ThumbnailService {
 	}
 
 	@Transactional
-	public void updateThumbnail(ThumbnailCreateDto thumbnailCreateDTO, Long id) {
+	public void updateThumbnail(ThumbnailCreateDto thumbnailCreateDTO, Long id,Project updatedProject) {
 		// TODO: 여기서 project 아이디를 먼저 저장하고 id 값을 받아와서 저장해줘야함
 		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
 		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
@@ -93,7 +94,9 @@ public class ThumbnailService {
 		
 		thumbnail.setImageUrl(thumbnailCreateDTO.getTimgoname());
 		// 저장되어 있는 값 넣어줘야함 이후에
-		thumbnail.setProjectId(thumbnail.getProjectId());
+		thumbnail.setProjectId(updatedProject.getId());
+		
+		thumbnailRepository.save(thumbnail);
 	}
 
 	
