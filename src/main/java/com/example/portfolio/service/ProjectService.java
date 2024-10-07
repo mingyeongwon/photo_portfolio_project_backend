@@ -1,15 +1,21 @@
 package com.example.portfolio.service;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
+import com.example.portfolio.dto.ThumbnailCreateDto;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.model.Photo;
 import com.example.portfolio.model.Project;
@@ -18,6 +24,10 @@ import com.example.portfolio.repository.CategoryRepository;
 import com.example.portfolio.repository.PhotoRepository;
 import com.example.portfolio.repository.ProjectRepository;
 import com.example.portfolio.repository.SubCategoryRepository;
+import com.google.auth.oauth2.GoogleCredentials;
+import com.google.cloud.storage.BlobInfo;
+import com.google.cloud.storage.Storage;
+import com.google.cloud.storage.StorageOptions;
 
 import jakarta.transaction.Transactional;
 
@@ -31,10 +41,42 @@ public class ProjectService {
 	@Autowired
 	private CategoryRepository categoryRepository;
 	
+	@Autowired
 	private SubCategoryRepository subCategoryRepository;
 
 	@Autowired
 	private PhotoRepository photoRepository;
+	
+	@Value("${spring.cloud.gcp.storage.project-id}") 
+    private String projectId;
+
+	@Value("${spring.cloud.gcp.storage.credentials.location}") 
+    private String keyFileName;
+	
+	@Value("${spring.cloud.gcp.storage.bucket}")
+    private String bucketName;
+	
+	public String uploadImageToGCS(MultipartFile multipartFile,String projectName) throws IOException {
+		// Google Cloud 인증에 사용되는 서비스 계정 키 파일을 스트림 형태로 읽어야 동작
+		//fromStream() 메소드가 InputStream을 매개변수로 받기 때문에 키 파일을 스트림 형태로 읽어와야함
+		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
+		String uuid = UUID.randomUUID().toString(); 
+		String extension = multipartFile.getContentType();
+		String objectName = projectName+"/"+uuid+"."+extension.split("/")[1];
+
+        Storage storage = StorageOptions.newBuilder()
+                .setCredentials(GoogleCredentials.fromStream(keyFile))
+                .build()
+                .getService();
+
+        BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
+                .setContentType(extension)
+                .build();
+        
+        //이미지 데이터를 클라우드에 저장 
+        storage.createFrom(blobInfo, multipartFile.getInputStream());
+        return "https://storage.googleapis.com/"+ bucketName+"/"+objectName;
+	}
 	
 	// 프로젝트 생성
 	@Transactional
@@ -60,12 +102,19 @@ public class ProjectService {
 		
 		// 사진 전체 저장
 		for(int i =0; i < multipartFiles.length; i++) {
-			Photo photo = new Photo();
-			MultipartFile multipartFile = multipartFiles[i];
-			// TODO : oname, type도 저장해야함
-			photo.setImageUrl(multipartFile.getOriginalFilename());
-			photo.setProjectId(savedProject.getId());
-			photoRepository.save(photo);
+			try {
+				Photo photo = new Photo();
+				MultipartFile multipartFile = multipartFiles[i];
+				String url = uploadImageToGCS(multipartFile, projectId);
+				photo.setImageUrl(url);
+				photo.setImgtype(multipartFile.getOriginalFilename());
+				photo.setImgtype(multipartFile.getContentType());
+				photo.setProjectId(savedProject.getId());
+				photoRepository.save(photo);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
