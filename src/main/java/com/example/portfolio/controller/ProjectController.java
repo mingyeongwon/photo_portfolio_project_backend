@@ -89,24 +89,16 @@ public class ProjectController {
 	}
 	
 	// 썸네일 불러오기
+
 	@GetMapping("/thumbnail/{categoryId}")
 	public List<Thumbnail> getThumbnail(@PathVariable("categoryId") Long categoryId) {
 		return thumbnailService.getThumbnail(categoryId);
-		
 	}
-	
 	// 썸네일 업데이트
 	@PatchMapping("/thumbnail/{id}")
 	public void updateThumbnail(ThumbnailCreateDTO thumbnailCreateDTO, @PathVariable("id") Long id) {
-		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
-		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
-		thumbnailCreateDTO.setTimgtype(image.getContentType());
-		try {
-			thumbnailCreateDTO.setTimgdata(image.getBytes());
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		thumbnailService.insertThumbnail(thumbnailCreateDTO);
+		
+		thumbnailService.updateThumbnail(thumbnailCreateDTO, id);
 	}
 	  //썸네일 삭제
     @DeleteMapping("/thumbnail/{id}")
