@@ -85,6 +85,7 @@ public class ProjectService {
 		
 		// 프로젝트 객체 생성
 		Project project = new Project();
+		project.setId(projectCreateDto.getId());
 		project.setTitle(projectCreateDto.getTitle());
 		
 		// 카테고리 이름 검색
@@ -101,7 +102,6 @@ public class ProjectService {
 		// 다중 이미지 전체
 		MultipartFile[] multipartFiles = projectCreateDto.getMultipartFiles();
 		
-		// 사진 전체 저장
 		for(int i =0; i < multipartFiles.length; i++) {
 			try {
 				Photo photo = new Photo();
@@ -125,6 +125,7 @@ public class ProjectService {
 		
 		// 프로젝트 객체 생성
 		Project project = new Project();
+		project.setId(projectUpdateDto.getId());
 		project.setTitle(projectUpdateDto.getTitle());
 		
 		// 카테고리 이름 검색
