@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.portfolio.dto.ThumbnailCreateDTO;
+import com.example.portfolio.dto.ThumbnailCreateDto;
 import com.example.portfolio.model.Project;
 import com.example.portfolio.model.Thumbnail;
 import com.example.portfolio.repository.ProjectRepository;
@@ -45,7 +45,7 @@ public class ThumbnailService {
 	@Value("${spring.cloud.gcp.storage.bucket}")
     private String bucketName;
 	
-	public String uploadImageToGCS(ThumbnailCreateDTO thumbnailDto,String projectName) throws IOException {
+	public String uploadImageToGCS(ThumbnailCreateDto thumbnailDto,String projectName) throws IOException {
 		// Google Cloud 인증에 사용되는 서비스 계정 키 파일을 스트림 형태로 읽어야 동작
 		//fromStream() 메소드가 InputStream을 매개변수로 받기 때문에 키 파일을 스트림 형태로 읽어와야함
 		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
@@ -68,7 +68,7 @@ public class ThumbnailService {
 	}
 	
 	@Transactional
-	public void insertThumbnail(ThumbnailCreateDTO thumbnailCreateDTO) {
+	public void insertThumbnail(ThumbnailCreateDto thumbnailCreateDTO) {
 		try {
 			Long projectId= 3L; //이후 수정해야 함 
 			String projectName = projectRepository.findById(projectId).get().getTitle();
@@ -93,7 +93,7 @@ public class ThumbnailService {
 	}
 
 	@Transactional
-	public void updateThumbnail(ThumbnailCreateDTO thumbnailCreateDTO, Long id) {
+	public void updateThumbnail(ThumbnailCreateDto thumbnailCreateDTO, Long id) {
 		// TODO: 여기서 project 아이디를 먼저 저장하고 id 값을 받아와서 저장해줘야함
 		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
 		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
