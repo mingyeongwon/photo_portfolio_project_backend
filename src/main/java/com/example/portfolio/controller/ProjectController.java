@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.CategoryDto;
+import com.example.portfolio.dto.ProjectCreateDto;
+import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.dto.ThumbnailCreateDto;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
@@ -93,7 +95,6 @@ public class ProjectController {
 	}
 	
 	// 썸네일 불러오기
-
 	@GetMapping("/thumbnail/{category}/{subCategory}")
 	public List<Thumbnail> getThumbnail(@PathVariable("category") Long categoryId,
 			@PathVariable("subCategory") Long subCategoryId) {
@@ -118,12 +119,30 @@ public class ProjectController {
     public void deleteThumbnail(@PathVariable("id") Long id) throws FileNotFoundException, IOException {
         thumbnailService.deleteThumbnail(id);
     }
+ // 프로젝트 저장
+ 	@PostMapping("/project")
+ 	public void saveProject(ProjectCreateDto  projectCreateDto) {
+ 		projectService.createProject(projectCreateDto);
+ 	}
+ 	
+ 	// 프로젝트 불러오기
+ 	@GetMapping("/project/{id}")
+ 	public List<Photo> getProject(@PathVariable("id") Long projectId) {
+ 		return projectService.getProject(projectId);
+ 	}
+ 	
+ 	// 프로젝트 업데이트
+ 	@PutMapping("/project")
+ 	public void updateProject(ProjectUpdateDto projectUpdateDto) {
+ 		projectService.updateProject(projectUpdateDto);
+ 		
+ 	}
+ 	
+ 	// 프로젝트 삭제
+ 	@DeleteMapping("/project/{id}")
+ 	public void deleteProject(@PathVariable("id") Long id) {
+ 		projectService.deleteProject(id); 
+ 	}
     
-    @GetMapping("/photos/{id}")
-    public List<Photo> getPhotos(@PathVariable("project_id") Long projectId) {
-    	
-        return null;
-    }
-
 
 }

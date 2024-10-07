@@ -158,8 +158,7 @@ public class ProjectService {
 					photoRepository.save(newPhoto);
 				} catch (IOException e) {
 					e.printStackTrace();
-				}
-				
+				}	
 			}
 		}
 		
@@ -183,8 +182,8 @@ public class ProjectService {
 		}
 	}
 	
-	public void getProject() {
-		
+	public List<Photo> getProject(Long projectId) {
+		return photoRepository.findByProjectId(projectId);
 	}
 	
 	// 프로젝트 삭제
