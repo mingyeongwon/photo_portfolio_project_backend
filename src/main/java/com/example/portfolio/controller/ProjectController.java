@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.ProjectCreateDto;
+import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.dto.ThumbnailCreateDto;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;

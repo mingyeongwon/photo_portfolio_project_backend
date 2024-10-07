@@ -8,8 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.portfolio.controller.ProjectUpdateDto;
 import com.example.portfolio.dto.ProjectCreateDto;
+import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.model.Photo;
 import com.example.portfolio.model.Project;

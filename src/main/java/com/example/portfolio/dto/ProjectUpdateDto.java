@@ -1,4 +1,4 @@
-package com.example.portfolio.controller;
+package com.example.portfolio.dto;
 
 import org.springframework.web.multipart.MultipartFile;
 
