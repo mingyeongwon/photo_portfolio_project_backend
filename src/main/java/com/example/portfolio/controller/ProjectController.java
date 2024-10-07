@@ -21,6 +21,7 @@ import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.ThumbnailCreateDTO;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
+import com.example.portfolio.model.Photo;
 import com.example.portfolio.model.Thumbnail;
 import com.example.portfolio.service.AdminService;
 import com.example.portfolio.service.CategoryService;
@@ -89,11 +90,17 @@ public class ProjectController {
 	}
 	
 	// 썸네일 불러오기
-	@GetMapping("/thumbnail/{categoryId}")
-	public List<Thumbnail> getThumbnail(@PathVariable("categoryId") Long categoryId) {
-		return thumbnailService.getThumbnail(categoryId);
+
+	@GetMapping("/thumbnail/{category}/{subCategory}")
+	public List<Thumbnail> getThumbnail(@PathVariable("categoryId") Long categoryId, @PathVariable("categoryId") Long subCategoryId) {
+		if(subCategoryId==null) {
+			return thumbnailService.getThumbnailByCategory(categoryId);
+		}else {
+			return thumbnailService.getThumbnailBySubCategory(subCategoryId);
+		}
 		
 	}
+	
 	
 	// 썸네일 업데이트
 	@PatchMapping("/thumbnail/{id}")
@@ -112,6 +119,12 @@ public class ProjectController {
     @DeleteMapping("/thumbnail/{id}")
     public void deleteThumbnail(@PathVariable("id") Long id) throws FileNotFoundException, IOException {
         thumbnailService.deleteThumbnail(id);
+    }
+    
+    @GetMapping("/photos/{id}")
+    public List<Photo> getPhotos(@PathVariable("project_id") Long projectId) {
+    	
+        return null;
     }
 
 
