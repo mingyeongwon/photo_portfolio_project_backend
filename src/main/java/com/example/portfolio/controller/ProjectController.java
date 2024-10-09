@@ -58,24 +58,26 @@ public class ProjectController {
 		// 썸네일 생성
 		thumbnailService.createThumbnail(thumbnailCreateDTO);
 		// 상세 사진 생성
-		photoService.createPhoto(projectCreateDto, savedProject);
+		photoService.createPhotos(projectCreateDto, savedProject);
 	}
 
 	// 프로젝트 수정
 	// param id 값 어떻게 할지 생각해야함
 	@PutMapping("/update/project/{id}")
-	public void updateProjecct(@ModelAttribute ProjectUpdateDto projectUpdateDto,
-			@ModelAttribute ThumbnailCreateDto thumbnailCreateDTO, @PathVariable("id") Long id) {
+	public void updateProject(@ModelAttribute ProjectUpdateDto projectUpdateDto,
+			@ModelAttribute ThumbnailCreateDto thumbnailCreateDto, @PathVariable("id") Long id) {
+		// 프로젝트 업데이트
 		Project updatedProject = projectService.updateProject(projectUpdateDto);
-		thumbnailService.updateThumbnail(thumbnailCreateDTO, id, updatedProject);
-		photoService.updatePhoto(projectUpdateDto);
+		thumbnailService.updateThumbnail(thumbnailCreateDto, id, updatedProject);
+		   // 상세 사진 업데이트
+        photoService.updatePhotos(projectUpdateDto);
 	}
 
 	@DeleteMapping("/delete/project/{id}")
 	public void deleteProjecct(@ModelAttribute ProjectUpdateDto projectUpdateDto,
 			@ModelAttribute ThumbnailCreateDto thumbnailCreateDTO, @PathVariable("id") Long id) {
 		Project updatedProject = projectService.updateProject(projectUpdateDto);
-		
+
 		try {
 			thumbnailService.deleteThumbnail(id);
 		} catch (FileNotFoundException e) {
@@ -85,7 +87,7 @@ public class ProjectController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		photoService.deletePhoto(id);
+		photoService.deletePhotosByProjectId(id);
 		projectService.deleteProject(id);
 	}
 
@@ -125,50 +127,24 @@ public class ProjectController {
 		return categoryService.getCategory();
 	}
 
-//	// 썸네일 저장
-//	@PostMapping("/thumbnail")
-//	public void saveThumbnail(ThumbnailCreateDto thumbnailCreateDTO) {
-//		thumbnailService.createThumbnail(thumbnailCreateDTO);
-//	}
-
 	// 썸네일 불러오기
-
 	@GetMapping("/thumbnail/{categoryId}")
 	public List<Thumbnail> getThumbnail(@PathVariable("categoryId") Long categoryId) {
 		return thumbnailService.getThumbnail(categoryId);
 	}
-//
-//	// 썸네일 업데이트
-//	@PatchMapping("/thumbnail/{id}")
-//	public void updateThumbnail(ThumbnailCreateDto thumbnailCreateDTO, @PathVariable("id") Long id) {
-//
-//		thumbnailService.updateThumbnail(thumbnailCreateDTO, id);
-//	}
+
 
 	// 썸네일 삭제
 	@DeleteMapping("/thumbnail/{id}")
 	public void deleteThumbnail(@PathVariable("id") Long id) throws FileNotFoundException, IOException {
 		thumbnailService.deleteThumbnail(id);
 	}
-
-//	// 프로젝트 저장
-//	@PostMapping("/project")
-//	public void saveProject(ProjectCreateDto projectCreateDto) {
-//		projectService.createProject(projectCreateDto);
-//	}
-
+	
 	// 프로젝트 불러오기
 	@GetMapping("/project")
 	public void getProject() {
-		projectService.getProject();
+//		projectService.getProject();
 	}
-//
-//	// 프로젝트 업데이트
-//	@PutMapping("/project")
-//	public void updateProject(ProjectUpdateDto projectUpdateDto) {
-//		projectService.updateProject(projectUpdateDto);
-//
-//	}
 
 	// 프로젝트 삭제
 	@DeleteMapping("/project/{id}")
