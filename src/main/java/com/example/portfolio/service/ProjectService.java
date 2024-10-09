@@ -156,12 +156,12 @@ public class ProjectService {
 
 	}
 
-	private Photo createPhoto(MultipartFile file, Long projectId) {
-		Photo photo = new Photo();
-		photo.setImgoname(file.getOriginalFilename());
-		photo.setProjectId(projectId);
-		photo.setImgtype(file.getContentType());
-		return photo;
-	}
+//	private Photo createPhoto(MultipartFile file, Long projectId) {
+//		Photo photo = new Photo();
+//		photo.setImgoname(file.getOriginalFilename());
+//		photo.setProjectId(projectId);
+//		photo.setImgtype(file.getContentType());
+//		return photo;
+//	}
 
 }
