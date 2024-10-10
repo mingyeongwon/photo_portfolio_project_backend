@@ -69,13 +69,11 @@ public class ThumbnailService {
 	}
 	
 	@Transactional
-	public void createThumbnail(ThumbnailCreateDto thumbnailCreateDTO) {
+	public void createThumbnail(ThumbnailCreateDto thumbnailCreateDTO,Long id) {
 		try {
-			Long projectId= 3L; //이후 수정해야 함 
-			String projectName = projectRepository.findById(projectId).get().getTitle();
+			String projectName = projectRepository.findById(id).get().getTitle();
 			String url = uploadImageToGCS(thumbnailCreateDTO, projectName);
-			// 여기서 project 아이디를 먼저 저장하고 id 값을 받아와서 저장해줘야함
-			Thumbnail thumbnail = new Thumbnail(url, 2L);// 저장되어 있는 값 넣어줘야함 이후에
+			Thumbnail thumbnail = new Thumbnail(url, id);
 			thumbnailRepository.save(thumbnail);
 			
 		} catch (IOException e) {

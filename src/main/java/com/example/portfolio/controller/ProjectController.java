@@ -54,7 +54,7 @@ public class ProjectController {
 		// 프로젝트 생성
 		Project savedProject = projectService.createProject(projectCreateDto);
 		// 썸네일 생성
-		thumbnailService.createThumbnail(thumbnailCreateDTO);
+		thumbnailService.createThumbnail(thumbnailCreateDTO,savedProject.getId());
 		// 상세 사진 생성
 		photoService.createPhotos(projectCreateDto, savedProject);
 	}
@@ -63,13 +63,31 @@ public class ProjectController {
 	// param id 값 어떻게 할지 생각해야함
 	@PutMapping("/update/project/{id}")
 	public void updateProject(@ModelAttribute ProjectUpdateDto projectUpdateDto,
-			@ModelAttribute ThumbnailCreateDto thumbnailCreateDto, @PathVariable("id") Long id) {
-		// 프로젝트 업데이트
-		Project updatedProject = projectService.updateProject(projectUpdateDto);
-		thumbnailService.updateThumbnail(thumbnailCreateDto, id, updatedProject);
-		   // 상세 사진 업데이트
-        photoService.updatePhotos(projectUpdateDto);
+	                          @ModelAttribute ThumbnailCreateDto thumbnailCreateDto,
+	                          @PathVariable("id") Long id) throws IOException {
+	    // 프로젝트 ID 확인
+	    if (id == null) {
+	        throw new IllegalArgumentException("Project ID가 null입니다.");
+	    } else {
+	    	projectUpdateDto.setId(id);
+	    }
+	    
+	    // 썸네일 파일이 존재하는지 체크
+	    if (thumbnailCreateDto.getMultipartFile() != null && !thumbnailCreateDto.getMultipartFile().isEmpty() &&projectUpdateDto.getId()!=null) {
+	        // 프로젝트 업데이트
+	        Project updatedProject = projectService.updateProject(projectUpdateDto);
+	        
+	        // 썸네일 업데이트
+	        thumbnailService.updateThumbnail(thumbnailCreateDto, id, updatedProject);
+	        
+	        // 썸네일이 수정되면 상세 사진도 업데이트
+	        photoService.updatePhotos(projectUpdateDto);
+	    } else {
+	        // 썸네일이 없으면 예외를 던지거나 업데이트를 막음
+	        throw new IllegalArgumentException("썸네일 파일이 없습니다. 썸네일이 없으면 프로젝트와 사진을 수정할 수 없습니다.");
+	    }
 	}
+
 
 	@DeleteMapping("/delete/project/{id}")
 	public void deleteProjecct(@ModelAttribute ProjectUpdateDto projectUpdateDto,
