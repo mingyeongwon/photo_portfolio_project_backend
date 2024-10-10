@@ -33,6 +33,12 @@ public class CategoryService {
 		List<Category> categories = categoryRepository.findAll();
 		return categories.stream().map(this::mapEntityToDto).toList();   
 	}
+	
+	public List<SubCategoryDto> getSubCategory(Long categoryId) {
+		List<SubCategory> subCategories = subCategoryRepository.findByCategory_id(categoryId);
+		//this::subCategoryEntityToDto = subCategoryDto -> this.mapSubCategoryDtoToEntity(subCategoryDto)
+		return subCategories.stream().map(this::subCategoryEntityToDto).toList();
+	}
 
 
 	@Transactional
@@ -44,8 +50,6 @@ public class CategoryService {
 	        categoryRepository.save(category);
 	    }
 	}
-
-
 
 
 	@Transactional
@@ -126,16 +130,16 @@ public class CategoryService {
 		CategoryDto categoryDto = new CategoryDto();
 		categoryDto.setId(category.getId());
 		categoryDto.setName(category.getName());
-
-		List<SubCategoryDto> subCategories = category.getSubCategories().stream().map(subCategory -> {
-			SubCategoryDto subCategoryDto = new SubCategoryDto();
-			subCategoryDto.setId(subCategory.getId());
-			subCategoryDto.setName(subCategory.getName());
-			return subCategoryDto;
-		}).toList();
-
+		List<SubCategoryDto> subCategories = category.getSubCategories().stream().map(this::subCategoryEntityToDto).toList();
 		categoryDto.setSubCategories(subCategories);
 		return categoryDto;
+	}
+	
+	private SubCategoryDto subCategoryEntityToDto(SubCategory subCategory) {
+		SubCategoryDto subCategoryDto = new SubCategoryDto();
+		subCategoryDto.setId(subCategory.getId());
+		subCategoryDto.setName(subCategory.getName());
+		return subCategoryDto;
 	}
 
 }
