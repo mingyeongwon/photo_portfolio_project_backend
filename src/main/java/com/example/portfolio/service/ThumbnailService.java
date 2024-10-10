@@ -100,7 +100,6 @@ public class ThumbnailService {
 	
 	@Transactional
 	public void deleteThumbnail(Long id) throws FileNotFoundException, IOException {
-		//fromStream() 메소드가 InputStream을 매개변수로 받기 때문에 키 파일을 스트림 형태로 읽어와야함
 		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
 		
         Storage storage = StorageOptions.newBuilder()
@@ -129,7 +128,7 @@ public class ThumbnailService {
 		
 	}
 	@Transactional
-	public List<Thumbnail> getThumbnailByCategory(Long categoryId,Long subCategoryId) {
+	public List<ThumbnailCreateDto> getThumbnailByCategory(Long categoryId,Long subCategoryId) {
 		
 		List<Project> projects = new ArrayList<>();
 		if(subCategoryId==0) {
@@ -144,7 +143,17 @@ public class ThumbnailService {
 	    	//프로젝트 아이디로 썸네일 찾아오기
 	        thumbnails.addAll(thumbnailRepository.findByProjectId(project.getId()));
 	    }
-		return thumbnails.stream().toList();
+		return thumbnails.stream().map(this::thumbnailEntityToDto).toList();
 	}
+	
+	// Entity -> DTO 변환
+	private ThumbnailCreateDto thumbnailEntityToDto(Thumbnail thumbnail) {
+		ThumbnailCreateDto thumbnailCreateDto = new ThumbnailCreateDto();
+		//oname에 url을 저장해야 하는가
+		thumbnailCreateDto.setTimgoname(thumbnail.getImageUrl());
+		thumbnailCreateDto.setProjectId(thumbnail.getProjectId());
+		return thumbnailCreateDto;
+	}
+	
 
 }

@@ -20,11 +20,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
+import com.example.portfolio.dto.SubCategoryDto;
 import com.example.portfolio.dto.ThumbnailCreateDto;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.model.Photo;
-import com.example.portfolio.model.SubCategory;
 import com.example.portfolio.model.Thumbnail;
 import com.example.portfolio.service.AdminService;
 import com.example.portfolio.service.CategoryService;
@@ -87,7 +87,7 @@ public class ProjectController {
 	}
 	
 	@GetMapping("/subCategory/{id}")
-	public List<SubCategory> getSubCategory(@PathVariable("id") Long categoryId) {
+	public List<SubCategoryDto> getSubCategory(@PathVariable("id") Long categoryId) {
 		return categoryService.getSubCategory(categoryId);
 	}
 	
@@ -102,11 +102,9 @@ public class ProjectController {
 	
 	// 썸네일 불러오기
 	@GetMapping("/thumbnail/{category}/{subCategory}")
-	public List<Thumbnail> getThumbnail(@PathVariable("category") Long categoryId,
+	public List<ThumbnailCreateDto> getThumbnail(@PathVariable("category") Long categoryId,
 			@PathVariable("subCategory") Long subCategoryId) {
-		List<Thumbnail> lists= thumbnailService.getThumbnailByCategory(categoryId, subCategoryId);	
-		System.out.println(lists);
-		return lists;		
+		return thumbnailService.getThumbnailByCategory(categoryId, subCategoryId);
 	}
 	
 	
