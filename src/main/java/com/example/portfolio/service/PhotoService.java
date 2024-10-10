@@ -23,6 +23,7 @@ public class PhotoService {
     @Autowired
     private PhotoRepository photoRepository;
 
+    //사진 생성
     public void createPhotos(ProjectCreateDto projectCreateDto, Project savedProject) {
         MultipartFile[] multipartFiles = projectCreateDto.getMultipartFiles();
 
@@ -40,7 +41,8 @@ public class PhotoService {
             }
         }
     }
-
+    
+    //사진 업데이트
     public void updatePhotos(ProjectUpdateDto projectUpdateDto) {
         MultipartFile[] multipartFiles = projectUpdateDto.getMultipartFiles();
         List<Photo> existingPhotos = photoRepository.findByProjectId(projectUpdateDto.getId());
@@ -73,7 +75,8 @@ public class PhotoService {
             e.printStackTrace();
         }
     }
-
+    
+    //사진 삭제
     public void deletePhotosByProjectId(Long projectId) {
         List<Photo> photos = photoRepository.findAllByProjectId(projectId);
         photoRepository.deleteAll(photos);
@@ -84,7 +87,7 @@ public class PhotoService {
             e.printStackTrace();
         }
     }
-
+    //있다면 true, 없다면 false
     private boolean isPhotoInFiles(Photo existingPhoto, MultipartFile[] multipartFiles, Long projectId) {
         for (MultipartFile multipartFile : multipartFiles) {
             Photo newPhoto = createPhoto(multipartFile, projectId);
@@ -95,6 +98,7 @@ public class PhotoService {
         return false;
     }
 
+    //기존에 사진이 존재하는지 확인
     private Photo createPhoto(MultipartFile file, Long projectId) {
         Photo photo = new Photo();
         photo.setImgoname(file.getOriginalFilename());

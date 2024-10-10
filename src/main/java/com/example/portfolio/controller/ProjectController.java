@@ -4,11 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -140,16 +138,16 @@ public class ProjectController {
 		thumbnailService.deleteThumbnail(id);
 	}
 	
-	// 프로젝트 불러오기
-	@GetMapping("/project")
-	public void getProject() {
-//		projectService.getProject();
-	}
-
-	// 프로젝트 삭제
-	@DeleteMapping("/project/{id}")
-	public void deleteProject(@PathVariable("id") Long id) {
-		projectService.deleteProject(id);
-	}
+//	// 프로젝트 불러오기
+//	@GetMapping("/project")
+//	public void getProject() {
+////		projectService.getProject();
+//	}
+//
+//	// 프로젝트 삭제
+//	@DeleteMapping("/project/{id}")
+//	public void deleteProject(@PathVariable("id") Long id) {
+//		projectService.deleteProject(id);
+//	}
 
 }
