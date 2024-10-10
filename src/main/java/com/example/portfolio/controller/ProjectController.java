@@ -101,9 +101,9 @@ public class ProjectController {
 	}
 	
 	// 썸네일 불러오기
-	@GetMapping("/thumbnail/{category}/{subCategory}")
-	public List<ThumbnailCreateDto> getThumbnail(@PathVariable("category") Long categoryId,
-			@PathVariable("subCategory") Long subCategoryId) {
+	@GetMapping(value={"/project/{category}/{subCategory}", "/project/{category}"})
+	public List<ThumbnailCreateDto> getProjectList(@PathVariable("category") Long categoryId,
+			@PathVariable(name="subCategory", required = false) Long subCategoryId) {
 		return thumbnailService.getThumbnailByCategory(categoryId, subCategoryId);
 	}
 	
@@ -111,7 +111,6 @@ public class ProjectController {
 	// 썸네일 업데이트
 	@PatchMapping("/thumbnail/{id}")
 	public void updateThumbnail(ThumbnailCreateDto thumbnailCreateDTO, @PathVariable("id") Long id) {
-
 		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
 		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
 		thumbnailCreateDTO.setTimgtype(image.getContentType());
@@ -127,12 +126,6 @@ public class ProjectController {
  	@PostMapping("/project")
  	public void saveProject(ProjectCreateDto  projectCreateDto) {
  		projectService.createProject(projectCreateDto);
- 	}
- 	
- 	// 프로젝트 불러오기
- 	@GetMapping("/project/{id}")
- 	public List<Photo> getProject(@PathVariable("id") Long projectId) {
- 		return projectService.getProject(projectId);
  	}
  	
  	// 프로젝트 업데이트

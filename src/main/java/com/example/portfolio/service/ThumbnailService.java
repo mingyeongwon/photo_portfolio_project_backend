@@ -130,12 +130,16 @@ public class ThumbnailService {
 	@Transactional
 	public List<ThumbnailCreateDto> getThumbnailByCategory(Long categoryId,Long subCategoryId) {
 		
+		
+		
 		List<Project> projects = new ArrayList<>();
-		if(subCategoryId==0) {
+		if(subCategoryId==null) { //
+			System.out.println("null");
 			//categoryId로 프로젝트 찾아오기
 			 projects = projectRepository.findByCategory_Id(categoryId);
 		}else {
 			//subcategoryId로 프로젝트 찾아오기
+			System.out.println("not null");
 			projects = projectRepository.findBySubCategory_Id(subCategoryId);
 		}
 	    List<Thumbnail> thumbnails = new ArrayList<>();
@@ -149,8 +153,8 @@ public class ThumbnailService {
 	// Entity -> DTO 변환
 	private ThumbnailCreateDto thumbnailEntityToDto(Thumbnail thumbnail) {
 		ThumbnailCreateDto thumbnailCreateDto = new ThumbnailCreateDto();
-		//oname에 url을 저장해야 하는가
-		thumbnailCreateDto.setTimgoname(thumbnail.getImageUrl());
+		thumbnailCreateDto.setId(thumbnail.getId());
+		thumbnailCreateDto.setTimgsname(thumbnail.getImageUrl());
 		thumbnailCreateDto.setProjectId(thumbnail.getProjectId());
 		return thumbnailCreateDto;
 	}

@@ -8,6 +8,7 @@ public class ThumbnailCreateDto {
 	private MultipartFile multipartFile;
 	private String timgoname;
 	private String timgtype;
+	private String timgsname;
 	
 	public Long getId() {
 		return id;
@@ -31,6 +32,14 @@ public class ThumbnailCreateDto {
 
 	public void setTimgtype(String timgtype) {
 		this.timgtype = timgtype;
+	}
+	
+	public String getTimgsname() {
+		return timgsname;
+	}
+
+	public void setTimgsname(String timgsname) {
+		this.timgsname = timgsname;
 	}
 
 	public ThumbnailCreateDto() {

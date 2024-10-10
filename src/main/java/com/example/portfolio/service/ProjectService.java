@@ -181,10 +181,7 @@ public class ProjectService {
 			e.printStackTrace();
 		}
 	}
-	
-	public List<Photo> getProject(Long projectId) {
-		return photoRepository.findByProjectId(projectId);
-	}
+
 	
 	// 프로젝트 삭제
 	@Transactional
