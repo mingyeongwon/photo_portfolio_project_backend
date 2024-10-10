@@ -29,6 +29,8 @@ import com.example.portfolio.service.PhotoService;
 import com.example.portfolio.service.ProjectService;
 import com.example.portfolio.service.ThumbnailService;
 
+import jakarta.transaction.Transactional;
+
 @RestController
 @RequestMapping("/api")
 public class ProjectController {
@@ -89,13 +91,13 @@ public class ProjectController {
 		}
 	}
 
+	@Transactional
 	@DeleteMapping("/delete/project/{id}")
-	public void deleteProjecct(@ModelAttribute ProjectUpdateDto projectUpdateDto,
-			@ModelAttribute ThumbnailCreateDto thumbnailCreateDTO, @PathVariable("id") Long id) {
-		Project updatedProject = projectService.updateProject(projectUpdateDto);
-
+	public void deleteProjecct(@PathVariable("id") Long id) {
 		try {
 			thumbnailService.deleteThumbnail(id);
+			photoService.deletePhotosByProjectId(id);
+			projectService.deleteProject(id);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -103,8 +105,7 @@ public class ProjectController {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		photoService.deletePhotosByProjectId(id);
-		projectService.deleteProject(id);
+
 	}
 
 	// 아이디 만들기
