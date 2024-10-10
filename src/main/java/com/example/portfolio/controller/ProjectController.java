@@ -63,6 +63,7 @@ public class ProjectController {
     }
     
     // 카테고리 생성
+//  @Secured("ROLE_ADMIN")
     @PostMapping("/categories")
     public void createCategories(@RequestBody List<CategoryDto> categoryDtos) {
         categoryService.createCategories(categoryDtos);
