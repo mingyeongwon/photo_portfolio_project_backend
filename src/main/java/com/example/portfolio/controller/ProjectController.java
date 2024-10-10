@@ -159,12 +159,8 @@ public class ProjectController {
 		// thumbnailService.insertThumbnail(thumbnailCreateDTO);
 	}
 
-//	// 썸네일 불러오기
-//	@GetMapping("/thumbnail/{categoryId}")
-//	public List<Thumbnail> getThumbnail(@PathVariable("categoryId") Long categoryId) {
-//		return thumbnailService.getThumbnail(categoryId);
-//	}
-
+	
+	// 썸네일 불러오기
 	@GetMapping(value = { "/project/{category}/{subCategory}", "/project/{category}" })
 	public List<ThumbnailCreateDto> getProjectList(@PathVariable("category") Long categoryId,
 			@PathVariable(name = "subCategory", required = false) Long subCategoryId) {

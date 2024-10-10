@@ -142,15 +142,14 @@ public class ThumbnailService {
 		List<Project> projects = new ArrayList<>();
 
 		if (subCategoryId == null) {
-			System.out.println("null");
 			// categoryId로 프로젝트 찾아오기
 			projects = projectRepository.findByCategory_Id(categoryId);
 		} else {
-			System.out.println("not null");
 			// subcategoryId로 프로젝트 찾아오기
 			projects = projectRepository.findBySubCategory_Id(subCategoryId);
 		}
 
+		System.out.println(projects);
 		List<Thumbnail> thumbnails = new ArrayList<>();
 		for (Project project : projects) {
 			// 프로젝트 아이디로 썸네일 찾아오기
