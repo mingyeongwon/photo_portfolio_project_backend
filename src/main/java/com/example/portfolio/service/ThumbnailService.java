@@ -150,6 +150,7 @@ public class ThumbnailService {
 		return thumbnails.stream().map(this::thumbnailEntityToDto).toList();
 	}
 	
+	
 	// Entity -> DTO 변환
 	private ThumbnailCreateDto thumbnailEntityToDto(Thumbnail thumbnail) {
 		ThumbnailCreateDto thumbnailCreateDto = new ThumbnailCreateDto();
