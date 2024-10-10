@@ -64,6 +64,7 @@ public class ProjectController {
 
 	// 프로젝트 수정
 	// param id 값 어떻게 할지 생각해야함
+	@Transactional
 	@PutMapping("/update/project/{id}")
 	public void updateProject(@ModelAttribute ProjectUpdateDto projectUpdateDto,
 			@ModelAttribute ThumbnailCreateDto thumbnailCreateDto, @PathVariable("id") Long id) throws IOException {

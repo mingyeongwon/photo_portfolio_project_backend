@@ -79,18 +79,26 @@ public class ThumbnailService {
 	}
 
 	@Transactional
-	public void updateThumbnail(ThumbnailCreateDto thumbnailCreateDTO, Long id, Project updatedProject) {
-		// TODO: 여기서 project 아이디를 먼저 저장하고 id 값을 받아와서 저장해줘야함
-		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
-		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
-		thumbnailCreateDTO.setTimgtype(image.getContentType());
-		Thumbnail thumbnail = thumbnailRepository.findById(id).get();
+	public void updateThumbnail(ThumbnailCreateDto thumbnailCreateDTO, Long id,Project updatedProject) {
+		try {
+			MultipartFile image = thumbnailCreateDTO.getMultipartFile();
+			//사진을 먼저 삭제 한 후 다시 insert 
+			deleteThumbnail(id);
+			
+			String url = uploadImageToGCS(thumbnailCreateDTO, updatedProject.getTitle());
+			thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
+			thumbnailCreateDTO.setTimgtype(image.getContentType());
 
-		thumbnail.setImageUrl(thumbnailCreateDTO.getTimgoname());
-		// 저장되어 있는 값 넣어줘야함 이후에
-		thumbnail.setProjectId(updatedProject.getId());
+			Thumbnail thumbnail = new Thumbnail();
+			thumbnail.setImageUrl(url);
+			thumbnail.setProjectId(id);
 
-		thumbnailRepository.save(thumbnail);
+			thumbnailRepository.save(thumbnail);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	@Transactional
