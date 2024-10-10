@@ -3,10 +3,20 @@ package com.example.portfolio.dto;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ThumbnailCreateDto {
+	private Long id;
 	private Long projectId;
 	private MultipartFile multipartFile;
 	private String timgoname;
 	private String timgtype;
+	private String timgsname;
+	
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 	
 	public String getTimgoname() {
 		return timgoname;
@@ -22,6 +32,14 @@ public class ThumbnailCreateDto {
 
 	public void setTimgtype(String timgtype) {
 		this.timgtype = timgtype;
+	}
+	
+	public String getTimgsname() {
+		return timgsname;
+	}
+
+	public void setTimgsname(String timgsname) {
+		this.timgsname = timgsname;
 	}
 
 	public ThumbnailCreateDto() {
@@ -43,5 +61,5 @@ public class ThumbnailCreateDto {
 	public void setProjectId(Long projectId) {
 		this.projectId = projectId;
 	}
-	
+
 }

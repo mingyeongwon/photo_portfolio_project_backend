@@ -73,8 +73,9 @@ public class ThumbnailService {
 			Long projectId= 3L; //이후 수정해야 함 
 			String projectName = projectRepository.findById(projectId).get().getTitle();
 			String url = uploadImageToGCS(thumbnailCreateDTO, projectName);
+			System.out.println(url);
 			// 여기서 project 아이디를 먼저 저장하고 id 값을 받아와서 저장해줘야함
-			Thumbnail thumbnail = new Thumbnail(url, 2L);// 저장되어 있는 값 넣어줘야함 이후에
+			Thumbnail thumbnail = new Thumbnail(url, 12L);// 저장되어 있는 값 넣어줘야함 이후에
 			thumbnailRepository.save(thumbnail);
 			
 		} catch (IOException e) {
@@ -99,7 +100,6 @@ public class ThumbnailService {
 	
 	@Transactional
 	public void deleteThumbnail(Long id) throws FileNotFoundException, IOException {
-		//fromStream() 메소드가 InputStream을 매개변수로 받기 때문에 키 파일을 스트림 형태로 읽어와야함
 		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
 		
         Storage storage = StorageOptions.newBuilder()
@@ -128,17 +128,36 @@ public class ThumbnailService {
 		
 	}
 	@Transactional
-	public List<Thumbnail> getThumbnail(Long categoryId) {
-		//categoryId로 프로젝트 찾아오기
-		 List<Project> projects = projectRepository.findByCategory_Id(categoryId);
-
-		    List<Thumbnail> thumbnails = new ArrayList<>();
-		    for (Project project : projects) {
-		    	//프로젝트 아이디로 썸네일 찾아오기
-		        thumbnails.addAll(thumbnailRepository.findByProjectId(project.getId()));
-		    }
-
-		return thumbnails.stream().toList();
+	public List<ThumbnailCreateDto> getThumbnailByCategory(Long categoryId,Long subCategoryId) {
+		
+		
+		
+		List<Project> projects = new ArrayList<>();
+		if(subCategoryId==null) { //
+			System.out.println("null");
+			//categoryId로 프로젝트 찾아오기
+			 projects = projectRepository.findByCategory_Id(categoryId);
+		}else {
+			//subcategoryId로 프로젝트 찾아오기
+			System.out.println("not null");
+			projects = projectRepository.findBySubCategory_Id(subCategoryId);
+		}
+	    List<Thumbnail> thumbnails = new ArrayList<>();
+	    for (Project project : projects) {
+	    	//프로젝트 아이디로 썸네일 찾아오기
+	        thumbnails.addAll(thumbnailRepository.findByProjectId(project.getId()));
+	    }
+		return thumbnails.stream().map(this::thumbnailEntityToDto).toList();
 	}
+	
+	// Entity -> DTO 변환
+	private ThumbnailCreateDto thumbnailEntityToDto(Thumbnail thumbnail) {
+		ThumbnailCreateDto thumbnailCreateDto = new ThumbnailCreateDto();
+		thumbnailCreateDto.setId(thumbnail.getId());
+		thumbnailCreateDto.setTimgsname(thumbnail.getImageUrl());
+		thumbnailCreateDto.setProjectId(thumbnail.getProjectId());
+		return thumbnailCreateDto;
+	}
+	
 
 }

@@ -15,13 +15,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
+import com.example.portfolio.dto.SubCategoryDto;
 import com.example.portfolio.dto.ThumbnailCreateDto;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
+import com.example.portfolio.model.Photo;
 import com.example.portfolio.model.Thumbnail;
 import com.example.portfolio.service.AdminService;
 import com.example.portfolio.service.CategoryService;
@@ -65,7 +68,7 @@ public class ProjectController {
         categoryService.createCategories(categoryDtos);
     }
     
-    // 카테고리 수정 
+    // 카테고리 수정
     @PutMapping("/categories")
     public void updateCategories(@RequestBody List<CategoryDto> categoryDtos) {
         categoryService.updateCategories(categoryDtos);
@@ -83,55 +86,60 @@ public class ProjectController {
 		return categoryService.getCategory();
 	}
 	
+	@GetMapping("/subCategory/{id}")
+	public List<SubCategoryDto> getSubCategory(@PathVariable("id") Long categoryId) {
+		return categoryService.getSubCategory(categoryId);
+	}
+	
 	// 썸네일 저장
 	@PostMapping("/thumbnail")
 	public void saveThumbnail(ThumbnailCreateDto thumbnailCreateDTO) {
+		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
+		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
+		thumbnailCreateDTO.setTimgtype(image.getContentType());
 		thumbnailService.insertThumbnail(thumbnailCreateDTO);
 	}
 	
 	// 썸네일 불러오기
-
-	@GetMapping("/thumbnail/{categoryId}")
-	public List<Thumbnail> getThumbnail(@PathVariable("categoryId") Long categoryId) {
-		return thumbnailService.getThumbnail(categoryId);
+	@GetMapping(value={"/project/{category}/{subCategory}", "/project/{category}"})
+	public List<ThumbnailCreateDto> getProjectList(@PathVariable("category") Long categoryId,
+			@PathVariable(name="subCategory", required = false) Long subCategoryId) {
+		return thumbnailService.getThumbnailByCategory(categoryId, subCategoryId);
 	}
+	
+	
 	// 썸네일 업데이트
 	@PatchMapping("/thumbnail/{id}")
 	public void updateThumbnail(ThumbnailCreateDto thumbnailCreateDTO, @PathVariable("id") Long id) {
-		
+		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
+		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
+		thumbnailCreateDTO.setTimgtype(image.getContentType());
 		thumbnailService.updateThumbnail(thumbnailCreateDTO, id);
+		
 	}
 	  //썸네일 삭제
     @DeleteMapping("/thumbnail/{id}")
     public void deleteThumbnail(@PathVariable("id") Long id) throws FileNotFoundException, IOException {
         thumbnailService.deleteThumbnail(id);
     }
+ // 프로젝트 저장
+ 	@PostMapping("/project")
+ 	public void saveProject(ProjectCreateDto  projectCreateDto) {
+ 		projectService.createProject(projectCreateDto);
+ 	}
+ 	
+ 	// 프로젝트 업데이트
+ 	@PutMapping("/project")
+ 	public void updateProject(ProjectUpdateDto projectUpdateDto) {
+ 		projectService.updateProject(projectUpdateDto);
+ 		
+ 	}
+ 	
+ 	// 프로젝트 삭제
+ 	@DeleteMapping("/project/{id}")
+ 	public void deleteProject(@PathVariable("id") Long id) {
+ 		projectService.deleteProject(id); 
+ 	}
     
-
-	// 프로젝트 저장
-	@PostMapping("/project")
-	public void saveProject(ProjectCreateDto  projectCreateDto) {
-		projectService.createProject(projectCreateDto);
-	}
-	
-	// 프로젝트 불러오기
-	@GetMapping("/project")
-	public void getProject() {
-		projectService.getProject();
-	}
-	
-	// 프로젝트 업데이트
-	@PutMapping("/project")
-	public void updateProject(ProjectUpdateDto projectUpdateDto) {
-		projectService.updateProject(projectUpdateDto);
-		
-	}
-	
-	// 프로젝트 삭제
-	@DeleteMapping("/project/{id}")
-	public void deleteProject(@PathVariable("id") Long id) {
-		projectService.deleteProject(id); 
-	}
-
 
 }

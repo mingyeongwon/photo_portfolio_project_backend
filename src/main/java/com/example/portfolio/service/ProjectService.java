@@ -158,8 +158,7 @@ public class ProjectService {
 					photoRepository.save(newPhoto);
 				} catch (IOException e) {
 					e.printStackTrace();
-				}
-				
+				}	
 			}
 		}
 		
@@ -182,10 +181,7 @@ public class ProjectService {
 			e.printStackTrace();
 		}
 	}
-	
-	public void getProject() {
-		
-	}
+
 	
 	// 프로젝트 삭제
 	@Transactional
