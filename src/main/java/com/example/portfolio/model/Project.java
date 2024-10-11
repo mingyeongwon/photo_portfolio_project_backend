@@ -45,6 +45,7 @@ public class Project {
 	@ManyToOne
 	@JoinColumn(name = "sub_category_id")
 	private SubCategory subCategory;
+	
 	public Project() {
 		super();
 	}
@@ -54,7 +55,6 @@ public class Project {
 		this.id = id;
 		this.title = title;
 		this.view = view;
-		this.created_at = created_at;
 		this.category = category;
 		this.subCategory = subCategory;
 	}
