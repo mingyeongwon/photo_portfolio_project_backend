@@ -10,12 +10,15 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
+import com.example.portfolio.exception.CustomException;
+import com.example.portfolio.exception.ErrorCode;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.model.Photo;
 import com.example.portfolio.model.Project;
@@ -188,7 +191,8 @@ public class ProjectService {
 	public void deleteProject(Long id)  {
 		// 이전의 조회 후 삭제하는 방식은 2번의 DB 조회가 필요해서 오버헤드가 발생하여 바로 삭제하는 방식으로 대체
 		Project project = projectRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Project not found"));
+//				.orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_FIND_PROJECT));
+				.orElseThrow(() -> new CustomException(HttpStatus.BAD_REQUEST, ErrorCode.NOT_FIND_PROJECT, "이것도 에러"));
 		
 		projectRepository.deleteById(id);
         
