@@ -1,10 +1,15 @@
 package com.example.portfolio.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
+import com.example.portfolio.exception.CustomException;
+import com.example.portfolio.exception.ErrorCode;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.model.Project;
 import com.example.portfolio.model.SubCategory;
@@ -16,7 +21,7 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class ProjectService {
-
+  
     @Autowired
     private ProjectRepository projectRepository;
 
