@@ -116,6 +116,7 @@ public class ProjectController {
 		return "회원가입 성공";
 	}
 
+<<<<<<< HEAD
     
     // 카테고리 전체 목록 가져오기
     @GetMapping("/categories")
