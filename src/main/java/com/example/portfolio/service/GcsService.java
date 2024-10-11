@@ -1,23 +1,27 @@
 package com.example.portfolio.service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.portfolio.model.Photo;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 
+//구글 클라우드 스토리지 관련 로직
 @Service
 public class GcsService {
-
 	@Value("${spring.cloud.gcp.storage.project-id}")
 	private String projectId;
 
@@ -27,7 +31,7 @@ public class GcsService {
 	@Value("${spring.cloud.gcp.storage.bucket}")
 	private String bucketName;
 
-	//GCS 업로드 메소드
+	// GCS 업로드 메소드
 	public String uploadFile(MultipartFile multipartFile, String projectName) throws IOException {
 		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
 		String uuid = UUID.randomUUID().toString();
@@ -42,24 +46,47 @@ public class GcsService {
 		storage.createFrom(blobInfo, multipartFile.getInputStream());
 		return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
 	}
-	
-    // 파일 삭제 로직 추가
-    public void deleteFile(String objectName) throws IOException {
-        InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
-        Storage storage = StorageOptions.newBuilder()
-                .setCredentials(GoogleCredentials.fromStream(keyFile))
-                .build()
-                .getService();
 
-        Blob blob = storage.get(bucketName, objectName);
-        if (blob != null) {
-            storage.delete(bucketName, objectName);
-        } else {
-            System.out.println("Blob not found: " + objectName);
+	// 파일 삭제 로직 추가
+	public void deleteFile(String objectName) throws IOException {
+		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
+		Storage storage = StorageOptions.newBuilder().setCredentials(GoogleCredentials.fromStream(keyFile)).build()
+				.getService();
+
+		Blob blob = storage.get(bucketName, objectName);
+		if (blob != null) {
+			storage.delete(bucketName, objectName);
+		} else {
+			System.out.println("Blob not found: " + objectName);
 		}
 	}
 
-    //url로 object 이름 가져오는 메소드
+	public void deletePhotoToGcs(List<Photo> photos) throws FileNotFoundException, IOException {
+
+		// fromStream() 메소드가 InputStream을 매개변수로 받기 때문에 키 파일을 스트림 형태로 읽어와야함
+		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
+
+		Storage storage = StorageOptions.newBuilder().setCredentials(GoogleCredentials.fromStream(keyFile)).build()
+				.getService();
+
+		// 사진들에서 url만 뽑아서 다시 리스트로 만듬
+		List<String> urls = photos.stream().map(p -> p.getImageUrl()).collect(Collectors.toList());
+
+		for (String url : urls) {
+			// minography_gcs가 처음 찾아지는 0 과 minography_gcs/의 길이 15를 합쳐서 15 값 저장
+			int index = url.indexOf("minography_gcs") + "minography_gcs/".length();
+			String objectName = url.substring(index); // 인덱스로 잘라서 objectName을 만들고
+
+			Blob blob = storage.get(bucketName, objectName); // 사진이 있는지 확인
+			if (blob != null) {
+				storage.delete(bucketName, objectName); // gcs에서 삭제하는 로직
+			} else {
+				System.out.println("없음");
+			}
+		}
+	}
+
+	// url로 object 이름 가져오는 메소드
 	public String getObjectNameFromUrl(String url) {
 		int index = url.indexOf("minography_gcs/") + "minography_gcs/".length();
 		return url.substring(index);
