@@ -25,17 +25,16 @@ public class PhotoService {
 
     //사진 생성
     public void createPhotos(ProjectCreateDto projectCreateDto, Project savedProject) {
-        MultipartFile[] multipartFiles = projectCreateDto.getMultipartFiles();
+        MultipartFile[] multipartFiles = projectCreateDto.getPhotoMultipartFiles();
 
         for (MultipartFile multipartFile : multipartFiles) {
             try {
                 Photo photo = new Photo();
-                String url = gcsService.uploadFile(multipartFile, savedProject.getTitle());
+                String url = gcsService.uploadFile(multipartFile, savedProject.getId());
                 photo.setImageUrl(url);
                 photo.setImgoname(multipartFile.getOriginalFilename());
                 photo.setImgtype(multipartFile.getContentType());
                 photo.setProjectId(savedProject.getId());
-                photoRepository.save(photo);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -52,7 +51,7 @@ public class PhotoService {
 
             if (existingPhotos.stream().noneMatch(p -> p.equals(newPhoto))) {
                 try {
-                    String url = gcsService.uploadFile(multipartFile, projectUpdateDto.getTitle());
+                    String url = gcsService.uploadFile(multipartFile, projectUpdateDto.getId());
                     newPhoto.setImageUrl(url);
                     newPhoto.setImgoname(multipartFile.getOriginalFilename());
                     newPhoto.setImgtype(multipartFile.getContentType());

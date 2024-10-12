@@ -22,6 +22,7 @@ import com.google.cloud.storage.StorageOptions;
 //구글 클라우드 스토리지 관련 로직
 @Service
 public class GcsService {
+	
 	@Value("${spring.cloud.gcp.storage.project-id}")
 	private String projectId;
 
@@ -30,13 +31,15 @@ public class GcsService {
 
 	@Value("${spring.cloud.gcp.storage.bucket}")
 	private String bucketName;
-
+	
 	// GCS 업로드 메소드
-	public String uploadFile(MultipartFile multipartFile, String projectName) throws IOException {
+	public String uploadFile(MultipartFile multipartFile, Long projectId) throws IOException {
+		// Google Cloud 인증에 사용되는 서비스 계정 키 파일을 스트림 형태로 읽어야 동작
+		// fromStream() 메소드가 InputStream을 매개변수로 받기 때문에 키 파일을 스트림 형태로 읽어와야함		
 		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
 		String uuid = UUID.randomUUID().toString();
 		String extension = multipartFile.getContentType();
-		String objectName = projectName + "/" + uuid + "." + extension.split("/")[1];
+		String objectName = projectId + "/" + uuid + "." + extension.split("/")[1];
 
 		Storage storage = StorageOptions.newBuilder().setCredentials(GoogleCredentials.fromStream(keyFile)).build()
 				.getService();

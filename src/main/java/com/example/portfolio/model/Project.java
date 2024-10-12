@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -23,9 +24,13 @@ public class Project {
 
 	private String title;
 	private Long view = 0L;
+	
+	@Column(name = "thumbnail_url")
+    private String thumbnailUrl;
 
 	@CreationTimestamp
-	private Date created_at;
+	@Column(name = "created_at")
+	private Date createdAt;
 
 	@ManyToOne
 	@JoinColumn(name = "category_id")
@@ -50,11 +55,13 @@ public class Project {
 		super();
 	}
 
-	public Project(Long id, String title, Long view, Date created_at, Category category,SubCategory subCategory) {
+	public Project(Long id, String title, Long view, Date createdAt, String thumbnailUrl, Category category,SubCategory subCategory) {
 		super();
 		this.id = id;
 		this.title = title;
 		this.view = view;
+		this.createdAt = createdAt;
+		this.thumbnailUrl = thumbnailUrl;
 		this.category = category;
 		this.subCategory = subCategory;
 	}
@@ -83,12 +90,20 @@ public class Project {
 		this.view = view;
 	}
 
-	public Date getCreated_at() {
-		return created_at;
+	public Date getCreatedAt() {
+		return createdAt;
 	}
 
-	public void setCreated_at(Date created_at) {
-		this.created_at = created_at;
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}
+	
+	public String getThumbnailUrl() {
+	  return thumbnailUrl;
+	}
+	
+	public void setThumbnailUrl(String thumbnailUrl) {
+	  this.thumbnailUrl = thumbnailUrl;
 	}
 
 	public Category getCategory() {
@@ -109,7 +124,7 @@ public class Project {
 
 	@Override
 	public String toString() {
-		return "Project [id=" + id + ", title=" + title + ", view=" + view + ", created_at=" + created_at
+		return "Project [id=" + id + ", title=" + title + ", view=" + view + ", created_at=" + createdAt
 				+ ", category=" + category + "]";
 	}
 }

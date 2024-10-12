@@ -19,17 +19,15 @@ import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.dto.SubCategoryDto;
-import com.example.portfolio.dto.ThumbnailCreateDto;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.model.Project;
 import com.example.portfolio.service.AdminService;
 import com.example.portfolio.service.CategoryService;
+import com.example.portfolio.service.GcsService;
 import com.example.portfolio.service.PhotoService;
 import com.example.portfolio.service.ProjectService;
 import com.example.portfolio.service.ThumbnailService;
-
-import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/api")
@@ -37,9 +35,9 @@ public class ProjectController {
 
 	private final CategoryService categoryService;
 	private final ProjectService projectService;
-	private final ThumbnailService thumbnailService;
 	private final AdminService adminService;
 	private final PhotoService photoService;
+	private final ThumbnailService thumbnailService;
 
 	// 생성자 주입
 	public ProjectController(CategoryService categoryService, ProjectService projectService,
@@ -52,62 +50,61 @@ public class ProjectController {
 	}
 
 	@PostMapping("/create/project")
-	public void createProejct(@ModelAttribute ProjectCreateDto projectCreateDto,
-			@ModelAttribute ThumbnailCreateDto thumbnailCreateDTO) {
+	public void createProject(@ModelAttribute ProjectCreateDto projectCreateDto) {
 		// 프로젝트 생성
 		Project savedProject = projectService.createProject(projectCreateDto);
 		// 썸네일 생성
-		thumbnailService.createThumbnail(thumbnailCreateDTO, savedProject.getId());
+		thumbnailService.createThumbnail(projectCreateDto, savedProject);
 		// 상세 사진 생성
 		photoService.createPhotos(projectCreateDto, savedProject);
 	}
 
-	// 프로젝트 수정
-	// param id 값 어떻게 할지 생각해야함
-	@Transactional
-	@PutMapping("/update/project/{id}")
-	public void updateProject(@ModelAttribute ProjectUpdateDto projectUpdateDto,
-			@ModelAttribute ThumbnailCreateDto thumbnailCreateDto, @PathVariable("id") Long id) throws IOException {
-		// 프로젝트 ID 확인
-		if (id == null) {
-			throw new IllegalArgumentException("Project ID가 null입니다.");
-		} else {
-			projectUpdateDto.setId(id);
-		}
-
-		// 썸네일 파일이 존재하는지 체크
-		if (thumbnailCreateDto.getMultipartFile() != null && !thumbnailCreateDto.getMultipartFile().isEmpty()
-				&& projectUpdateDto.getId() != null) {
-			// 프로젝트 업데이트
-			Project updatedProject = projectService.updateProject(projectUpdateDto);
-
-			// 썸네일 업데이트
-			thumbnailService.updateThumbnail(thumbnailCreateDto, id, updatedProject);
-
-			// 썸네일이 수정되면 상세 사진도 업데이트
-			photoService.updatePhotos(projectUpdateDto);
-		} else {
-			// 썸네일이 없으면 예외를 던지거나 업데이트를 막음
-			throw new IllegalArgumentException("썸네일 파일이 없습니다. 썸네일이 없으면 프로젝트와 사진을 수정할 수 없습니다.");
-		}
-	}
-
-	@Transactional
-	@DeleteMapping("/delete/project/{id}")
-	public void deleteProjecct(@PathVariable("id") Long id) {
-		try {
-			thumbnailService.deleteThumbnail(id);
-			photoService.deletePhotosByProjectId(id);
-			projectService.deleteProject(id);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
+//	// 프로젝트 수정
+//	// param id 값 어떻게 할지 생각해야함
+//	@Transactional
+//	@PutMapping("/update/project/{id}")
+//	public void updateProject(@ModelAttribute ProjectUpdateDto projectUpdateDto,
+//			@ModelAttribute ThumbnailCreateDto thumbnailCreateDto, @PathVariable("id") Long id) throws IOException {
+//		// 프로젝트 ID 확인
+//		if (id == null) {
+//			throw new IllegalArgumentException("Project ID가 null입니다.");
+//		} else {
+//			projectUpdateDto.setId(id);
+//		}
+//
+//		// 썸네일 파일이 존재하는지 체크
+//		if (thumbnailCreateDto.getMultipartFile() != null && !thumbnailCreateDto.getMultipartFile().isEmpty()
+//				&& projectUpdateDto.getId() != null) {
+//			// 프로젝트 업데이트
+//			Project updatedProject = projectService.updateProject(projectUpdateDto);
+//
+//			// 썸네일 업데이트
+//			thumbnailService.updateThumbnail(thumbnailCreateDto, id, updatedProject);
+//
+//			// 썸네일이 수정되면 상세 사진도 업데이트
+//			photoService.updatePhotos(projectUpdateDto);
+//		} else {
+//			// 썸네일이 없으면 예외를 던지거나 업데이트를 막음
+//			throw new IllegalArgumentException("썸네일 파일이 없습니다. 썸네일이 없으면 프로젝트와 사진을 수정할 수 없습니다.");
+//		}
+//	}
+//
+//	@Transactional
+//	@DeleteMapping("/delete/project/{id}")
+//	public void deleteProjecct(@PathVariable("id") Long id) {
+//		try {
+//			thumbnailService.deleteThumbnail(id);
+//			photoService.deletePhotosByProjectId(id);
+//			projectService.deleteProject(id);
+//		} catch (FileNotFoundException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//
+//	}
 
 	// 아이디 만들기
 	@PostMapping("/signUp")
@@ -151,22 +148,22 @@ public class ProjectController {
 		return categoryService.getSubCategory(categoryId);
 	}
 
-	// 썸네일 저장
-	@PostMapping("/thumbnail")
-	public void saveThumbnail(ThumbnailCreateDto thumbnailCreateDTO) {
-		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
-		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
-		thumbnailCreateDTO.setTimgtype(image.getContentType());
-		// thumbnailService.insertThumbnail(thumbnailCreateDTO);
-	}
-
-	
-	// 썸네일 불러오기
-	@GetMapping(value = { "/project/{category}/{subCategory}", "/project/{category}" })
-	public List<ThumbnailCreateDto> getProjectList(@PathVariable("category") Long categoryId,
-			@PathVariable(name = "subCategory", required = false) Long subCategoryId) {
-		return thumbnailService.getThumbnailByCategory(categoryId, subCategoryId);
-	}
+//	// 썸네일 저장
+//	@PostMapping("/thumbnail")
+//	public void saveThumbnail(ThumbnailCreateDto thumbnailCreateDTO) {
+//		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
+//		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
+//		thumbnailCreateDTO.setTimgtype(image.getContentType());
+//		// thumbnailService.insertThumbnail(thumbnailCreateDTO);
+//	}
+//
+//	
+//	// 썸네일 불러오기
+//	@GetMapping(value = { "/project/{category}/{subCategory}", "/project/{category}" })
+//	public List<ThumbnailCreateDto> getProjectList(@PathVariable("category") Long categoryId,
+//			@PathVariable(name = "subCategory", required = false) Long subCategoryId) {
+//		return thumbnailService.getThumbnailByCategory(categoryId, subCategoryId);
+//	}
 
 //	// 썸네일 업데이트
 //	@PatchMapping("/thumbnail/{id}")
@@ -176,12 +173,12 @@ public class ProjectController {
 //		thumbnailCreateDTO.setTimgtype(image.getContentType());
 //		thumbnailService.updateThumbnail(thumbnailCreateDTO, id);
 //	}
-
-	// 썸네일 삭제
-	@DeleteMapping("/thumbnail/{id}")
-	public void deleteThumbnail(@PathVariable("id") Long id) throws FileNotFoundException, IOException {
-		thumbnailService.deleteThumbnail(id);
-	}
+//
+//	// 썸네일 삭제
+//	@DeleteMapping("/thumbnail/{id}")
+//	public void deleteThumbnail(@PathVariable("id") Long id) throws FileNotFoundException, IOException {
+//		thumbnailService.deleteThumbnail(id);
+//	}
 
 	// 프로젝트 저장
 	@PostMapping("/project")
