@@ -35,6 +35,7 @@ public class PhotoService {
                 photo.setImgoname(multipartFile.getOriginalFilename());
                 photo.setImgtype(multipartFile.getContentType());
                 photo.setProjectId(savedProject.getId());
+                photoRepository.save(photo);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -86,6 +87,7 @@ public class PhotoService {
             e.printStackTrace();
         }
     }
+    
     //있다면 true, 없다면 false
     private boolean isPhotoInFiles(Photo existingPhoto, MultipartFile[] multipartFiles, Long projectId) {
         for (MultipartFile multipartFile : multipartFiles) {

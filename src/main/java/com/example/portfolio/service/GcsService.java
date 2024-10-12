@@ -50,12 +50,14 @@ public class GcsService {
 		return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
 	}
 
-	// 파일 삭제 로직 추가
-	public void deleteFile(String objectName) throws IOException {
+	// 썸네일 파일 삭제 
+	public void deleteThumbnailFile(String thumbnailUrl) throws IOException {
 		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
 		Storage storage = StorageOptions.newBuilder().setCredentials(GoogleCredentials.fromStream(keyFile)).build()
 				.getService();
-
+		
+		String objectName = getObjectNameFromUrl(thumbnailUrl);
+		
 		Blob blob = storage.get(bucketName, objectName);
 		if (blob != null) {
 			storage.delete(bucketName, objectName);
@@ -63,7 +65,8 @@ public class GcsService {
 			System.out.println("Blob not found: " + objectName);
 		}
 	}
-
+	
+	// photo 파일 삭제
 	public void deletePhotoToGcs(List<Photo> photos) throws FileNotFoundException, IOException {
 
 		// fromStream() 메소드가 InputStream을 매개변수로 받기 때문에 키 파일을 스트림 형태로 읽어와야함
@@ -77,8 +80,7 @@ public class GcsService {
 
 		for (String url : urls) {
 			// minography_gcs가 처음 찾아지는 0 과 minography_gcs/의 길이 15를 합쳐서 15 값 저장
-			int index = url.indexOf("minography_gcs") + "minography_gcs/".length();
-			String objectName = url.substring(index); // 인덱스로 잘라서 objectName을 만들고
+			String objectName = getObjectNameFromUrl(url); // 인덱스로 잘라서 objectName을 만들고
 
 			Blob blob = storage.get(bucketName, objectName); // 사진이 있는지 확인
 			if (blob != null) {

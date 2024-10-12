@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.ProjectCreateDto;
@@ -24,10 +23,11 @@ import com.example.portfolio.model.Category;
 import com.example.portfolio.model.Project;
 import com.example.portfolio.service.AdminService;
 import com.example.portfolio.service.CategoryService;
-import com.example.portfolio.service.GcsService;
 import com.example.portfolio.service.PhotoService;
 import com.example.portfolio.service.ProjectService;
 import com.example.portfolio.service.ThumbnailService;
+
+import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/api")
@@ -48,7 +48,8 @@ public class ProjectController {
 		this.adminService = adminService;
 		this.photoService = photoService;
 	}
-
+	
+	// 프로젝트 생성 
 	@PostMapping("/create/project")
 	public void createProject(@ModelAttribute ProjectCreateDto projectCreateDto) {
 		// 프로젝트 생성
@@ -88,23 +89,24 @@ public class ProjectController {
 //			throw new IllegalArgumentException("썸네일 파일이 없습니다. 썸네일이 없으면 프로젝트와 사진을 수정할 수 없습니다.");
 //		}
 //	}
-//
-//	@Transactional
-//	@DeleteMapping("/delete/project/{id}")
-//	public void deleteProjecct(@PathVariable("id") Long id) {
+	
+	// 삭제
+	@Transactional
+	@DeleteMapping("/delete/project/{id}")
+	public void deleteProjecct(@PathVariable("id") Long id) {
 //		try {
-//			thumbnailService.deleteThumbnail(id);
-//			photoService.deletePhotosByProjectId(id);
-//			projectService.deleteProject(id);
+			thumbnailService.deleteThumbnail(id);
+			photoService.deletePhotosByProjectId(id);
+			projectService.deleteProject(id);
 //		} catch (FileNotFoundException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
-//		} catch (IOException e) {
+//		} 
+//			catch (IOException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
-//
-//	}
+	}
 
 	// 아이디 만들기
 	@PostMapping("/signUp")

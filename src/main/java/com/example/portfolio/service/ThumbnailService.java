@@ -29,34 +29,6 @@ public class ThumbnailService {
 	
     @Autowired
     private GcsService gcsService;
-
-
-//	@Value("${spring.cloud.gcp.storage.project-id}")
-//	private String projectId;
-//
-//	@Value("${spring.cloud.gcp.storage.credentials.location}")
-//	private String keyFileName;
-//
-//	@Value("${spring.cloud.gcp.storage.bucket}")
-//	private String bucketName;
-//
-//	public String uploadImageToGCS(ThumbnailCreateDto thumbnailDto, String projectName) throws IOException {
-//		// Google Cloud 인증에 사용되는 서비스 계정 키 파일을 스트림 형태로 읽어야 동작
-//		// fromStream() 메소드가 InputStream을 매개변수로 받기 때문에 키 파일을 스트림 형태로 읽어와야함
-//		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
-//		String uuid = UUID.randomUUID().toString();
-//		String extension = thumbnailDto.getMultipartFile().getContentType();
-//		String objectName = projectName + "/" + uuid + "." + extension.split("/")[1];
-//
-//		Storage storage = StorageOptions.newBuilder().setCredentials(GoogleCredentials.fromStream(keyFile)).build()
-//				.getService();
-//
-//		BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName).setContentType(extension).build();
-//
-//		// 이미지 데이터를 클라우드에 저장
-//		storage.createFrom(blobInfo, thumbnailDto.getMultipartFile().getInputStream());
-//		return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
-//	}
 	
 	// 썸네일 생성 
 	@Transactional
@@ -92,43 +64,21 @@ public class ThumbnailService {
 //		}
 //
 //	}
-//
-//	@Transactional
-//	public void deleteThumbnail(Long id) throws FileNotFoundException, IOException {
-//		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
-//
-//		Storage storage = StorageOptions.newBuilder().setCredentials(GoogleCredentials.fromStream(keyFile)).build()
-//				.getService();
-//
-//		Thumbnail thumbnail = thumbnailRepository.findByProjectId(id);
-//
-//		// 썸네일이 없는 경우 예외 처리
-//		if (thumbnail == null) {
-//			throw new RuntimeException("Thumbnail not found");
-//		}
-//
-//		String url = thumbnail.getImageUrl();
-//		int index = url.indexOf("minography_gcs/") + "minography_gcs/".length();
-//
-//		// 인덱스부터 끝까지 substring으로 추출
-//		String objectName = url.substring(index);
-//		System.out.println(objectName);
-//
-//		// 썸네일 ID가 있으면 삭제
-//		if (thumbnail.getId() != null) {
-//			thumbnailRepository.deleteById(thumbnail.getId());
-//			System.out.println("삭제 완료");
-//		}
-//
-//		// GCS에서 파일 삭제
-//		Blob blob = storage.get(bucketName, objectName);
-//		if (blob != null) {
-//			storage.delete(bucketName, objectName);
-//		} else {
-//			System.out.println("파일이 없습니다.");
-//		}
-//	}
-//
+	
+	// 썸네일 삭제
+	@Transactional
+	public void deleteThumbnail(Long id) {
+		
+		Project project = projectRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("project not found"));
+		
+        try {
+            gcsService.deleteThumbnailFile(project.getThumbnailUrl());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }		
+	}
+
 //	@Transactional
 //	public List<ThumbnailCreateDto> getThumbnailByCategory(Long categoryId, Long subCategoryId) {
 //		List<Project> projects = new ArrayList<>();
