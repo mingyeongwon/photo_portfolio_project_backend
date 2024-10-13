@@ -22,6 +22,7 @@ import com.google.cloud.storage.StorageOptions;
 //구글 클라우드 스토리지 관련 로직
 @Service
 public class GcsService {
+	
 	@Value("${spring.cloud.gcp.storage.project-id}")
 	private String projectId;
 
@@ -30,13 +31,15 @@ public class GcsService {
 
 	@Value("${spring.cloud.gcp.storage.bucket}")
 	private String bucketName;
-
+	
 	// GCS 업로드 메소드
-	public String uploadFile(MultipartFile multipartFile, String projectName) throws IOException {
+	public String uploadFile(MultipartFile multipartFile, Long projectId) throws IOException {
+		// Google Cloud 인증에 사용되는 서비스 계정 키 파일을 스트림 형태로 읽어야 동작
+		// fromStream() 메소드가 InputStream을 매개변수로 받기 때문에 키 파일을 스트림 형태로 읽어와야함		
 		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
 		String uuid = UUID.randomUUID().toString();
 		String extension = multipartFile.getContentType();
-		String objectName = projectName + "/" + uuid + "." + extension.split("/")[1];
+		String objectName = projectId + "/" + uuid + "." + extension.split("/")[1];
 
 		Storage storage = StorageOptions.newBuilder().setCredentials(GoogleCredentials.fromStream(keyFile)).build()
 				.getService();
@@ -47,12 +50,14 @@ public class GcsService {
 		return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
 	}
 
-	// 파일 삭제 로직 추가
-	public void deleteFile(String objectName) throws IOException {
+	// 썸네일 파일 삭제 
+	public void deleteThumbnailFile(String thumbnailUrl) throws IOException {
 		InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
 		Storage storage = StorageOptions.newBuilder().setCredentials(GoogleCredentials.fromStream(keyFile)).build()
 				.getService();
-
+		
+		String objectName = getObjectNameFromUrl(thumbnailUrl);
+		
 		Blob blob = storage.get(bucketName, objectName);
 		if (blob != null) {
 			storage.delete(bucketName, objectName);
@@ -60,7 +65,8 @@ public class GcsService {
 			System.out.println("Blob not found: " + objectName);
 		}
 	}
-
+	
+	// photo 파일 삭제
 	public void deletePhotoToGcs(List<Photo> photos) throws FileNotFoundException, IOException {
 
 		// fromStream() 메소드가 InputStream을 매개변수로 받기 때문에 키 파일을 스트림 형태로 읽어와야함
@@ -74,8 +80,7 @@ public class GcsService {
 
 		for (String url : urls) {
 			// minography_gcs가 처음 찾아지는 0 과 minography_gcs/의 길이 15를 합쳐서 15 값 저장
-			int index = url.indexOf("minography_gcs") + "minography_gcs/".length();
-			String objectName = url.substring(index); // 인덱스로 잘라서 objectName을 만들고
+			String objectName = getObjectNameFromUrl(url); // 인덱스로 잘라서 objectName을 만들고
 
 			Blob blob = storage.get(bucketName, objectName); // 사진이 있는지 확인
 			if (blob != null) {

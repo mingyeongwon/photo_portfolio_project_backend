@@ -8,7 +8,8 @@ public class ProjectCreateDto {
 	private Long categoryId;
 	private Long subcategoryId;
 	
-	private MultipartFile[] multipartFiles;
+	private MultipartFile thumbnailMultipartFile;
+	private MultipartFile[] photoMultipartFiles;
 	
 	public Long getId() {
 		return id;
@@ -22,11 +23,17 @@ public class ProjectCreateDto {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	public MultipartFile[] getMultipartFiles() {
-		return multipartFiles;
+	public MultipartFile getThumbnailMultipartFile() {
+		return thumbnailMultipartFile;
 	}
-	public void setMultipartFiles(MultipartFile[] multipartFiles) {
-		this.multipartFiles = multipartFiles;
+	public void setThumbnailMultipartFile(MultipartFile thumbnailMultipartFile) {
+		this.thumbnailMultipartFile = thumbnailMultipartFile;
+	}
+	public MultipartFile[] getPhotoMultipartFiles() {
+		return photoMultipartFiles;
+	}
+	public void setPhotoMultipartFiles(MultipartFile[] photoMultipartFiles) {
+		this.photoMultipartFiles = photoMultipartFiles;
 	}
 	public Long getCategoryId() {
 		return categoryId;

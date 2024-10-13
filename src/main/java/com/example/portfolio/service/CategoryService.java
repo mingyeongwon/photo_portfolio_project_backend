@@ -2,7 +2,6 @@ package com.example.portfolio.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.portfolio.dto.CategoryDto;
@@ -16,41 +15,43 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class CategoryService {
-	@Autowired
-	private CategoryRepository categoryRepository;
 
-	@Autowired
-	private SubCategoryRepository subCategoryRepository;
+	private final CategoryRepository categoryRepository;
+	private final SubCategoryRepository subCategoryRepository;
+
+	//생성자
+	public CategoryService(CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository) {
+		this.categoryRepository = categoryRepository;
+		this.subCategoryRepository = subCategoryRepository;
+	}
 
 	public List<Category> getCategory() {
-		
+
 		return categoryRepository.findAll();
 	}
-	
 
 	// 카테고리 전체 목록 가져오기
 	public List<CategoryDto> getAllCategories() {
 		List<Category> categories = categoryRepository.findAll();
-		return categories.stream().map(this::mapEntityToDto).toList();   
+		return categories.stream().map(this::mapEntityToDto).toList();
 	}
-	
+
 	public List<SubCategoryDto> getSubCategory(Long categoryId) {
 		List<SubCategory> subCategories = subCategoryRepository.findByCategory_id(categoryId);
-		//this::subCategoryEntityToDto = subCategoryDto -> this.mapSubCategoryDtoToEntity(subCategoryDto)
+		// this::subCategoryEntityToDto = subCategoryDto ->
+		// this.mapSubCategoryDtoToEntity(subCategoryDto)
 		return subCategories.stream().map(this::subCategoryEntityToDto).toList();
 	}
 
-
 	@Transactional
 	public void createCategories(List<CategoryDto> categoryDtos) {
-	    for (CategoryDto categoryDto : categoryDtos) {
-	        // DTO에서 Category로 변환
-	        Category category = mapDtoToEntity(categoryDto);
-	        // 카테고리 먼저 저장
-	        categoryRepository.save(category);
-	    }
+		for (CategoryDto categoryDto : categoryDtos) {
+			// DTO에서 Category로 변환
+			Category category = mapDtoToEntity(categoryDto);
+			// 카테고리 먼저 저장
+			categoryRepository.save(category);
+		}
 	}
-
 
 	@Transactional
 	public void updateCategories(List<CategoryDto> categoryDtos) {
@@ -108,33 +109,33 @@ public class CategoryService {
 
 	// DTO -> Entity 변환
 	private Category mapDtoToEntity(CategoryDto categoryDto) {
-	    Category category = new Category();
-	    category.setId(categoryDto.getId());
-	    category.setName(categoryDto.getName());
+		Category category = new Category();
+		category.setId(categoryDto.getId());
+		category.setName(categoryDto.getName());
 
-	    List<SubCategory> subCategories = categoryDto.getSubCategories().stream().map(subCategoryDto -> {
-	        SubCategory subCategory = new SubCategory();
-	        subCategory.setId(subCategoryDto.getId());
-	        subCategory.setName(subCategoryDto.getName());
-	        subCategory.setCategory(category);
-	        return subCategory;
-	    }).toList();
+		List<SubCategory> subCategories = categoryDto.getSubCategories().stream().map(subCategoryDto -> {
+			SubCategory subCategory = new SubCategory();
+			subCategory.setId(subCategoryDto.getId());
+			subCategory.setName(subCategoryDto.getName());
+			subCategory.setCategory(category);
+			return subCategory;
+		}).toList();
 
-	    category.setSubCategories(subCategories);
-	    return category;
+		category.setSubCategories(subCategories);
+		return category;
 	}
-
 
 	// Entity -> DTO 변환
 	private CategoryDto mapEntityToDto(Category category) {
 		CategoryDto categoryDto = new CategoryDto();
 		categoryDto.setId(category.getId());
 		categoryDto.setName(category.getName());
-		List<SubCategoryDto> subCategories = category.getSubCategories().stream().map(this::subCategoryEntityToDto).toList();
+		List<SubCategoryDto> subCategories = category.getSubCategories().stream().map(this::subCategoryEntityToDto)
+				.toList();
 		categoryDto.setSubCategories(subCategories);
 		return categoryDto;
 	}
-	
+
 	private SubCategoryDto subCategoryEntityToDto(SubCategory subCategory) {
 		SubCategoryDto subCategoryDto = new SubCategoryDto();
 		subCategoryDto.setId(subCategory.getId());
