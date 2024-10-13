@@ -31,6 +31,7 @@ public class ProjectService {
     @Autowired
     private SubCategoryRepository subCategoryRepository;
 
+    //프로젝트 생성
     @Transactional
     public Project createProject(ProjectCreateDto projectCreateDto) {
         Project project = new Project();
@@ -53,7 +54,8 @@ public class ProjectService {
 //	public void getProject{
 //    	
 //    }
-
+    
+    //프로젝트 업데이트
     @Transactional
     public Project updateProject(ProjectUpdateDto projectUpdateDto) {
         Project project = projectRepository.findById(projectUpdateDto.getId())
@@ -74,7 +76,7 @@ public class ProjectService {
        return projectRepository.save(project);
     }
 
- 
+    //프로젝트 삭제
     @Transactional
     public void deleteProject(Long id) {
         Project project = projectRepository.findById(id)
