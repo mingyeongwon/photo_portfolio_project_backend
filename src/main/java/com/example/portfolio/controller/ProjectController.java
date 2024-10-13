@@ -1,7 +1,5 @@
 package com.example.portfolio.controller;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
