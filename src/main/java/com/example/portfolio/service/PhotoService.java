@@ -17,94 +17,97 @@ import com.example.portfolio.repository.PhotoRepository;
 @Service
 public class PhotoService {
 
-    @Autowired
-    private GcsService gcsService;
+	private final GcsService gcsService;
+	private final PhotoRepository photoRepository;
 
-    @Autowired
-    private PhotoRepository photoRepository;
+	//생성자 주입
+	public PhotoService(GcsService gcsService, PhotoRepository photoRepository) {
+		this.gcsService = gcsService;
+		this.photoRepository = photoRepository;
+	}
 
-    //사진 생성
-    public void createPhotos(ProjectCreateDto projectCreateDto, Project savedProject) {
-        MultipartFile[] multipartFiles = projectCreateDto.getPhotoMultipartFiles();
+	// 사진 생성
+	public void createPhotos(ProjectCreateDto projectCreateDto, Long projectId) {
+		MultipartFile[] multipartFiles = projectCreateDto.getPhotoMultipartFiles();
 
-        for (MultipartFile multipartFile : multipartFiles) {
-            try {
-                Photo photo = new Photo();
-                String url = gcsService.uploadFile(multipartFile, savedProject.getId());
-                photo.setImageUrl(url);
-                photo.setImgoname(multipartFile.getOriginalFilename());
-                photo.setImgtype(multipartFile.getContentType());
-                photo.setProjectId(savedProject.getId());
-                photoRepository.save(photo);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    
-    //사진 업데이트
-    public void updatePhotos(ProjectUpdateDto projectUpdateDto) {
-        MultipartFile[] multipartFiles = projectUpdateDto.getMultipartFiles();
-        List<Photo> existingPhotos = photoRepository.findByProjectId(projectUpdateDto.getId());
+		for (MultipartFile multipartFile : multipartFiles) {
+			try {
+				Photo photo = new Photo();
+				String url = gcsService.uploadFile(multipartFile, projectId);
+				photo.setImageUrl(url);
+				photo.setImgoname(multipartFile.getOriginalFilename());
+				photo.setImgtype(multipartFile.getContentType());
+				photo.setProjectId(projectId);
+				photoRepository.save(photo);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
-        for (MultipartFile multipartFile : multipartFiles) {
-            Photo newPhoto = createPhoto(multipartFile, projectUpdateDto.getId());
+	// 사진 업데이트
+	public void updatePhotos(ProjectUpdateDto projectUpdateDto) {
+		MultipartFile[] multipartFiles = projectUpdateDto.getPhotoMultipartFiles();
+		List<Photo> existingPhotos = photoRepository.findByProjectId(projectUpdateDto.getId());
 
-            if (existingPhotos.stream().noneMatch(p -> p.equals(newPhoto))) {
-                try {
-                    String url = gcsService.uploadFile(multipartFile, projectUpdateDto.getId());
-                    newPhoto.setImageUrl(url);
-                    newPhoto.setImgoname(multipartFile.getOriginalFilename());
-                    newPhoto.setImgtype(multipartFile.getContentType());
-                    photoRepository.save(newPhoto);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+		for (MultipartFile multipartFile : multipartFiles) {
+			Photo newPhoto = createPhoto(multipartFile, projectUpdateDto.getId());
 
-        List<Photo> deletePhotos = existingPhotos.stream()
-                .filter(existingPhoto -> !isPhotoInFiles(existingPhoto, multipartFiles, projectUpdateDto.getId()))
-                .collect(Collectors.toList());
+			if (existingPhotos.stream().noneMatch(p -> p.equals(newPhoto))) {
+				try {
+					String url = gcsService.uploadFile(multipartFile, projectUpdateDto.getId());
+					newPhoto.setImageUrl(url);
+					newPhoto.setImgoname(multipartFile.getOriginalFilename());
+					newPhoto.setImgtype(multipartFile.getContentType());
+					photoRepository.save(newPhoto);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 
-        photoRepository.deleteAll(deletePhotos);
+		List<Photo> deletePhotos = existingPhotos.stream()
+				.filter(existingPhoto -> !isPhotoInFiles(existingPhoto, multipartFiles, projectUpdateDto.getId()))
+				.collect(Collectors.toList());
 
-        try {
-            gcsService.deletePhotoToGcs(deletePhotos);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    //사진 삭제
-    public void deletePhotosByProjectId(Long projectId) {
-        List<Photo> photos = photoRepository.findAllByProjectId(projectId);
-        photoRepository.deleteAll(photos);
+		photoRepository.deleteAll(deletePhotos);
 
-        try {
-            gcsService.deletePhotoToGcs(photos);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    //있다면 true, 없다면 false
-    private boolean isPhotoInFiles(Photo existingPhoto, MultipartFile[] multipartFiles, Long projectId) {
-        for (MultipartFile multipartFile : multipartFiles) {
-            Photo newPhoto = createPhoto(multipartFile, projectId);
-            if (existingPhoto.equals(newPhoto)) {
-                return true;
-            }
-        }
-        return false;
-    }
+		try {
+			gcsService.deletePhotoToGcs(deletePhotos);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-    //기존에 사진이 존재하는지 확인
-    private Photo createPhoto(MultipartFile file, Long projectId) {
-        Photo photo = new Photo();
-        photo.setImgoname(file.getOriginalFilename());
-        photo.setProjectId(projectId);
-        photo.setImgtype(file.getContentType());
-        return photo;
-    }
+	// 사진 삭제
+	public void deletePhotosByProjectId(Long projectId) {
+		List<Photo> photos = photoRepository.findAllByProjectId(projectId);
+		photoRepository.deleteAll(photos);
+
+		try {
+			gcsService.deletePhotoToGcs(photos);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	// 있다면 true, 없다면 false
+	private boolean isPhotoInFiles(Photo existingPhoto, MultipartFile[] multipartFiles, Long projectId) {
+		for (MultipartFile multipartFile : multipartFiles) {
+			Photo newPhoto = createPhoto(multipartFile, projectId);
+			if (existingPhoto.equals(newPhoto)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	// 기존에 사진이 존재하는지 확인
+	private Photo createPhoto(MultipartFile file, Long projectId) {
+		Photo photo = new Photo();
+		photo.setImgoname(file.getOriginalFilename());
+		photo.setProjectId(projectId);
+		photo.setImgtype(file.getContentType());
+		return photo;
+	}
 }
