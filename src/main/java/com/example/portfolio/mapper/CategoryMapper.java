@@ -9,9 +9,17 @@ import com.example.portfolio.model.Category;
 
 @Mapper
 public interface CategoryMapper {
-	CategoryMapper ININSTANCE = Mappers.getMapper (CategoryMapper.class);
-	//Entity -> Create Dto
-	CategoryCreateDto caregoryToCreateDto(Category category);
-	//Entity -> Update Dto
-	CategoryUpdateDto caregoryToUpdateDto(Category category);
+	CategoryMapper ININSTANCE = Mappers.getMapper(CategoryMapper.class);
+
+	// Entity -> Create Dto
+	CategoryCreateDto categoryToCreateDto(Category category);
+
+	// Entity -> Update Dto
+	CategoryUpdateDto categoryToUpdateDto(Category category);
+
+	// Update Dto -> Entity
+	Category CreateDtoToEntity(CategoryCreateDto categoryCreateDto);
+
+	// Create Dto -> Entity
+	Category UpdateDtoToEntity(CategoryUpdateDto categoryUpdateDto);
 }
