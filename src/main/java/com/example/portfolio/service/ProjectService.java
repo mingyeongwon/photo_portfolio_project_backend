@@ -1,11 +1,14 @@
 package com.example.portfolio.service;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.ProjectCreateDto;
+import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.model.Project;
@@ -133,6 +136,21 @@ public class ProjectService {
 		}
 		projectRepository.delete(project);
 	}
+
+	@Transactional
+	public List<ProjectListDto> getProjectList(Pageable pageable, Long CategoryId,Long subCategoryId) {
+		if(subCategoryId==null) {
+			return projectRepository.findByCategory_id(pageable, CategoryId).getContent();
+		}else {
+			return projectRepository.findBySubCategory_id(pageable, subCategoryId).getContent();
+		}
+		
+	}
+
+	public List<ProjectListDto> getAdminProjectList(Pageable pageable, String keyWord) {
+		return projectRepository.findByKeyWord(pageable, keyWord).getContent();
+	}
+
 
 //	public void getProject{
 //	
