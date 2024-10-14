@@ -125,5 +125,59 @@ public class ProjectController {
 	}
 
 	
+<<<<<<< Upstream, based on origin/master
+=======
+
+//	// 썸네일 저장
+//	@PostMapping("/thumbnail")
+//	public void saveThumbnail(ThumbnailCreateDto thumbnailCreateDTO) {
+//		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
+//		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
+//		thumbnailCreateDTO.setTimgtype(image.getContentType());
+//		// thumbnailService.insertThumbnail(thumbnailCreateDTO);
+//	}
+//
+//	
+//	// 썸네일 불러오기
+//	@GetMapping(value = { "/project/{category}/{subCategory}", "/project/{category}" })
+//	public List<ThumbnailCreateDto> getProjectList(@PathVariable("category") Long categoryId,
+//			@PathVariable(name = "subCategory", required = false) Long subCategoryId) {
+//		return thumbnailService.getThumbnailByCategory(categoryId, subCategoryId);
+//	}
+
+//	// 썸네일 업데이트
+//	@PatchMapping("/thumbnail/{id}")
+//	public void updateThumbnail(ThumbnailCreateDto thumbnailCreateDTO, @PathVariable("id") Long id) {
+//		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
+//		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
+//		thumbnailCreateDTO.setTimgtype(image.getContentType());
+//		thumbnailService.updateThumbnail(thumbnailCreateDTO, id);
+//	}
+//
+//	// 썸네일 삭제
+//	@DeleteMapping("/thumbnail/{id}")
+//	public void deleteThumbnail(@PathVariable("id") Long id) throws FileNotFoundException, IOException {
+//		thumbnailService.deleteThumbnail(id);
+//	}
+
+//	// 프로젝트 저장
+//	@PostMapping("/project")
+//	public void saveProject(ProjectCreateDto projectCreateDto) {
+//		projectService.createProject(projectCreateDto);
+//	}
+
+//	// 프로젝트 업데이트
+//	@PutMapping("/project")
+//	public void updateProject(ProjectUpdateDto projectUpdateDto) {
+//		projectService.updateProject(projectUpdateDto);
+//
+//	}
+
+//	// 프로젝트 삭제
+//	@DeleteMapping("/project/{id}")
+//	public void deleteProject(@PathVariable("id") Long id) {
+//		projectService.deleteProject(id);
+//	}
+>>>>>>> 9307a9d 프로젝트 검색 및 정렬하기
 
 }
