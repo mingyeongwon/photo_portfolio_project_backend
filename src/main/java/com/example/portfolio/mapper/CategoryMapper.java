@@ -9,7 +9,7 @@ import com.example.portfolio.model.Category;
 
 @Mapper
 public interface CategoryMapper {
-	CategoryMapper ININSTANCE = Mappers.getMapper(CategoryMapper.class);
+	CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
 
 	// Entity -> Create Dto
 	CategoryCreateDto categoryToCreateDto(Category category);
