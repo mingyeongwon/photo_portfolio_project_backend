@@ -18,8 +18,8 @@ public interface CategoryMapper {
 	CategoryUpdateDto categoryToUpdateDto(Category category);
 
 	// Update Dto -> Entity
-	Category CreateDtoToEntity(CategoryCreateDto categoryCreateDto);
+	Category createDtoToEntity(CategoryCreateDto categoryCreateDto);
 
 	// Create Dto -> Entity
-	Category UpdateDtoToEntity(CategoryUpdateDto categoryUpdateDto);
+	Category updateDtoToEntity(CategoryUpdateDto categoryUpdateDto);
 }
