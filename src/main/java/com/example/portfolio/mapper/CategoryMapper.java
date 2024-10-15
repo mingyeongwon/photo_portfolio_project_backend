@@ -7,7 +7,7 @@ import com.example.portfolio.dto.CategoryCreateDto;
 import com.example.portfolio.dto.CategoryUpdateDto;
 import com.example.portfolio.model.Category;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface CategoryMapper {
 	CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
 

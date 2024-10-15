@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.portfolio.dto.CategoryCreateDto;
 import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
@@ -77,8 +78,8 @@ public class ProjectController {
 	// 카테고리 생성
 //  @Secured("ROLE_ADMIN")
 	@PostMapping("/categories")
-	public void createCategories(@RequestBody List<CategoryDto> categoryDtos) {
-		categoryService.createCategories(categoryDtos);
+	public void createCategories(@RequestBody List<CategoryCreateDto> categoryCreateDtos) {
+		categoryService.createCategories(categoryCreateDtos);
 	}
 
 	// 카테고리 수정
