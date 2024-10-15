@@ -17,9 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.portfolio.dto.CategoryCreateDto;
 import com.example.portfolio.dto.CategoryDto;
-import com.example.portfolio.dto.CategoryUpdateDto;
+import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
@@ -28,22 +27,26 @@ import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.service.AdminService;
 import com.example.portfolio.service.CategoryService;
+import com.example.portfolio.service.PhotoService;
 import com.example.portfolio.service.ProjectService;
 
 @RestController
 @RequestMapping("/api")
 public class ProjectController {
-
+	
 	private final CategoryService categoryService;
 	private final ProjectService projectService;
 	private final AdminService adminService;
+	private final PhotoService photoService;
+
 
 	// 생성자 주입
 	public ProjectController(CategoryService categoryService, ProjectService projectService,
-			AdminService adminService) {
+			AdminService adminService,PhotoService photoService) {
 		this.categoryService = categoryService;
 		this.projectService = projectService;
 		this.adminService = adminService;
+		this.photoService = photoService;
 	}
 
 	// 프로젝트 생성
@@ -64,16 +67,19 @@ public class ProjectController {
 	
 	//프로젝트 가져오기 
 	@GetMapping(value={"/get/project/{categoryId}/{subCategory}", "/get/project/{categoryId}"} )
-	public List<ProjectListDto> getProject( Pageable pageable, @PathVariable("categoryId") Long categoryId,
+	public List<ProjectListDto> getProject( 
+			@PageableDefault(page= 0, size = 5) Pageable pageable, 
+			@PathVariable("categoryId") Long categoryId,
 			@PathVariable(name = "subCategory", required = false) Long subCategoryId){
 		return projectService.getProjectList(pageable,categoryId,subCategoryId);
 	}
 
-	//admin 프로젝트 가져오기 
+	//admin page 프로젝트 가져오기 
 	@GetMapping("/get/adminProject" )
-	public List<ProjectListDto> getAdminProject(@PageableDefault(page= 0, size = 5, sort = "id", direction = Sort.Direction.DESC)  Pageable pageable, 
-			@RequestParam("keyWord") String keyWord ){ 
-		return projectService.getAdminProjectList(pageable,keyWord);
+	public List<ProjectListDto> getAdminProject(
+			@PageableDefault(page= 0, size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable, 
+			@RequestParam(value= "keyWord", defaultValue = "") String keyWord ){ 
+		return adminService.getAdminProjectList(pageable,keyWord);
 	}
 
 	// 프로젝트 삭제
@@ -98,14 +104,14 @@ public class ProjectController {
 	// 카테고리 생성
 //  @Secured("ROLE_ADMIN")
 	@PostMapping("/categories")
-	public void createCategories(@RequestBody List<CategoryCreateDto> categoryCreateDtos) {
-		categoryService.createCategories(categoryCreateDtos);
+	public void createCategories(@RequestBody List<CategoryDto> categoryDtos) {
+		categoryService.createCategories(categoryDtos);
 	}
 
 	// 카테고리 수정
 	@PutMapping("/categories")
-	public void updateCategories(@RequestBody List<CategoryUpdateDto> categoryUpdateDtos) {
-		categoryService.updateCategories(categoryUpdateDtos);
+	public void updateCategories(@RequestBody List<CategoryDto> categoryDtos) {
+		categoryService.updateCategories(categoryDtos);
 	}
 
 	// 카테고리 삭제
@@ -124,6 +130,64 @@ public class ProjectController {
 		return categoryService.getSubCategory(categoryId);
 	}
 
+	@GetMapping("/photos/{id}")
+	public List<PhotoListDto> getPhotos(
+			@PageableDefault(page= 0, size = 5) Pageable pageable,
+			@PathVariable("id") Long projectId) {
+		return photoService.getPhotoList(pageable, projectId);
+	}
 	
+	
+
+//	// 썸네일 저장
+//	@PostMapping("/thumbnail")
+//	public void saveThumbnail(ThumbnailCreateDto thumbnailCreateDTO) {
+//		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
+//		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
+//		thumbnailCreateDTO.setTimgtype(image.getContentType());
+//		// thumbnailService.insertThumbnail(thumbnailCreateDTO);
+//	}
+//
+//	
+//	// 썸네일 불러오기
+//	@GetMapping(value = { "/project/{category}/{subCategory}", "/project/{category}" })
+//	public List<ThumbnailCreateDto> getProjectList(@PathVariable("category") Long categoryId,
+//			@PathVariable(name = "subCategory", required = false) Long subCategoryId) {
+//		return thumbnailService.getThumbnailByCategory(categoryId, subCategoryId);
+//	}
+
+//	// 썸네일 업데이트
+//	@PatchMapping("/thumbnail/{id}")
+//	public void updateThumbnail(ThumbnailCreateDto thumbnailCreateDTO, @PathVariable("id") Long id) {
+//		MultipartFile image = thumbnailCreateDTO.getMultipartFile();
+//		thumbnailCreateDTO.setTimgoname(image.getOriginalFilename());
+//		thumbnailCreateDTO.setTimgtype(image.getContentType());
+//		thumbnailService.updateThumbnail(thumbnailCreateDTO, id);
+//	}
+//
+//	// 썸네일 삭제
+//	@DeleteMapping("/thumbnail/{id}")
+//	public void deleteThumbnail(@PathVariable("id") Long id) throws FileNotFoundException, IOException {
+//		thumbnailService.deleteThumbnail(id);
+//	}
+
+//	// 프로젝트 저장
+//	@PostMapping("/project")
+//	public void saveProject(ProjectCreateDto projectCreateDto) {
+//		projectService.createProject(projectCreateDto);
+//	}
+
+//	// 프로젝트 업데이트
+//	@PutMapping("/project")
+//	public void updateProject(ProjectUpdateDto projectUpdateDto) {
+//		projectService.updateProject(projectUpdateDto);
+//
+//	}
+
+//	// 프로젝트 삭제
+//	@DeleteMapping("/project/{id}")
+//	public void deleteProject(@PathVariable("id") Long id) {
+//		projectService.deleteProject(id);
+//	}
 
 }
