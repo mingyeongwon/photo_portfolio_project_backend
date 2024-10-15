@@ -19,11 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.portfolio.dto.CategoryCreateDto;
 import com.example.portfolio.dto.CategoryDto;
-<<<<<<< Upstream, based on origin/master
 import com.example.portfolio.dto.CategoryUpdateDto;
-=======
 import com.example.portfolio.dto.PhotoListDto;
->>>>>>> 39db424 photo 리스트 불러오기
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
@@ -142,9 +139,7 @@ public class ProjectController {
 		return photoService.getPhotoList(pageable, projectId);
 	}
 	
-	
-<<<<<<< Upstream, based on origin/master
-=======
+
 
 //	// 썸네일 저장
 //	@PostMapping("/thumbnail")
@@ -196,6 +191,5 @@ public class ProjectController {
 //	public void deleteProject(@PathVariable("id") Long id) {
 //		projectService.deleteProject(id);
 //	}
->>>>>>> 9307a9d 프로젝트 검색 및 정렬하기
 
 }
