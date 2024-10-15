@@ -116,40 +116,4 @@ public class CategoryService {
 		}
 	}
 
-	// DTO -> Entity 변환
-	private Category mapDtoToEntity(CategoryDto categoryDto) {
-		Category category = new Category();
-		category.setId(categoryDto.getId());
-		category.setName(categoryDto.getName());
-
-		List<SubCategory> subCategories = categoryDto.getSubCategories().stream().map(subCategoryDto -> {
-			SubCategory subCategory = new SubCategory();
-			subCategory.setId(subCategoryDto.getId());
-			subCategory.setName(subCategoryDto.getName());
-			subCategory.setCategory(category);
-			return subCategory;
-		}).toList();
-
-		category.setSubCategories(subCategories);
-		return category;
-	}
-
-	// Entity -> DTO 변환
-	private CategoryDto mapEntityToDto(Category category) {
-		CategoryDto categoryDto = new CategoryDto();
-		categoryDto.setId(category.getId());
-		categoryDto.setName(category.getName());
-		List<SubCategoryDto> subCategories = category.getSubCategories().stream().map(this::subCategoryEntityToDto)
-				.toList();
-		categoryDto.setSubCategories(subCategories);
-		return categoryDto;
-	}
-
-	private SubCategoryDto subCategoryEntityToDto(SubCategory subCategory) {
-		SubCategoryDto subCategoryDto = new SubCategoryDto();
-		subCategoryDto.setId(subCategory.getId());
-		subCategoryDto.setName(subCategory.getName());
-		return subCategoryDto;
-	}
-
 }
