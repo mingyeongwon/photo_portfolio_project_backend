@@ -1,43 +1,25 @@
 package com.example.portfolio.mapper;
 
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
+
 import com.example.portfolio.dto.CategoryCreateDto;
-import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.CategoryUpdateDto;
-import com.example.portfolio.dto.SubCategoryDto;
 import com.example.portfolio.model.Category;
-import com.example.portfolio.model.SubCategory;
 
-public class CategoryMapper {
+@Mapper(componentModel = "spring")
+public interface CategoryMapper {
+	CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
 
-	// Category -> CategoryDto 변환
-	public static CategoryDto toDto(Category category) {
-		CategoryDto categoryDto = new CategoryDto();
-		categoryDto.setId(category.getId());
-		categoryDto.setName(category.getName());
-		categoryDto
-				.setSubCategories(category.getSubCategories().stream().map(CategoryMapper::toSubCategoryDto).toList());
-		return categoryDto;
-	}
+	// Entity -> Create Dto
+	CategoryCreateDto categoryToCreateDto(Category category);
 
-	// CategoryCreateDto -> Category 변환
-	public static Category toEntity(CategoryCreateDto categoryCreateDto) {
-		Category category = new Category();
-		category.setName(categoryCreateDto.getName());
-		return category;
-	}
+	// Entity -> Update Dto
+	CategoryUpdateDto categoryToUpdateDto(Category category);
 
-	// CategoryUpdateDto -> Category 변환 (업데이트)
-	public static void updateEntity(CategoryUpdateDto categoryUpdateDto, Category category) {
-		if (categoryUpdateDto.getName() != null) {
-			category.setName(categoryUpdateDto.getName());
-		}
-	}
+	// Update Dto -> Entity
+	Category createDtoToEntity(CategoryCreateDto categoryCreateDto);
 
-	// SubCategory -> SubCategoryDto 변환
-	public static SubCategoryDto toSubCategoryDto(SubCategory subCategory) {
-		SubCategoryDto subCategoryDto = new SubCategoryDto();
-		subCategoryDto.setId(subCategory.getId());
-		subCategoryDto.setName(subCategory.getName());
-		return subCategoryDto;
-	}
+	// Create Dto -> Entity
+	Category updateDtoToEntity(CategoryUpdateDto categoryUpdateDto);
 }

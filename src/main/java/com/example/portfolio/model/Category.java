@@ -2,6 +2,8 @@ package com.example.portfolio.model;
 
 import java.util.List;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
 @Entity
+@DynamicUpdate
 public class Category {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

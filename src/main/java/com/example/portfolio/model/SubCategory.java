@@ -22,9 +22,13 @@ public class SubCategory {
 	@ManyToOne
 	@JsonIgnore
 	private Category category;
+	
+	public SubCategory() {}
 
-	public SubCategory() {
+	public SubCategory(Long id, String name) {
 		super();
+		this.id = id;
+		this.name = name;
 	}
 
 	public Long getId() {
