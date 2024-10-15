@@ -22,7 +22,7 @@ public class CategoryService {
 	private final SubCategoryRepository subCategoryRepository;
 	private final CategoryMapper categoryMapper;
 
-	//생성자
+	// 생성자
 	public CategoryService(CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository,
 			CategoryMapper categoryMapper) {
 		this.categoryRepository = categoryRepository;
@@ -54,6 +54,10 @@ public class CategoryService {
 			// DTO에서 Category로 변환
 			Category category = categoryMapper.createDtoToEntity(categoryCreateDto);
 			// 카테고리 먼저 저장
+			// SubCategory의 category 설정
+			for (SubCategory subCategory : category.getSubCategories()) {
+				subCategory.setCategory(category);
+			}
 			categoryRepository.save(category);
 		}
 	}
