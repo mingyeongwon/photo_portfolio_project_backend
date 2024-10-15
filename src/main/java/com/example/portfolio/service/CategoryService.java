@@ -4,11 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.example.portfolio.dto.CategoryCreateDto;
 import com.example.portfolio.dto.CategoryDto;
-import com.example.portfolio.dto.CategoryUpdateDto;
 import com.example.portfolio.dto.SubCategoryDto;
-import com.example.portfolio.mapper.CategoryMapper;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.model.SubCategory;
 import com.example.portfolio.repository.CategoryRepository;
@@ -21,14 +18,11 @@ public class CategoryService {
 
 	private final CategoryRepository categoryRepository;
 	private final SubCategoryRepository subCategoryRepository;
-	private final CategoryMapper categoryMapper;
 
-	// 생성자
-	public CategoryService(CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository,
-			CategoryMapper categoryMapper) {
+	//생성자
+	public CategoryService(CategoryRepository categoryRepository, SubCategoryRepository subCategoryRepository) {
 		this.categoryRepository = categoryRepository;
 		this.subCategoryRepository = subCategoryRepository;
-		this.categoryMapper = categoryMapper;
 	}
 
 	public List<Category> getCategory() {
@@ -50,34 +44,30 @@ public class CategoryService {
 	}
 
 	@Transactional
-	public void createCategories(List<CategoryCreateDto> categoryCreateDtos) {
-		for (CategoryCreateDto categoryCreateDto : categoryCreateDtos) {
+	public void createCategories(List<CategoryDto> categoryDtos) {
+		for (CategoryDto categoryDto : categoryDtos) {
 			// DTO에서 Category로 변환
-			Category category = categoryMapper.createDtoToEntity(categoryCreateDto);
+			Category category = mapDtoToEntity(categoryDto);
 			// 카테고리 먼저 저장
-			// SubCategory의 category 설정
-			for (SubCategory subCategory : category.getSubCategories()) {
-				subCategory.setCategory(category);
-			}
 			categoryRepository.save(category);
 		}
 	}
 
 	@Transactional
-	public void updateCategories(List<CategoryUpdateDto> categoryUpdateDtos) {
-		for (CategoryUpdateDto categoryUpdateDto : categoryUpdateDtos) {
+	public void updateCategories(List<CategoryDto> categoryDtos) {
+		for (CategoryDto categoryDto : categoryDtos) {
 			// 카테고리를 데이터베이스에서 찾음
-			Category category = categoryRepository.findById(categoryUpdateDto.getId())
+			Category category = categoryRepository.findById(categoryDto.getId())
 					.orElseThrow(() -> new RuntimeException("Category not found"));
 
 			// 이름이 존재하면 업데이트
-			if (categoryUpdateDto.getName() != null) {
-				category.setName(categoryUpdateDto.getName());
+			if (categoryDto.getName() != null) {
+				category.setName(categoryDto.getName());
 			}
 
 			// 서브카테고리가 null이 아닐 때만 처리
-			if (categoryUpdateDto.getSubCategories() != null) {
-				for (SubCategoryDto subCategoryDto : categoryUpdateDto.getSubCategories()) {
+			if (categoryDto.getSubCategories() != null) {
+				for (SubCategoryDto subCategoryDto : categoryDto.getSubCategories()) {
 					// 서브카테고리를 데이터베이스에서 찾거나 새로운 서브카테고리를 생성
 					SubCategory subCategory = subCategoryRepository.findById(subCategoryDto.getId())
 							.orElse(new SubCategory());
@@ -89,6 +79,8 @@ public class CategoryService {
 					subCategoryRepository.save(subCategory);
 				}
 			}
+
+			categoryRepository.save(category);
 		}
 	}
 

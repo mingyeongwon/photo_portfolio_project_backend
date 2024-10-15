@@ -14,6 +14,8 @@ import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.model.Photo;
 import com.example.portfolio.repository.PhotoRepository;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class PhotoService {
 
@@ -111,6 +113,7 @@ public class PhotoService {
 		return photo;
 	}
 
+	@Transactional
 	public List<PhotoListDto> getPhotoList(Pageable pageable, Long projectId) {
 		return photoRepository.findByPhotosProjectId(projectId,pageable).getContent();
 	}
