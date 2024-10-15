@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.model.Photo;
-import com.example.portfolio.model.Project;
 import com.example.portfolio.repository.PhotoRepository;
 
 @Service
@@ -109,5 +109,9 @@ public class PhotoService {
 		photo.setProjectId(projectId);
 		photo.setImgtype(file.getContentType());
 		return photo;
+	}
+
+	public List<PhotoListDto> getPhotoList(Pageable pageable, Long projectId) {
+		return photoRepository.findByPhotosProjectId(projectId,pageable).getContent();
 	}
 }
