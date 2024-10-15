@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.portfolio.dto.CategoryCreateDto;
 import com.example.portfolio.dto.CategoryDto;
+import com.example.portfolio.dto.CategoryUpdateDto;
 import com.example.portfolio.dto.SubCategoryDto;
 import com.example.portfolio.mapper.CategoryMapper;
 import com.example.portfolio.model.Category;
@@ -63,20 +64,20 @@ public class CategoryService {
 	}
 
 	@Transactional
-	public void updateCategories(List<CategoryDto> categoryDtos) {
-		for (CategoryDto categoryDto : categoryDtos) {
+	public void updateCategories(List<CategoryUpdateDto> categoryUpdateDtos) {
+		for (CategoryUpdateDto categoryUpdateDto : categoryUpdateDtos) {
 			// 카테고리를 데이터베이스에서 찾음
-			Category category = categoryRepository.findById(categoryDto.getId())
+			Category category = categoryRepository.findById(categoryUpdateDto.getId())
 					.orElseThrow(() -> new RuntimeException("Category not found"));
 
 			// 이름이 존재하면 업데이트
-			if (categoryDto.getName() != null) {
-				category.setName(categoryDto.getName());
+			if (categoryUpdateDto.getName() != null) {
+				category.setName(categoryUpdateDto.getName());
 			}
 
 			// 서브카테고리가 null이 아닐 때만 처리
-			if (categoryDto.getSubCategories() != null) {
-				for (SubCategoryDto subCategoryDto : categoryDto.getSubCategories()) {
+			if (categoryUpdateDto.getSubCategories() != null) {
+				for (SubCategoryDto subCategoryDto : categoryUpdateDto.getSubCategories()) {
 					// 서브카테고리를 데이터베이스에서 찾거나 새로운 서브카테고리를 생성
 					SubCategory subCategory = subCategoryRepository.findById(subCategoryDto.getId())
 							.orElse(new SubCategory());
@@ -88,8 +89,6 @@ public class CategoryService {
 					subCategoryRepository.save(subCategory);
 				}
 			}
-
-			categoryRepository.save(category);
 		}
 	}
 
