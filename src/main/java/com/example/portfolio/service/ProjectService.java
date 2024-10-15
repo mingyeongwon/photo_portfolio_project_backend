@@ -137,8 +137,10 @@ public class ProjectService {
 		projectRepository.delete(project);
 	}
 
+	//프로젝트 불러오기
 	@Transactional
 	public List<ProjectListDto> getProjectList(Pageable pageable, Long CategoryId,Long subCategoryId) {
+		//서브카테고리가 선택되지 않았을 때 카테고리로 찾아오기 
 		if(subCategoryId==null) {
 			return projectRepository.findByCategory_id(pageable, CategoryId).getContent();
 		}else {
@@ -147,9 +149,6 @@ public class ProjectService {
 		
 	}
 
-	public List<ProjectListDto> getAdminProjectList(Pageable pageable, String keyWord) {
-		return projectRepository.findByKeyWord(pageable, keyWord).getContent();
-	}
 
 
 //	public void getProject{
