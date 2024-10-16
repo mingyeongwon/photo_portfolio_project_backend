@@ -57,30 +57,6 @@ public class CategoryService {
 		return CategoryMapper.INSTANCE.categoryToCreateDto(categoryRepository.save(category));
 	}
 
-//	@Transactional
-//	public void updateCategories(List<CategoryUpdateDto> categoryUpdateDtos) {
-//		for (CategoryUpdateDto categoryUpdateDto : categoryUpdateDtos) {
-//			Category category = categoryRepository.findById(categoryUpdateDto.getId())
-//					.orElseThrow(() -> new RuntimeException("Category not found"));
-//
-//			if (categoryUpdateDto.getName() != null) {
-//				category.setName(categoryUpdateDto.getName());
-//			}
-//
-//			if (categoryUpdateDto.getSubCategories() != null) {
-//				for (SubCategoryDto subCategoryDto : categoryUpdateDto.getSubCategories()) {
-//					SubCategory subCategory = subCategoryRepository.findById(subCategoryDto.getId())
-//							.orElse(new SubCategory());
-//					if (subCategoryDto.getName() != null) {
-//						subCategory.setName(subCategoryDto.getName());
-//					}
-//					subCategory.setCategory(category);
-//					subCategoryRepository.save(subCategory);
-//				}
-//			}
-//		}
-//	}
-
 	@Transactional
 	public void deleteCategory(Long categoryId) {
 		if (isCategoryUsed(categoryId)) {
@@ -97,22 +73,22 @@ public class CategoryService {
 	}
 
 	// DTO -> Entity 변환
-	private Category mapDtoToEntity(CategoryDto categoryDto) {
-		Category category = new Category();
-		category.setId(categoryDto.getId());
-		category.setName(categoryDto.getName());
-
-		List<SubCategory> subCategories = categoryDto.getSubCategories().stream().map(subCategoryDto -> {
-			SubCategory subCategory = new SubCategory();
-			subCategory.setId(subCategoryDto.getId());
-			subCategory.setName(subCategoryDto.getName());
-			subCategory.setCategory(category);
-			return subCategory;
-		}).toList();
-
-		category.setSubCategories(subCategories);
-		return category;
-	}
+//	private Category mapDtoToEntity(CategoryDto categoryDto) {
+//		Category category = new Category();
+//		category.setId(categoryDto.getId());
+//		category.setName(categoryDto.getName());
+//
+//		List<SubCategory> subCategories = categoryDto.getSubCategories().stream().map(subCategoryDto -> {
+//			SubCategory subCategory = new SubCategory();
+//			subCategory.setId(subCategoryDto.getId());
+//			subCategory.setName(subCategoryDto.getName());
+//			subCategory.setCategory(category);
+//			return subCategory;
+//		}).toList();
+//
+//		category.setSubCategories(subCategories);
+//		return category;
+//	}
 
 	// Entity -> DTO 변환
 	private CategoryDto mapEntityToDto(Category category) {
@@ -156,16 +132,18 @@ public class CategoryService {
 	public void updateCategory(CategoryUpdateDto categoryUpdateDto) {
 		Category category = categoryRepository.findById(categoryUpdateDto.getId()).orElseThrow(
 				() -> new IllegalArgumentException("Category not found with id: " + categoryUpdateDto.getId()));
-
-		// Name만 업데이트
 		category.setName(categoryUpdateDto.getName());
 		// subCategories 리스트를 변경하지 않음
 		categoryRepository.save(category);
 	}
 
-	public void updateSubCategory(SubCategoryUpdateDto subCategoryDto) {
-		// TODO Auto-generated method stub
-		
-	}
+    // 서브 카테고리 수정
+    @Transactional
+    public void updateSubCategory(Long subCategoryId, SubCategoryUpdateDto subCategoryUpdateDto) {
+        SubCategory subCategory = subCategoryRepository.findById(subCategoryId)
+                .orElseThrow(() -> new IllegalArgumentException("SubCategory not found with id: " + subCategoryId));
+        subCategory.setName(subCategoryUpdateDto.getName());
+        subCategoryRepository.save(subCategory);
+    }
 
 }

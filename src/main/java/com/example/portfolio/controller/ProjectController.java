@@ -85,12 +85,6 @@ public class ProjectController {
 		return categoryService.createCategories(categoryCreateDtos);
 	}
 
-	// 카테고리 수정
-//	@PutMapping("/categories")
-//	public void updateCategories(@RequestBody List<CategoryUpdateDto> categoryUpdateDtos) {
-//		categoryService.updateCategories(categoryUpdateDtos);
-//	}
-
 	// 카테고리 삭제
 	@DeleteMapping("/categories/{id}")
 	public void deleteCategories(@PathVariable("id") Long categoryId) {
@@ -139,10 +133,9 @@ public class ProjectController {
 		return categoryService.isSubCategoryUsed(subCategoryId);
 	}
 
-//	@PutMapping("/subcategories/${subCategoryId}")
-//	public void updateSubCategory(@PathVariable("subCategoryId") Long subCategoryId,
-//			SubCategoryUpdateDto subCategoryDto) {
-//		subCategoryDto.(subCategoryId)
-//		categoryService.updateSubCategory(subCategoryDto);
-//	}
+	@PutMapping("/subcategories/{subCategoryId}")
+	public void updateSubCategory(@PathVariable("subCategoryId") Long subCategoryId,
+			@RequestBody SubCategoryUpdateDto subCategoryUpdateDto) {
+		categoryService.updateSubCategory(subCategoryId, subCategoryUpdateDto);
+	}
 }
