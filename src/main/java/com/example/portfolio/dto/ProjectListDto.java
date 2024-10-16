@@ -7,7 +7,7 @@ public class ProjectListDto {
 	private String title;
 	private String imageUrl; // 썸네일 URL
 	private Date createdAt;
-	private Long view;
+	private int view;
 	private String categoryName;
 	private Long imageCount;
 
@@ -15,7 +15,7 @@ public class ProjectListDto {
 		super();
 	}
 
-	public ProjectListDto(Long id, String title, String imageUrl, Date createdAt, Long view, String categoryName, Long imageCount) {
+	public ProjectListDto(Long id, String title, String imageUrl, Date createdAt, int view, String categoryName, Long imageCount) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -59,11 +59,11 @@ public class ProjectListDto {
 		this.createdAt = createdAt;
 	}
 
-	public Long getView() {
+	public int getView() {
 		return view;
 	}
 
-	public void setView(Long view) {
+	public void setView(int view) {
 		this.view = view;
 	}
 

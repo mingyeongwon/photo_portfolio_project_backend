@@ -40,7 +40,7 @@ class PortfolioProjectApplicationTests {
 	
 	@Test
 	public void ProjectMapperTest() {
-		Project project = new Project(35L,"CreateProjectTest",null,null,null,null,null);
+		Project project = new Project(35L,"CreateProjectTest",0,null,null,null,null);
 		
 		ProjectCreateDto projectCreateDto = ProjectMapper.INSTANCE.projectToCreateDto(project);
 		

@@ -23,7 +23,7 @@ public class Project {
 	private Long id;
 
 	private String title;
-	private Long view = 0L;
+	private int view = 0;
 	
 	@Column(name = "thumbnail_url")
     private String thumbnailUrl;
@@ -55,7 +55,7 @@ public class Project {
 		super();
 	}
 
-	public Project(Long id, String title, Long view, Date createdAt, String thumbnailUrl, Category category,SubCategory subCategory) {
+	public Project(Long id, String title, int view, Date createdAt, String thumbnailUrl, Category category,SubCategory subCategory) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -82,11 +82,11 @@ public class Project {
 		this.title = title;
 	}
 
-	public Long getView() {
+	public int getView() {
 		return view;
 	}
 
-	public void setView(Long view) {
+	public void setView(int view) {
 		this.view = view;
 	}
 

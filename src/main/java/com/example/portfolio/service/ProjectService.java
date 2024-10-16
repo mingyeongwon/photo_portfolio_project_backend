@@ -115,7 +115,6 @@ public class ProjectService {
 		}else {
 			return projectRepository.findBySubCategory_id(pageable, subCategoryId).getContent();
 		}
-		
 	}
 
 }
