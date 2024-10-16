@@ -11,6 +11,7 @@ import com.example.portfolio.model.Project;
 public interface ProjectRepository extends JpaRepository<Project, Long>{
 	 List<Project> findByCategory_Id(Long categoryId);
 	 List<Project> findBySubCategory_Id(Long subCategory);
+	boolean existsBySubCategory_Id(Long subCategoryId);
 	 
 }
  
