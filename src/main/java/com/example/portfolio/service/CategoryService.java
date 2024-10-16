@@ -82,8 +82,7 @@ public class CategoryService {
 	}
 
 	public boolean isCategoryUsed(Long categoryId) {
-		return subCategoryRepository.existsByCategory_Id(categoryId)
-				|| projectRepository.findByCategory_Id(categoryId).size() > 0;
+		return projectRepository.existsByCategory_Id(categoryId);
 	}
 
 	// DTO -> Entity 변환
