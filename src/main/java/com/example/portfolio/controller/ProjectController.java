@@ -79,8 +79,8 @@ public class ProjectController {
 	// 카테고리 생성
 //  @Secured("ROLE_ADMIN")
 	@PostMapping("/categories")
-	public void createCategories(@RequestBody List<CategoryCreateDto> categoryCreateDtos) {
-		categoryService.createCategories(categoryCreateDtos);
+	public CategoryCreateDto createCategories(@RequestBody CategoryCreateDto categoryCreateDtos) {
+		return categoryService.createCategories(categoryCreateDtos);
 	}
 
 	// 카테고리 수정
@@ -90,9 +90,15 @@ public class ProjectController {
 	}
 
 	// 카테고리 삭제
-	@DeleteMapping("/categories")
-	public void deleteCategories(@RequestBody List<CategoryDto> categoryDtos) {
-		categoryService.deleteCategories(categoryDtos);
+	@DeleteMapping("/categories/{id}")
+	public void deleteCategories(@PathVariable("id") Long categoryId) {
+		categoryService.deleteCategory(categoryId);
+	}
+
+	// 카테고리가 사용 중인지 확인하는 엔드포인트 추가
+	@GetMapping("/categories/{id}/used")
+	public boolean isCategoryUsed(@PathVariable("id") Long categoryId) {
+		return categoryService.isCategoryUsed(categoryId);
 	}
 
 	@GetMapping("/category")
@@ -104,5 +110,4 @@ public class ProjectController {
 	public List<SubCategoryDto> getSubCategory(@PathVariable("id") Long categoryId) {
 		return categoryService.getSubCategory(categoryId);
 	}
-
 }
