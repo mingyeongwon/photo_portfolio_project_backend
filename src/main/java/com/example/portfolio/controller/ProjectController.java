@@ -18,7 +18,9 @@ import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.CategoryUpdateDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
+import com.example.portfolio.dto.SubCategoryCreateDto;
 import com.example.portfolio.dto.SubCategoryDto;
+import com.example.portfolio.dto.SubCategoryUpdateDto;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.service.AdminService;
@@ -79,20 +81,20 @@ public class ProjectController {
 	// 카테고리 생성
 //  @Secured("ROLE_ADMIN")
 	@PostMapping("/categories")
-	public void createCategories(@RequestBody List<CategoryCreateDto> categoryCreateDtos) {
-		categoryService.createCategories(categoryCreateDtos);
-	}
-
-	// 카테고리 수정
-	@PutMapping("/categories")
-	public void updateCategories(@RequestBody List<CategoryUpdateDto> categoryUpdateDtos) {
-		categoryService.updateCategories(categoryUpdateDtos);
+	public CategoryCreateDto createCategories(@RequestBody CategoryCreateDto categoryCreateDtos) {
+		return categoryService.createCategories(categoryCreateDtos);
 	}
 
 	// 카테고리 삭제
-	@DeleteMapping("/categories")
-	public void deleteCategories(@RequestBody List<CategoryDto> categoryDtos) {
-		categoryService.deleteCategories(categoryDtos);
+	@DeleteMapping("/categories/{id}")
+	public void deleteCategories(@PathVariable("id") Long categoryId) {
+		categoryService.deleteCategory(categoryId);
+	}
+
+	// 카테고리가 사용 중인지 확인하는 엔드포인트 추가
+	@GetMapping("/categories/{id}/used")
+	public boolean isCategoryUsed(@PathVariable("id") Long categoryId) {
+		return categoryService.isCategoryUsed(categoryId);
 	}
 
 	@GetMapping("/category")
@@ -100,9 +102,41 @@ public class ProjectController {
 		return categoryService.getCategory();
 	}
 
+	// 카테고리 수정
+	@PutMapping("/categories/{id}")
+	public void updateCategory(@PathVariable("id") Long categoryId, @RequestBody CategoryUpdateDto categoryUpdateDto) {
+		categoryUpdateDto.setId(categoryId);
+		System.out.println("디티오 이름입니다.: " + categoryUpdateDto.getName());
+		categoryService.updateCategory(categoryUpdateDto);
+	}
+
+	@PostMapping("/category/{selectedCategoryId}/subcategory")
+	public SubCategoryCreateDto createSubCategory(@PathVariable("selectedCategoryId") Long categoryId,
+			@RequestBody SubCategoryCreateDto subCategoryCreateDto) {
+		SubCategoryCreateDto createdSubCategory = categoryService.createSubCategory(categoryId, subCategoryCreateDto);
+		return createdSubCategory;
+	}
+
 	@GetMapping("/subCategory/{id}")
 	public List<SubCategoryDto> getSubCategory(@PathVariable("id") Long categoryId) {
 		return categoryService.getSubCategory(categoryId);
 	}
 
+	@DeleteMapping("/subcategory/{id}")
+	public void deleteSubCategory(@PathVariable("id") Long subCategoryId) {
+		categoryService.deleteSubCategory(subCategoryId);
+	}
+
+	// 카테고리가 사용 중인지 확인하는 엔드포인트 추가
+	@GetMapping("/subcategory/{id}/used")
+	public boolean isSubCategoryUsed(@PathVariable("id") Long subCategoryId) {
+		return categoryService.isSubCategoryUsed(subCategoryId);
+	}
+
+	@PutMapping("/subcategories/{subCategoryId}")
+	public void updateSubCategory(@PathVariable("subCategoryId") Long subCategoryId,
+			@RequestBody SubCategoryUpdateDto subCategoryUpdateDto) {
+		categoryService.updateSubCategory(subCategoryId, subCategoryUpdateDto);
+	}
 }
+
