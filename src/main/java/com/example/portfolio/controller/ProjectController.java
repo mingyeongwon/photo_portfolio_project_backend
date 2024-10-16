@@ -18,6 +18,7 @@ import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.CategoryUpdateDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
+import com.example.portfolio.dto.SubCategoryCreateDto;
 import com.example.portfolio.dto.SubCategoryDto;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
@@ -106,6 +107,11 @@ public class ProjectController {
 		return categoryService.getCategory();
 	}
 
+	@PostMapping("/category/{selectedCategoryId}/subcategory")
+	public SubCategoryCreateDto createSubCategory(@PathVariable("selectedCategoryId") Long categoryId,@RequestBody SubCategoryCreateDto subCategoryCreateDto) {
+		SubCategoryCreateDto createdSubCategory = categoryService.createSubCategory(categoryId,subCategoryCreateDto);
+		return createdSubCategory;
+	}
 	@GetMapping("/subCategory/{id}")
 	public List<SubCategoryDto> getSubCategory(@PathVariable("id") Long categoryId) {
 		return categoryService.getSubCategory(categoryId);
