@@ -3,7 +3,6 @@ package com.example.portfolio.dto;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ProjectCreateDto {
-	private Long id;
 	private String title;
 	private Long categoryId;
 	private Long subcategoryId;
@@ -11,12 +10,6 @@ public class ProjectCreateDto {
 	private MultipartFile thumbnailMultipartFile;
 	private MultipartFile[] photoMultipartFiles;
 	
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
 	public String getTitle() {
 		return title;
 	}

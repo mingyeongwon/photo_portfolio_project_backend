@@ -7,7 +7,7 @@ public class ProjectUpdateDto {
 	private String title;
 	private Long categoryId;
 	private Long subcategoryId;
-	
+		
 	private MultipartFile thumbnailMultipartFile;
 	private MultipartFile[] photoMultipartFiles;
 	
@@ -49,4 +49,6 @@ public class ProjectUpdateDto {
 	public void setSubcategoryId(Long subcategoryId) {
 		this.subcategoryId = subcategoryId;
 	}
+
+	
 }
