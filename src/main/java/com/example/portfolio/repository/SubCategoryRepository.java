@@ -10,7 +10,4 @@ public interface SubCategoryRepository extends JpaRepository<SubCategory, Long> 
 
     // 카테고리 ID로 서브카테고리 목록 조회
     List<SubCategory> findByCategory_Id(Long categoryId);
-
-    // 카테고리 ID로 서브카테고리가 존재하는지 확인
-    boolean existsByCategory_Id(Long categoryId);
 }
