@@ -126,4 +126,15 @@ public class CategoryService {
 		SubCategory subCategory = categoryMapper.createSubCategoryToSubCategory(subCategoryDto);
 		return CategoryMapper.INSTANCE.createSubCategoryToSubCategoryDto(subCategoryRepository.save(subCategory));
 	}
+
+	public void deleteSubCategory(Long subCategoryId) {
+	    if (isSubCategoryUsed(subCategoryId)) {
+	        throw new RuntimeException("SubCategory is in use by a project and cannot be deleted.");
+	    }
+	    subCategoryRepository.deleteById(subCategoryId);
+	}
+
+	public boolean isSubCategoryUsed(Long subCategoryId) {
+		return projectRepository.existsBySubCategory_Id(subCategoryId);
+	}
 }

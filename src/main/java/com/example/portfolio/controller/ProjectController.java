@@ -116,4 +116,15 @@ public class ProjectController {
 	public List<SubCategoryDto> getSubCategory(@PathVariable("id") Long categoryId) {
 		return categoryService.getSubCategory(categoryId);
 	}
+	
+	@DeleteMapping("/subcategory/{id}")
+	public void deleteSubCategory(@PathVariable("id") Long subCategoryId) {
+		categoryService.deleteSubCategory(subCategoryId);
+	}
+	
+	// 카테고리가 사용 중인지 확인하는 엔드포인트 추가
+	@GetMapping("/subcategory/{id}/used")
+	public boolean isSubCategoryUsed(@PathVariable("id") Long subCategoryId) {
+		return categoryService.isSubCategoryUsed(subCategoryId);
+	}
 }
