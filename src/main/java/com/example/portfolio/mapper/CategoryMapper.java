@@ -23,8 +23,9 @@ public interface CategoryMapper {
 	// Update Dto -> Entity
 	Category createDtoToEntity(CategoryCreateDto categoryCreateDto);
 
-	// Create Dto -> Entity
-	Category updateDtoToEntity(CategoryUpdateDto categoryUpdateDto);
+//	// Create Dto -> Entity
+//	@Mapping(target = "subCategories", ignore = true)
+//	Category updateDtoToEntity(CategoryUpdateDto categoryUpdateDto);
 
 	@Mapping(source = "categoryId", target = "category.id")
 	SubCategory createSubCategoryToSubCategory(SubCategoryCreateDto subCategoryCreateDto);

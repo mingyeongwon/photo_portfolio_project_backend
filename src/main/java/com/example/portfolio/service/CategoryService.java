@@ -3,10 +3,20 @@ package com.example.portfolio.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import com.example.portfolio.dto.*;
+
+import com.example.portfolio.dto.CategoryCreateDto;
+import com.example.portfolio.dto.CategoryDto;
+import com.example.portfolio.dto.CategoryUpdateDto;
+import com.example.portfolio.dto.SubCategoryCreateDto;
+import com.example.portfolio.dto.SubCategoryDto;
+import com.example.portfolio.dto.SubCategoryUpdateDto;
 import com.example.portfolio.mapper.CategoryMapper;
-import com.example.portfolio.model.*;
-import com.example.portfolio.repository.*;
+import com.example.portfolio.model.Category;
+import com.example.portfolio.model.SubCategory;
+import com.example.portfolio.repository.CategoryRepository;
+import com.example.portfolio.repository.ProjectRepository;
+import com.example.portfolio.repository.SubCategoryRepository;
+
 import jakarta.transaction.Transactional;
 
 @Service
@@ -47,29 +57,29 @@ public class CategoryService {
 		return CategoryMapper.INSTANCE.categoryToCreateDto(categoryRepository.save(category));
 	}
 
-	@Transactional
-	public void updateCategories(List<CategoryUpdateDto> categoryUpdateDtos) {
-		for (CategoryUpdateDto categoryUpdateDto : categoryUpdateDtos) {
-			Category category = categoryRepository.findById(categoryUpdateDto.getId())
-					.orElseThrow(() -> new RuntimeException("Category not found"));
-
-			if (categoryUpdateDto.getName() != null) {
-				category.setName(categoryUpdateDto.getName());
-			}
-
-			if (categoryUpdateDto.getSubCategories() != null) {
-				for (SubCategoryDto subCategoryDto : categoryUpdateDto.getSubCategories()) {
-					SubCategory subCategory = subCategoryRepository.findById(subCategoryDto.getId())
-							.orElse(new SubCategory());
-					if (subCategoryDto.getName() != null) {
-						subCategory.setName(subCategoryDto.getName());
-					}
-					subCategory.setCategory(category);
-					subCategoryRepository.save(subCategory);
-				}
-			}
-		}
-	}
+//	@Transactional
+//	public void updateCategories(List<CategoryUpdateDto> categoryUpdateDtos) {
+//		for (CategoryUpdateDto categoryUpdateDto : categoryUpdateDtos) {
+//			Category category = categoryRepository.findById(categoryUpdateDto.getId())
+//					.orElseThrow(() -> new RuntimeException("Category not found"));
+//
+//			if (categoryUpdateDto.getName() != null) {
+//				category.setName(categoryUpdateDto.getName());
+//			}
+//
+//			if (categoryUpdateDto.getSubCategories() != null) {
+//				for (SubCategoryDto subCategoryDto : categoryUpdateDto.getSubCategories()) {
+//					SubCategory subCategory = subCategoryRepository.findById(subCategoryDto.getId())
+//							.orElse(new SubCategory());
+//					if (subCategoryDto.getName() != null) {
+//						subCategory.setName(subCategoryDto.getName());
+//					}
+//					subCategory.setCategory(category);
+//					subCategoryRepository.save(subCategory);
+//				}
+//			}
+//		}
+//	}
 
 	@Transactional
 	public void deleteCategory(Long categoryId) {
@@ -81,6 +91,7 @@ public class CategoryService {
 		categoryRepository.delete(category);
 	}
 
+	@Transactional
 	public boolean isCategoryUsed(Long categoryId) {
 		return projectRepository.existsByCategory_Id(categoryId);
 	}
@@ -121,20 +132,40 @@ public class CategoryService {
 		return subCategoryDto;
 	}
 
+	@Transactional
 	public SubCategoryCreateDto createSubCategory(Long categoryId, SubCategoryCreateDto subCategoryDto) {
 		subCategoryDto.setCategoryId(categoryId);
 		SubCategory subCategory = categoryMapper.createSubCategoryToSubCategory(subCategoryDto);
 		return CategoryMapper.INSTANCE.createSubCategoryToSubCategoryDto(subCategoryRepository.save(subCategory));
 	}
 
+	@Transactional
 	public void deleteSubCategory(Long subCategoryId) {
-	    if (isSubCategoryUsed(subCategoryId)) {
-	        throw new RuntimeException("SubCategory is in use by a project and cannot be deleted.");
-	    }
-	    subCategoryRepository.deleteById(subCategoryId);
+		if (isSubCategoryUsed(subCategoryId)) {
+			throw new RuntimeException("SubCategory is in use by a project and cannot be deleted.");
+		}
+		subCategoryRepository.deleteById(subCategoryId);
 	}
 
+	@Transactional
 	public boolean isSubCategoryUsed(Long subCategoryId) {
 		return projectRepository.existsBySubCategory_Id(subCategoryId);
 	}
+
+	@Transactional
+	public void updateCategory(CategoryUpdateDto categoryUpdateDto) {
+		Category category = categoryRepository.findById(categoryUpdateDto.getId()).orElseThrow(
+				() -> new IllegalArgumentException("Category not found with id: " + categoryUpdateDto.getId()));
+
+		// Name만 업데이트
+		category.setName(categoryUpdateDto.getName());
+		// subCategories 리스트를 변경하지 않음
+		categoryRepository.save(category);
+	}
+
+	public void updateSubCategory(SubCategoryUpdateDto subCategoryDto) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

@@ -20,6 +20,7 @@ import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.dto.SubCategoryCreateDto;
 import com.example.portfolio.dto.SubCategoryDto;
+import com.example.portfolio.dto.SubCategoryUpdateDto;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.service.AdminService;
@@ -85,10 +86,10 @@ public class ProjectController {
 	}
 
 	// 카테고리 수정
-	@PutMapping("/categories")
-	public void updateCategories(@RequestBody List<CategoryUpdateDto> categoryUpdateDtos) {
-		categoryService.updateCategories(categoryUpdateDtos);
-	}
+//	@PutMapping("/categories")
+//	public void updateCategories(@RequestBody List<CategoryUpdateDto> categoryUpdateDtos) {
+//		categoryService.updateCategories(categoryUpdateDtos);
+//	}
 
 	// 카테고리 삭제
 	@DeleteMapping("/categories/{id}")
@@ -107,24 +108,41 @@ public class ProjectController {
 		return categoryService.getCategory();
 	}
 
+	// 카테고리 수정
+	@PutMapping("/categories/{id}")
+	public void updateCategory(@PathVariable("id") Long categoryId, @RequestBody CategoryUpdateDto categoryUpdateDto) {
+		categoryUpdateDto.setId(categoryId);
+		System.out.println("디티오 이름입니다.: " + categoryUpdateDto.getName());
+		categoryService.updateCategory(categoryUpdateDto);
+	}
+
 	@PostMapping("/category/{selectedCategoryId}/subcategory")
-	public SubCategoryCreateDto createSubCategory(@PathVariable("selectedCategoryId") Long categoryId,@RequestBody SubCategoryCreateDto subCategoryCreateDto) {
-		SubCategoryCreateDto createdSubCategory = categoryService.createSubCategory(categoryId,subCategoryCreateDto);
+	public SubCategoryCreateDto createSubCategory(@PathVariable("selectedCategoryId") Long categoryId,
+			@RequestBody SubCategoryCreateDto subCategoryCreateDto) {
+		SubCategoryCreateDto createdSubCategory = categoryService.createSubCategory(categoryId, subCategoryCreateDto);
 		return createdSubCategory;
 	}
+
 	@GetMapping("/subCategory/{id}")
 	public List<SubCategoryDto> getSubCategory(@PathVariable("id") Long categoryId) {
 		return categoryService.getSubCategory(categoryId);
 	}
-	
+
 	@DeleteMapping("/subcategory/{id}")
 	public void deleteSubCategory(@PathVariable("id") Long subCategoryId) {
 		categoryService.deleteSubCategory(subCategoryId);
 	}
-	
+
 	// 카테고리가 사용 중인지 확인하는 엔드포인트 추가
 	@GetMapping("/subcategory/{id}/used")
 	public boolean isSubCategoryUsed(@PathVariable("id") Long subCategoryId) {
 		return categoryService.isSubCategoryUsed(subCategoryId);
 	}
+
+//	@PutMapping("/subcategories/${subCategoryId}")
+//	public void updateSubCategory(@PathVariable("subCategoryId") Long subCategoryId,
+//			SubCategoryUpdateDto subCategoryDto) {
+//		subCategoryDto.(subCategoryId)
+//		categoryService.updateSubCategory(subCategoryDto);
+//	}
 }
