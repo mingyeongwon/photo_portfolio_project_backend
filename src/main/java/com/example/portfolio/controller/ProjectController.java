@@ -45,8 +45,8 @@ public class ProjectController {
 
 	// 프로젝트 생성
 	@PostMapping("/create/project")
-	public void createProject(@ModelAttribute ProjectCreateDto projectCreateDto) {
-		projectService.createProject(projectCreateDto);
+	public void createProject(@ModelAttribute ProjectCreateDto projectCreateDtos) {
+		projectService.createProject(projectCreateDtos);
 	}
 
 	// 프로젝트 수정
@@ -139,3 +139,4 @@ public class ProjectController {
 		categoryService.updateSubCategory(subCategoryId, subCategoryUpdateDto);
 	}
 }
+

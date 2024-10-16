@@ -1,12 +1,16 @@
 package com.example.portfolio.service;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.ProjectCreateDto;
+import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
+import com.example.portfolio.mapper.ProjectMapper;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.model.Project;
 import com.example.portfolio.model.SubCategory;
@@ -20,53 +24,37 @@ import jakarta.transaction.Transactional;
 public class ProjectService {
 
 	private final ProjectRepository projectRepository;
-	private final CategoryRepository categoryRepository;
-	private final SubCategoryRepository subCategoryRepository;
 	private final GcsService gcsService;
 	private final PhotoService photoService;
+	private final ProjectMapper projectMapper;
 
 	// 여러 의존성을 생성자로 주입
-	public ProjectService(ProjectRepository projectRepository, CategoryRepository categoryRepository,
-			SubCategoryRepository subCategoryRepository, GcsService gcsService, PhotoService photoService) {
+	public ProjectService(ProjectRepository projectRepository,
+							GcsService gcsService, PhotoService photoService, ProjectMapper projectMapper) {
 		this.projectRepository = projectRepository;
-		this.categoryRepository = categoryRepository;
-		this.subCategoryRepository = subCategoryRepository;
 		this.gcsService = gcsService;
 		this.photoService = photoService;
+		this.projectMapper = projectMapper;
 	}
 
 	// 프로젝트 생성
 	@Transactional
-	public void createProject(ProjectCreateDto projectCreateDto) {
-		Project project = new Project();
-
-		// 프로젝트 제목 설정
-		project.setTitle(projectCreateDto.getTitle());
-
-		// 카테고리 설정
-		Category category = categoryRepository.findById(projectCreateDto.getCategoryId())
-				.orElseThrow(() -> new RuntimeException("Category not found"));
-		project.setCategory(category);
-
-		// 서브 카테고리 설정
-		SubCategory subCategory = subCategoryRepository.findById(projectCreateDto.getSubcategoryId())
-				.orElseThrow(() -> new RuntimeException("SubCategory not found"));
-		project.setSubCategory(subCategory);
-
-		// 프로젝트를 먼저 저장하여 ID 생성
+	public void  createProject(ProjectCreateDto projectCreateDtos) {
+		
+		Project project = projectMapper.createDtoToProject(projectCreateDtos);
+		
 		Long projectId = projectRepository.save(project).getId();
-
+		
 		// 썸네일 생성
-		MultipartFile multipartFile = projectCreateDto.getThumbnailMultipartFile();
+		MultipartFile multipartFile = projectCreateDtos.getThumbnailMultipartFile();
 		try {
 			String url = gcsService.uploadFile(multipartFile, projectId); // GCS에 파일 업로드
-			project.setThumbnailUrl(url); // 썸네일 URL 설정
+			project.setThumbnailUrl(url);
 		} catch (IOException e) {
 			throw new RuntimeException("Failed to upload thumbnail to GCS", e); // 예외 처리
 		}
-
 		// 사진 생성
-		photoService.createPhotos(projectCreateDto, projectId);
+		photoService.createPhotos(projectCreateDtos, projectId);
 
 		// 최종적으로 프로젝트 업데이트
 		projectRepository.save(project);
@@ -75,31 +63,15 @@ public class ProjectService {
 	// 프로젝트 업데이트
 	@Transactional
 	public void updateProject(ProjectUpdateDto projectUpdateDto) {
-		Project project = projectRepository.findById(projectUpdateDto.getId())
-				.orElseThrow(() -> new RuntimeException("Project not found"));
-
-		// 제목 업데이트
-		if (projectUpdateDto.getTitle() != null && !projectUpdateDto.getTitle().isEmpty()) {
-			project.setTitle(projectUpdateDto.getTitle());
-		}
-
-		// 카테고리 업데이트
-		if (projectUpdateDto.getCategoryId() != null) {
-			Category category = categoryRepository.findById(projectUpdateDto.getCategoryId())
-					.orElseThrow(() -> new RuntimeException("Category not found"));
-			project.setCategory(category);
-		}
-
-		// 서브 카테고리 업데이트
-		if (projectUpdateDto.getSubcategoryId() != null) {
-			SubCategory subCategory = subCategoryRepository.findById(projectUpdateDto.getSubcategoryId())
-					.orElseThrow(() -> new RuntimeException("SubCategory not found"));
-			project.setSubCategory(subCategory);
-		}
-
+		
+		Project project = projectMapper.upadateDtoToProject(projectUpdateDto);
+		String thumbnailurl = projectRepository.findById(projectUpdateDto.getId()).get().getThumbnailUrl();
+		project.setThumbnailUrl(thumbnailurl);
+		
 		// 썸네일이 있는 경우에만 업데이트
 		if (projectUpdateDto.getThumbnailMultipartFile() != null
 				&& !projectUpdateDto.getThumbnailMultipartFile().isEmpty()) {
+			
 			try {
 				// 기존 썸네일 삭제
 				gcsService.deleteThumbnailFile(project.getThumbnailUrl());
@@ -134,7 +106,16 @@ public class ProjectService {
 		projectRepository.delete(project);
 	}
 
-//	public void getProject{
-//	
-//}
+	//프로젝트 불러오기
+	@Transactional
+	public List<ProjectListDto> getProjectList(Pageable pageable, Long CategoryId,Long subCategoryId) {
+		//서브카테고리가 선택되지 않았을 때 카테고리로 찾아오기 
+		if(subCategoryId==null) {
+			return projectRepository.findByCategory_id(pageable, CategoryId).getContent();
+		}else {
+			return projectRepository.findBySubCategory_id(pageable, subCategoryId).getContent();
+		}
+		
+	}
+
 }
