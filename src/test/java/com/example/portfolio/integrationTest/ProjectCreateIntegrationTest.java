@@ -32,7 +32,6 @@ import com.example.portfolio.service.ProjectService;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
-@Rollback(false) 
 class ProjectCreateIntegrationTest {
 	
 
