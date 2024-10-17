@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -70,7 +72,11 @@ public class ProjectController {
 	// 로그인
 	@GetMapping("/loginSucess")
 	public ResponseEntity<String> loginSucess() {
-		return ResponseEntity.ok("login success");
+		// 로그인된 유저 정보 가져옴
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String id = authentication.getName();
+		
+		return ResponseEntity.ok(id);
 	}
 
 	// 아이디 만들기
