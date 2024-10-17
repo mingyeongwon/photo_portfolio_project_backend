@@ -48,11 +48,6 @@ class ProjectControllerTest {
 	void ControllerCreateTest() throws Exception {
 		
 		// Given
-		ProjectCreateDto projectCreateDto = new ProjectCreateDto();
-		projectCreateDto.setTitle("서비스테스트제목");
-		projectCreateDto.setCategoryId(1L);
-		projectCreateDto.setSubcategoryId(1L);
-		
 		// 썸네일 사진 생성
 		MockMultipartFile thumbnailFile = new MockMultipartFile(
 				"thumbnailMultipartFile",
