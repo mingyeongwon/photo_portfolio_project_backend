@@ -3,6 +3,7 @@ package com.example.portfolio.controller;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,6 +22,7 @@ import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.dto.SubCategoryDto;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
+import com.example.portfolio.security.AdminDetailsService;
 import com.example.portfolio.service.AdminService;
 import com.example.portfolio.service.CategoryService;
 import com.example.portfolio.service.ProjectService;
@@ -32,13 +34,15 @@ public class ProjectController {
 	private final CategoryService categoryService;
 	private final ProjectService projectService;
 	private final AdminService adminService;
+	private final AdminDetailsService adminDetailsService;
 
 	// 생성자 주입
 	public ProjectController(CategoryService categoryService, ProjectService projectService,
-			AdminService adminService) {
+			AdminService adminService, AdminDetailsService adminDetailsService) {
 		this.categoryService = categoryService;
 		this.projectService = projectService;
 		this.adminService = adminService;
+		this.adminDetailsService = adminDetailsService;
 	}
 
 	// 프로젝트 생성
@@ -61,6 +65,12 @@ public class ProjectController {
 	@DeleteMapping("/delete/project/{id}")
 	public void deleteProjecct(@PathVariable("id") Long id) {
 		projectService.deleteProject(id);
+	}
+	
+	// 로그인
+	@GetMapping("/loginSucess")
+	public ResponseEntity<String> loginSucess() {
+		return ResponseEntity.ok("login success");
 	}
 
 	// 아이디 만들기

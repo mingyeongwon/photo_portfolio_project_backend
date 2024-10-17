@@ -41,22 +41,13 @@ public class WebSecurityConfig {
 			)
 			.formLogin(
 				(form) -> form
-					
-								// 로그인 성공 시 핸들러
-//								.successHandler(loginSuccessHandler())
-								.defaultSuccessUrl("http://localhost:9090/Admin/ManageImages", true)
+								.loginPage("/Admin/Login")
+								.loginProcessingUrl("/loginProcess")
+								.usernameParameter("id")
+								.defaultSuccessUrl("/api/loginSucess")
 								.permitAll()
 			);
 		return http.build();
-	}
-	
-	// 로그인 성공 시 핸들러
-	@Bean
-	public AuthenticationSuccessHandler loginSuccessHandler() {
-		return (request, response, authentication) -> {
-			// 프론트 리다이렉트
-			response.sendRedirect("http://localhost:9090/Admin/ManageImages");
-		};
 	}
 	
 	// CORS 설정
@@ -65,7 +56,7 @@ public class WebSecurityConfig {
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true); // 쿠키 허용
 		config.setAllowedOrigins(List.of("http://localhost:9090")); // 프론트 port
-		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용 메소드
 		config.setAllowedHeaders(List.of("*"));
 		
 		// url 경로마다 cors 적용 가능
