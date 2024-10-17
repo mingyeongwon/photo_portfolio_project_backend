@@ -10,13 +10,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
-import com.example.portfolio.mapper.ProjectMapper;
-import com.example.portfolio.model.Category;
+import com.example.portfolio.mapper.ProjectMapper; 
 import com.example.portfolio.model.Project;
-import com.example.portfolio.model.SubCategory;
-import com.example.portfolio.repository.CategoryRepository;
 import com.example.portfolio.repository.ProjectRepository;
-import com.example.portfolio.repository.SubCategoryRepository;
 
 import jakarta.transaction.Transactional;
 

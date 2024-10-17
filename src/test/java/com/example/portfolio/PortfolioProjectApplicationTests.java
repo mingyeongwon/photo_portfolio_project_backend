@@ -38,17 +38,6 @@ class PortfolioProjectApplicationTests {
 	    assertThat( categoryCreateDto.getName() ).isEqualTo( "testCategory" );
 	}
 	
-	@Test
-	public void ProjectMapperTest() {
-		Project project = new Project(35L,"CreateProjectTest",0,null,null,null,null);
-		
-		ProjectCreateDto projectCreateDto = ProjectMapper.INSTANCE.projectToCreateDto(project);
-		
-		assertThat( projectCreateDto ).isNotNull();
-	    assertThat( projectCreateDto.getTitle() ).isEqualTo( "CreateProjectTest" );
-	    assertThat( projectCreateDto.getCategoryId() ).isEqualTo( 8L );
-		
-	}
 
 //	@Test
 //	public void createProjectTest() throws Exception {

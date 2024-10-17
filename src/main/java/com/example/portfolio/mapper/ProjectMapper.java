@@ -16,12 +16,6 @@ import com.example.portfolio.model.Project;
 public interface ProjectMapper {
 	ProjectMapper INSTANCE = Mappers.getMapper(ProjectMapper.class);
 
-	// Entity -> Create Dto
-	ProjectCreateDto projectToCreateDto(Project project);
-
-	// Entity -> Update Dto
-	ProjectUpdateDto projectToUpdateDto(Project project);
-	
 
 	// Create Dto -> Entity
 	@Mapping(source = "categoryId", target = "category.id")
