@@ -11,12 +11,8 @@ public class ProjectListDto {
 	private String categoryName;
 	private Long imageCount;
 
-	public ProjectListDto() {
-		super();
-	}
 
 	public ProjectListDto(Long id, String title, String imageUrl, Date createdAt, int view, String categoryName, Long imageCount) {
-		super();
 		this.id = id;
 		this.title = title;
 		this.imageUrl = imageUrl;

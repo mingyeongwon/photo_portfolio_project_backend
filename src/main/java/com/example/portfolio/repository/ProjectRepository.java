@@ -1,5 +1,7 @@
 package com.example.portfolio.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -31,6 +33,17 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
 			+"FROM Project p JOIN p.category c "
 		    +"WHERE p.title LIKE (CONCAT('%', :keyWord, '%')) ")
 	Page<ProjectListDto> findByKeyWord(Pageable pageable,@Param("keyWord") String keyWord);
+	
+	List<Project> findByCategory_Id(Long categoryId);
+
+	List<Project> findBySubCategory_Id(Long subCategory);
+
+	// 카테고리 사용 유무 확인
+	boolean existsByCategory_Id(Long Categoryid);
+
+	// 서브 카테고리 사용 유무
+	boolean existsBySubCategory_Id(Long subCategoryId);
+	
 	
 	@Modifying
 	@Transactional

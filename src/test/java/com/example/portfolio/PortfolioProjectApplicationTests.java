@@ -10,11 +10,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.example.portfolio.dto.CategoryCreateDto;
-import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.mapper.CategoryMapper;
-import com.example.portfolio.mapper.ProjectMapper;
 import com.example.portfolio.model.Category;
-import com.example.portfolio.model.Project;
 
 @SpringBootTest
 @AutoConfigureMockMvc
