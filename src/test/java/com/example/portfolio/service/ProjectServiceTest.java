@@ -38,9 +38,6 @@ class ProjectServiceTest {
 	@Mock
 	private GcsService gcsService;
 	
-	@Mock
-	private PhotoService photoService;
-	
 	@InjectMocks
 	private ProjectService projectService;
 	
@@ -102,18 +99,12 @@ class ProjectServiceTest {
 	    assertThat(project.getSubCategory().getId()).isEqualTo(1L);
 	    assertThat(project.getThumbnailUrl()).isEqualTo("http:localhost:8181/image.jpg");
 	   
-	    
 		assertThat(projectId).isEqualTo(1L);
 		assertThat(url).isEqualTo("http:localhost8181/thumbnail.jpg");
 		
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	    
-	    
-	
-	    
-	    
 	    
 	}
 
