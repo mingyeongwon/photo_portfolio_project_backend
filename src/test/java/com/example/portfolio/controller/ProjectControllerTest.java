@@ -42,10 +42,7 @@ class ProjectControllerTest {
     
     @MockBean
     private PhotoService photoService;
-	
-	// 객체 <-> Json 변경을 도와주는 라이브러리
-	 private Gson gson = new Gson();
-	 
+
 	@Test
 	@DisplayName("컨트롤러 생성 성공 테스트")
 	void ControllerCreateTest() throws Exception {
@@ -78,36 +75,6 @@ class ProjectControllerTest {
 	        "photo2 content".getBytes()
 	    );
 	    
-	 // ProjectCreateDto를 JSON으로 변환
-//        String projectCreateDtoJson = new ObjectMapper().writeValueAsString(projectCreateDto);
-//        MockMultipartFile jsonFile = new MockMultipartFile(
-//            "projectCreateDto", 
-//            "", 
-//            "application/json", 
-//            projectCreateDtoJson.getBytes()
-//        );
-//        
-        // ProjectCreateDto를 JSON으로 변환 (Gson 사용)
-        String projectCreateDtoJson = gson.toJson(projectCreateDto);
-        // 이름. 오리지널이름, 타입, 바이트
-        MockMultipartFile jsonFile = new MockMultipartFile(
-            "projectCreateDto", 
-            "", 
-            "application/json", 
-            projectCreateDtoJson.getBytes()
-        );
-
-	  
-		// When & Then
-//        mockMvc.perform(MockMvcRequestBuilders.multipart("/api/create/project")
-//                .file(thumbnailFile)
-//                .file(photoFile1)
-//                .file(photoFile2)
-//                .file(jsonFile)
-//                .contentType(MediaType.MULTIPART_FORM_DATA))
-//                .andExpect(status().isOk())
-//                .andDo(print());
-        
         // When & Then
         mockMvc.perform(MockMvcRequestBuilders.multipart("/api/create/project")
                 .file(thumbnailFile)
