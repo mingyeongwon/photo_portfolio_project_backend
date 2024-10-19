@@ -3,6 +3,9 @@ package com.example.portfolio.controller;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,19 +17,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.portfolio.dto.CategoryCreateDto;
 import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.CategoryUpdateDto;
+import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
+import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
+import com.example.portfolio.dto.SubCategoryCreateDto;
 import com.example.portfolio.dto.SubCategoryDto;
+import com.example.portfolio.dto.SubCategoryUpdateDto;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.security.AdminDetailsService;
 import com.example.portfolio.service.AdminService;
 import com.example.portfolio.service.CategoryService;
+import com.example.portfolio.service.PhotoService;
 import com.example.portfolio.service.ProjectService;
 
 @RestController
@@ -37,20 +46,22 @@ public class ProjectController {
 	private final ProjectService projectService;
 	private final AdminService adminService;
 	private final AdminDetailsService adminDetailsService;
+	private final PhotoService photoService;
 
 	// 생성자 주입
 	public ProjectController(CategoryService categoryService, ProjectService projectService,
-			AdminService adminService, AdminDetailsService adminDetailsService) {
+			AdminService adminService, AdminDetailsService adminDetailsService, PhotoService photoService) {
 		this.categoryService = categoryService;
 		this.projectService = projectService;
 		this.adminService = adminService;
 		this.adminDetailsService = adminDetailsService;
+		this.photoService = photoService;
 	}
 
 	// 프로젝트 생성
 	@PostMapping("/create/project")
-	public void createProject(@ModelAttribute ProjectCreateDto projectCreateDto) {
-		projectService.createProject(projectCreateDto);
+	public void createProject(@ModelAttribute ProjectCreateDto projectCreateDtos) {
+		projectService.createProject(projectCreateDtos);
 	}
 
 	// 프로젝트 수정
@@ -61,6 +72,23 @@ public class ProjectController {
 		projectUpdateDto.setId(id);
 		// 프로젝트 업데이트 서비스 호출
 		projectService.updateProject(projectUpdateDto);
+	}
+	
+	//프로젝트 가져오기 
+	@GetMapping(value={"/get/project/{categoryId}/{subCategory}", "/get/project/{categoryId}"} )
+	public List<ProjectListDto> getProject( 
+			@PageableDefault(page= 0, size = 5) Pageable pageable, 
+			@PathVariable("categoryId") Long categoryId,
+			@PathVariable(name = "subCategory", required = false) Long subCategoryId){
+		return projectService.getProjectList(pageable,categoryId,subCategoryId);
+	}
+	
+	//admin page 프로젝트 가져오기 
+	@GetMapping("/get/adminProject" )
+	public List<ProjectListDto> getAdminProject(
+			@PageableDefault(page= 0, size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable, 
+			@RequestParam(value= "keyWord", defaultValue = "") String keyWord ){ 
+		return adminService.getAdminProjectList(pageable,keyWord);
 	}
 
 	// 프로젝트 삭제
@@ -95,20 +123,20 @@ public class ProjectController {
 	// 카테고리 생성
 //  @Secured("ROLE_ADMIN")
 	@PostMapping("/categories")
-	public void createCategories(@RequestBody List<CategoryCreateDto> categoryCreateDtos) {
-		categoryService.createCategories(categoryCreateDtos);
-	}
-
-	// 카테고리 수정
-	@PutMapping("/categories")
-	public void updateCategories(@RequestBody List<CategoryUpdateDto> categoryUpdateDtos) {
-		categoryService.updateCategories(categoryUpdateDtos);
+	public CategoryCreateDto createCategories(@RequestBody CategoryCreateDto categoryCreateDtos) {
+		return categoryService.createCategories(categoryCreateDtos);
 	}
 
 	// 카테고리 삭제
-	@DeleteMapping("/categories")
-	public void deleteCategories(@RequestBody List<CategoryDto> categoryDtos) {
-		categoryService.deleteCategories(categoryDtos);
+	@DeleteMapping("/categories/{id}")
+	public void deleteCategories(@PathVariable("id") Long categoryId) {
+		categoryService.deleteCategory(categoryId);
+	}
+
+	// 카테고리가 사용 중인지 확인하는 엔드포인트 추가
+	@GetMapping("/categories/{id}/used")
+	public boolean isCategoryUsed(@PathVariable("id") Long categoryId) {
+		return categoryService.isCategoryUsed(categoryId);
 	}
 
 	@GetMapping("/category")
@@ -116,9 +144,48 @@ public class ProjectController {
 		return categoryService.getCategory();
 	}
 
+	// 카테고리 수정
+	@PutMapping("/categories/{id}")
+	public void updateCategory(@PathVariable("id") Long categoryId, @RequestBody CategoryUpdateDto categoryUpdateDto) {
+		categoryUpdateDto.setId(categoryId);
+		System.out.println("디티오 이름입니다.: " + categoryUpdateDto.getName());
+		categoryService.updateCategory(categoryUpdateDto);
+	}
+
+	@PostMapping("/category/{selectedCategoryId}/subcategory")
+	public SubCategoryCreateDto createSubCategory(@PathVariable("selectedCategoryId") Long categoryId,
+			@RequestBody SubCategoryCreateDto subCategoryCreateDto) {
+		SubCategoryCreateDto createdSubCategory = categoryService.createSubCategory(categoryId, subCategoryCreateDto);
+		return createdSubCategory;
+	}
+
 	@GetMapping("/subCategory/{id}")
 	public List<SubCategoryDto> getSubCategory(@PathVariable("id") Long categoryId) {
 		return categoryService.getSubCategory(categoryId);
 	}
+	
+	@GetMapping("/photos/{id}")
+	public List<PhotoListDto> getPhotos(
+			@PageableDefault(page= 0, size = 5) Pageable pageable,
+			@PathVariable("id") Long projectId) {
+		return photoService.getPhotoList(pageable, projectId);
+	}
 
+	@DeleteMapping("/subcategory/{id}")
+	public void deleteSubCategory(@PathVariable("id") Long subCategoryId) {
+		categoryService.deleteSubCategory(subCategoryId);
+	}
+
+	// 카테고리가 사용 중인지 확인하는 엔드포인트 추가
+	@GetMapping("/subcategory/{id}/used")
+	public boolean isSubCategoryUsed(@PathVariable("id") Long subCategoryId) {
+		return categoryService.isSubCategoryUsed(subCategoryId);
+	}
+
+	@PutMapping("/subcategories/{subCategoryId}")
+	public void updateSubCategory(@PathVariable("subCategoryId") Long subCategoryId,
+			@RequestBody SubCategoryUpdateDto subCategoryUpdateDto) {
+		categoryService.updateSubCategory(subCategoryId, subCategoryUpdateDto);
+	}
 }
+

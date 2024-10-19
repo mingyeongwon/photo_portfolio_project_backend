@@ -34,6 +34,7 @@ class PortfolioProjectApplicationTests {
 	    assertThat( categoryCreateDto.getId() ).isEqualTo( 33L );
 	    assertThat( categoryCreateDto.getName() ).isEqualTo( "testCategory" );
 	}
+	
 
 //	@Test
 //	public void createProjectTest() throws Exception {
