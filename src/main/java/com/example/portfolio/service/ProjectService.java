@@ -105,8 +105,12 @@ public class ProjectService {
 	//프로젝트 불러오기
 	@Transactional
 	public List<ProjectListDto> getProjectList(Pageable pageable, Long CategoryId,Long subCategoryId) {
+		System.out.println("cate" + CategoryId);
+		System.out.println("sub"+subCategoryId);
 		//서브카테고리가 선택되지 않았을 때 카테고리로 찾아오기 
-		if(subCategoryId==null) {
+		if(CategoryId==null) {
+			return projectRepository.findAllProject(pageable).getContent();
+		}else if(subCategoryId==null) {
 			return projectRepository.findByCategory_id(pageable, CategoryId).getContent();
 		}else {
 			return projectRepository.findBySubCategory_id(pageable, subCategoryId).getContent();

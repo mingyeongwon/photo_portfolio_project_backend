@@ -18,6 +18,11 @@ import com.example.portfolio.model.Project;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long>{
+	
+	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name, NULL) "
+			+ "FROM Project p JOIN p.category c ")
+	Slice<ProjectListDto> findAllProject(Pageable pageable);
+	
 	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name, NULL) "
 			+ "FROM Project p JOIN p.category c "
 			+ "where c.id= :categoryId ")

@@ -69,13 +69,14 @@ public class ProjectController {
 	}
 	
 	//프로젝트 가져오기 
-	@GetMapping(value={"/get/project/{categoryId}/{subCategory}", "/get/project/{categoryId}"} )
-	public List<ProjectListDto> getProject( 
-			@PageableDefault(page= 0, size = 5) Pageable pageable, 
-			@PathVariable("categoryId") Long categoryId,
-			@PathVariable(name = "subCategory", required = false) Long subCategoryId){
+	@GetMapping(value={"/get/project"})
+	public List<ProjectListDto> getProject( Pageable pageable, 
+			@RequestParam( name="categoryId", required = false) Long categoryId,
+			@RequestParam(name = "subCategoryId", required = false) Long subCategoryId){
+
 		return projectService.getProjectList(pageable,categoryId,subCategoryId);
 	}
+
 	
 	//admin page 프로젝트 가져오기 
 	@GetMapping("/get/adminProject" )
