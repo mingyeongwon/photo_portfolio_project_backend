@@ -69,11 +69,10 @@ public class ProjectController {
 	}
 	
 	//프로젝트 가져오기 
-	@GetMapping(value={"/get/project"})
+	@GetMapping("/get/project")
 	public List<ProjectListDto> getProject( Pageable pageable, 
 			@RequestParam( name="categoryId", required = false) Long categoryId,
 			@RequestParam(name = "subCategoryId", required = false) Long subCategoryId){
-
 		return projectService.getProjectList(pageable,categoryId,subCategoryId);
 	}
 
@@ -151,8 +150,9 @@ public class ProjectController {
 	
 	@GetMapping("/photos/{id}")
 	public List<PhotoListDto> getPhotos(
-			@PageableDefault(page= 0, size = 5) Pageable pageable,
+			@PageableDefault( size = 12) Pageable pageable,
 			@PathVariable("id") Long projectId) {
+		System.out.println("page"+pageable.getPageNumber());
 		return photoService.getPhotoList(pageable, projectId);
 	}
 
