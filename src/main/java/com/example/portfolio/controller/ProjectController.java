@@ -6,6 +6,9 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,6 +32,7 @@ import com.example.portfolio.dto.SubCategoryDto;
 import com.example.portfolio.dto.SubCategoryUpdateDto;
 import com.example.portfolio.model.Admin;
 import com.example.portfolio.model.Category;
+import com.example.portfolio.security.AdminDetailsService;
 import com.example.portfolio.service.AdminService;
 import com.example.portfolio.service.CategoryService;
 import com.example.portfolio.service.PhotoService;
@@ -41,14 +45,16 @@ public class ProjectController {
 	private final CategoryService categoryService;
 	private final ProjectService projectService;
 	private final AdminService adminService;
+	private final AdminDetailsService adminDetailsService;
 	private final PhotoService photoService;
 
 	// 생성자 주입
 	public ProjectController(CategoryService categoryService, ProjectService projectService,
-			AdminService adminService, PhotoService photoService ) {
+			AdminService adminService, AdminDetailsService adminDetailsService, PhotoService photoService) {
 		this.categoryService = categoryService;
 		this.projectService = projectService;
 		this.adminService = adminService;
+		this.adminDetailsService = adminDetailsService;
 		this.photoService = photoService;
 	}
 
@@ -89,6 +95,16 @@ public class ProjectController {
 	@DeleteMapping("/delete/project/{id}")
 	public void deleteProjecct(@PathVariable("id") Long id) {
 		projectService.deleteProject(id);
+	}
+	
+	// 로그인
+	@GetMapping("/loginSucess")
+	public ResponseEntity<String> loginSucess() {
+		// 로그인된 유저 정보 가져옴
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String id = authentication.getName();
+		
+		return ResponseEntity.ok(id);
 	}
 
 	// 아이디 만들기

@@ -2,11 +2,16 @@ package com.example.portfolio.dto;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 public class ProjectListDto {
 	private Long id;
 	private String title;
 	private String imageUrl; // 썸네일 URL
+	
+	@JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul") //날짜 포멧 바꾸기
 	private Date createdAt;
+	
 	private int view;
 	private String categoryName;
 	private Long imageCount;
