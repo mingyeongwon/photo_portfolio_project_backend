@@ -2,6 +2,7 @@ package com.example.portfolio.service;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.example.portfolio.dto.CategoryCreateDto;
@@ -41,6 +42,7 @@ public class CategoryService {
 	}
 
 	// 카테고리 전체 목록 가져오기
+	@Cacheable("categories")
 	public List<CategoryDto> getAllCategories() {
 		List<Category> categories = categoryRepository.findAll();
 		return categories.stream().map(this::mapEntityToDto).toList();

@@ -3,6 +3,8 @@ package com.example.portfolio.controller;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -84,11 +86,17 @@ public class ProjectController {
 	}
 	
 	//admin page 프로젝트 가져오기 
-	@GetMapping("/get/adminProject" )
-	public List<ProjectListDto> getAdminProject(
-			@PageableDefault(page= 0, size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable, 
-			@RequestParam(value= "keyWord", defaultValue = "") String keyWord ){ 
-		return adminService.getAdminProjectList(pageable,keyWord);
+	@GetMapping("/get/adminProject")
+	public Page<ProjectListDto> getAdminProject(
+	        @RequestParam(value = "page", defaultValue = "0") int page,
+	        @RequestParam(value = "size", defaultValue = "5") int size,
+	        @RequestParam(value = "sort", defaultValue = "id") String sort,
+	        @RequestParam(value = "direction", defaultValue = "desc") String direction,
+	        @RequestParam(value = "keyWord", defaultValue = "") String keyWord) {
+	    Sort sortOrder = direction.equalsIgnoreCase("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+	    Pageable pageable = PageRequest.of(page, size, sortOrder);
+
+	    return adminService.getAdminProjectList(pageable, keyWord);
 	}
 
 	// 프로젝트 삭제

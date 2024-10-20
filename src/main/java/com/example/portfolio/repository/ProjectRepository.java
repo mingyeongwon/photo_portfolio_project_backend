@@ -28,11 +28,14 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
 			+ "where s.id= :subCategoryId " )
 	Slice<ProjectListDto> findBySubCategory_id(Pageable pageable,@Param("subCategoryId") Long subCategoryId);
 
-	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name, " 
-			+"(SELECT COUNT(ph) FROM Photo ph WHERE ph.projectId = p.id)) "
-			+"FROM Project p JOIN p.category c "
-		    +"WHERE p.title LIKE (CONCAT('%', :keyWord, '%')) ")
-	Page<ProjectListDto> findByKeyWord(Pageable pageable,@Param("keyWord") String keyWord);
+	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name, COUNT(ph)) "
+	        + "FROM Project p "
+	        + "JOIN p.category c "
+	        + "LEFT JOIN Photo ph ON ph.projectId = p.id "
+	        + "WHERE p.title LIKE CONCAT('%', :keyWord, '%') "
+	        + "GROUP BY p.id, c.name")
+	Page<ProjectListDto> findByKeyWord(Pageable pageable, @Param("keyWord") String keyWord);
+
 	
 	List<Project> findByCategory_Id(Long categoryId);
 
@@ -49,6 +52,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
 	@Transactional
 	@Query("UPDATE Project p SET p.view = p.view + 1 WHERE p.id = :projectId")
 	void updateViewCount(@Param("projectId") Long projectId);
+	
 	
 }
  
