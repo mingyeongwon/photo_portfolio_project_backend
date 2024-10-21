@@ -14,10 +14,11 @@ public class ProjectListDto {
 	
 	private int view;
 	private String categoryName;
+	private String subCategoryName;
 	private Long imageCount;
 
 
-	public ProjectListDto(Long id, String title, String imageUrl, Date createdAt, int view, String categoryName, Long imageCount) {
+	public ProjectListDto(Long id, String title, String imageUrl, Date createdAt, int view, String categoryName, String subCategoryName, Long imageCount) {
 		this.id = id;
 		this.title = title;
 		this.imageUrl = imageUrl;
@@ -25,6 +26,7 @@ public class ProjectListDto {
 		this.view = view;
 		this.categoryName = categoryName;
 		this.imageCount = imageCount;
+		this.subCategoryName = subCategoryName;
 	}
 
 
@@ -82,6 +84,16 @@ public class ProjectListDto {
 
 	public void setImageCount(Long imageCount) {
 		this.imageCount = imageCount;
+	}
+
+
+	public String getSubCategoryName() {
+		return subCategoryName;
+	}
+
+
+	public void setSubCategoryName(String subCategoryName) {
+		this.subCategoryName = subCategoryName;
 	}
 
 	
