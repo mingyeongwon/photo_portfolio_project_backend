@@ -8,9 +8,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.ProjectCreateDto;
+import com.example.portfolio.dto.ProjectDetailDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
-import com.example.portfolio.mapper.ProjectMapper; 
+import com.example.portfolio.mapper.ProjectMapper;
 import com.example.portfolio.model.Project;
 import com.example.portfolio.repository.ProjectRepository;
 
@@ -113,6 +114,11 @@ public class ProjectService {
 		}else {
 			return projectRepository.findBySubCategory_id(pageable, subCategoryId).getContent();
 		}
+	}
+	
+	// 프로젝트 디테일 정보 가져오기
+	public ProjectDetailDto getAdminProject(Long projectId) {
+		return projectRepository.findByProjectId(projectId);
 	}
 
 }
