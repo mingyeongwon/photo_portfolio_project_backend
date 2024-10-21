@@ -83,14 +83,21 @@ public class ProjectController {
 	}
 
 	
-	//admin page 프로젝트 가져오기 
+	
+	//admin page 프로젝트 리스트 가져오기 
 	@GetMapping("/get/adminProject" )
-	public List<ProjectListDto> getAdminProject(
+	public List<ProjectListDto> getAdminProjectList(
 			@PageableDefault(page= 0, size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable, 
 			@RequestParam(value= "keyWord", defaultValue = "") String keyWord ){ 
 		return adminService.getAdminProjectList(pageable,keyWord);
 	}
-
+	
+	//admin page 프로젝트 디테일 가져오기 
+		@GetMapping("/get/adminProject/{projectId}" )
+		public List<ProjectListDto> getAdminProjectDetail(
+				@PathVariable("projectId") Long projectId ){ 
+			return adminService.getAdminProject(projectId);
+		}
 	// 프로젝트 삭제
 	@DeleteMapping("/delete/project/{id}")
 	public void deleteProjecct(@PathVariable("id") Long id) {
