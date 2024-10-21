@@ -2,6 +2,8 @@ package com.example.portfolio.service;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,8 +37,9 @@ public class AdminService {
 	
 	//admin page 프로젝트 불러오기 
 	@Transactional
-	public List<ProjectListDto> getAdminProjectList(Pageable pageable, String keyWord) {
-		return projectRepository.findByKeyWord(pageable, keyWord).getContent();
+	@Cacheable("projects")
+	public Page<ProjectListDto> getAdminProjectList(Pageable pageable, String keyWord) {
+	    return projectRepository.findByKeyWord(pageable, keyWord);
 	}
 
 	public List<ProjectListDto> getAdminProject(Long projectId) {
