@@ -46,7 +46,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
 	        + "JOIN p.subCategory s "
 	        + "LEFT JOIN Photo ph ON ph.projectId = p.id "
 	        + "WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyWord, '%')) "
-	        + "GROUP BY p.id, c.name")
+	        + "GROUP BY p.id, c.name, s.name")
 	Page<ProjectListDto> findByKeyWord(Pageable pageable, @Param("keyWord") String keyWord);
 	
 	List<Project> findByCategory_Id(Long categoryId);
