@@ -32,10 +32,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
 	        + "FROM Project p "
 	        + "JOIN p.category c "
 	        + "LEFT JOIN Photo ph ON ph.projectId = p.id "
-	        + "WHERE p.title LIKE CONCAT('%', :keyWord, '%') "
+	        + "WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyWord, '%')) "
 	        + "GROUP BY p.id, c.name")
 	Page<ProjectListDto> findByKeyWord(Pageable pageable, @Param("keyWord") String keyWord);
-
 	
 	List<Project> findByCategory_Id(Long categoryId);
 
