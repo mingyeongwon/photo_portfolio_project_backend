@@ -40,9 +40,10 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
 			+ "where s.id= :subCategoryId " )
 	Slice<ProjectListDto> findBySubCategory_id(Pageable pageable,@Param("subCategoryId") Long subCategoryId);
 
-	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name, COUNT(ph)) "
+	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name, s.name, COUNT(ph)) "
 	        + "FROM Project p "
 	        + "JOIN p.category c "
+	        + "JOIN p.subCategory s "
 	        + "LEFT JOIN Photo ph ON ph.projectId = p.id "
 	        + "WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyWord, '%')) "
 	        + "GROUP BY p.id, c.name")
