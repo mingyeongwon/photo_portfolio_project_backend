@@ -1,5 +1,7 @@
 package com.example.portfolio.service;
 
+import java.util.List;
+
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,5 +42,8 @@ public class AdminService {
 	    return projectRepository.findByKeyWord(pageable, keyWord);
 	}
 
+	public List<ProjectListDto> getAdminProject(Long projectId) {
+		return projectRepository.findByProjectId(projectId);
+	}
 
 }

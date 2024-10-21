@@ -18,13 +18,17 @@ import com.example.portfolio.model.Project;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long>{
-	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name, NULL) "
-			+ "FROM Project p JOIN p.category c "
+	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name, s.name, NULL) "
+			+ "FROM Project p "
+			+ "JOIN p.category c "
+			+ "JOIN p.subCategory s "
 			+ "where c.id= :categoryId ")
 	Slice<ProjectListDto> findByCategory_id(Pageable pageable,@Param("categoryId") Long categoryId);
 	
-	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, s.name, NULL) "
-			+ "FROM Project p JOIN p.subCategory s "
+	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name,s.name, NULL) "
+			+ "FROM Project p "
+			+ "JOIN p.category c "
+			+ "JOIN p.subCategory s "
 			+ "where s.id= :subCategoryId " )
 	Slice<ProjectListDto> findBySubCategory_id(Pageable pageable,@Param("subCategoryId") Long subCategoryId);
 
@@ -52,6 +56,15 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
 	@Query("UPDATE Project p SET p.view = p.view + 1 WHERE p.id = :projectId")
 	void updateViewCount(@Param("projectId") Long projectId);
 	
+<<<<<<< HEAD
+=======
+	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name, s.name, NULL) "
+			+ "FROM Project p "
+			+ "JOIN p.category c "
+			+ "JOIN p.subCategory s "
+			+ "where p.id= :projectId ")
+	List<ProjectListDto> findByProjectId(@Param("projectId") Long projectId);
+>>>>>>> refs/heads/master
 	
 }
  

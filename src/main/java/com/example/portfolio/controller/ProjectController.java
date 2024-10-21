@@ -97,8 +97,15 @@ public class ProjectController {
 	    Pageable pageable = PageRequest.of(page, size, sortOrder);
 
 	    return adminService.getAdminProjectList(pageable, keyWord);
-	}
 
+	}
+	
+	//admin page 프로젝트 디테일 가져오기 
+		@GetMapping("/get/adminProject/{projectId}" )
+		public List<ProjectListDto> getAdminProjectDetail(
+				@PathVariable("projectId") Long projectId ){ 
+			return adminService.getAdminProject(projectId);
+		}
 	// 프로젝트 삭제
 	@DeleteMapping("/delete/project/{id}")
 	public void deleteProjecct(@PathVariable("id") Long id) {
