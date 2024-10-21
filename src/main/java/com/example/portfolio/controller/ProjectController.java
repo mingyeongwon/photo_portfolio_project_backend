@@ -3,10 +3,13 @@ package com.example.portfolio.controller;
 import java.io.IOException;
 import java.util.List;
 
+import org.springframework.boot.context.properties.bind.DefaultValue;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -78,7 +81,7 @@ public class ProjectController {
 	
 	//프로젝트 가져오기 
 	@GetMapping("/get/project")
-	public List<ProjectListDto> getProject( Pageable pageable, 
+	public List<ProjectListDto> getProject( @PageableDefault( sort = "createdAt" , direction = Direction.DESC) Pageable pageable, 
 			@RequestParam( name="categoryId", required = false) Long categoryId,
 			@RequestParam(name = "subCategoryId", required = false) Long subCategoryId){
 		return projectService.getProjectList(pageable,categoryId,subCategoryId);
