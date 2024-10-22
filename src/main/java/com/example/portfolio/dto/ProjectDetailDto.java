@@ -8,7 +8,15 @@ public class ProjectDetailDto {
 	private String imageUrl; // 썸네일 URL
 	private Long categoryId;
 	private Long subCategoryId;
-	private List<PhotoListDto> photos;
+	private List<String> photos;
+	
+    public ProjectDetailDto(Long id, String title, String imageUrl, Long categoryId, Long subCategoryId) {
+        this.id = id;
+        this.title = title;
+        this.imageUrl = imageUrl;
+        this.categoryId = categoryId;
+        this.subCategoryId = subCategoryId;
+    }
 
 	public Long getId() {
 		return id;
@@ -52,11 +60,11 @@ public class ProjectDetailDto {
 		this.subCategoryId = subCategoryId;
 	}
 	
-    public List<PhotoListDto> getPhotos() {
+    public List<String> getPhotos() {
         return photos;
     }
 
-    public void setPhotos(List<PhotoListDto> photos) {
+    public void setPhotos(List<String> photos) {
         this.photos = photos;
     }
 	

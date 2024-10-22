@@ -12,7 +12,9 @@ import com.example.portfolio.dto.ProjectDetailDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.mapper.ProjectMapper;
+import com.example.portfolio.model.Photo;
 import com.example.portfolio.model.Project;
+import com.example.portfolio.repository.PhotoRepository;
 import com.example.portfolio.repository.ProjectRepository;
 
 import jakarta.transaction.Transactional;
@@ -24,14 +26,17 @@ public class ProjectService {
 	private final GcsService gcsService;
 	private final PhotoService photoService;
 	private final ProjectMapper projectMapper;
+	private final PhotoRepository photoRepository;
 
 	// 여러 의존성을 생성자로 주입
 	public ProjectService(ProjectRepository projectRepository,
-							GcsService gcsService, PhotoService photoService, ProjectMapper projectMapper) {
+							GcsService gcsService, PhotoService photoService, 
+							ProjectMapper projectMapper, PhotoRepository photoRepository) {
 		this.projectRepository = projectRepository;
 		this.gcsService = gcsService;
 		this.photoService = photoService;
 		this.projectMapper = projectMapper;
+		this.photoRepository = photoRepository;
 	}
 
 	// 프로젝트 생성
@@ -118,7 +123,13 @@ public class ProjectService {
 	
 	// 프로젝트 디테일 정보 가져오기
 	public ProjectDetailDto getAdminProject(Long projectId) {
-		return projectRepository.findProjectDetailByProjectId(projectId);
+		ProjectDetailDto projectDetail =  projectRepository.findProjectDetailByProjectId(projectId);
+		List<String> photoImageUrls = photoRepository.findByProjectId(projectId)
+                .stream()
+                .map(Photo::getImageUrl) // 각 Photo에서 imageUrl 추출
+                .toList(); // Java 16 이상에서 사용 가능
+		projectDetail.setPhotos(photoImageUrls);
+		return projectDetail;
 	}
 
 }

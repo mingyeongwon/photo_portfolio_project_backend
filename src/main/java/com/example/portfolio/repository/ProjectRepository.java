@@ -67,6 +67,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
 	// 프로젝트 detail 정보 가져오기
 	@Query("SELECT new com.example.portfolio.dto.ProjectDetailDto(p.id, p.title, p.thumbnailUrl, c.id, s.id) "
 			+ "FROM Project p "
+			+ "JOIN p.category c "
+			+ "JOIN p.subCategory s "
 			+ "where p.id= :projectId ")
 	ProjectDetailDto findProjectDetailByProjectId(@Param("projectId") Long projectId);
 	
