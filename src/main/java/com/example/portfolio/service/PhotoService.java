@@ -126,4 +126,17 @@ public class PhotoService {
 		projectRepository.updateViewCount(projectId);
 		return photoRepository.findByPhotosProjectId(projectId,pageable).getContent();
 	}
+	
+	// edit에서 삭제
+	public void deleteSelectedPhotos(List<Long> deletedPhotoIds) {
+		List<Photo> selecetedPhotos = photoRepository.findAllById(deletedPhotoIds);
+		photoRepository.deleteAll(selecetedPhotos);
+
+		try {
+			gcsService.deletePhotoToGcs(selecetedPhotos);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
 }

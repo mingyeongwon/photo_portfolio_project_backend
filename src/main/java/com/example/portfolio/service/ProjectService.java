@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectDetailDto;
 import com.example.portfolio.dto.ProjectListDto;
@@ -85,9 +86,16 @@ public class ProjectService {
 				throw new RuntimeException("Failed to upload new thumbnail to GCS", e);
 			}
 		}
+		
+		// 기존 사진 삭제
+		if(projectUpdateDto.getDeletedPhotoIds() != null 
+				&& !projectUpdateDto.getDeletedPhotoIds().isEmpty()) {
+			 photoService.deleteSelectedPhotos(projectUpdateDto.getDeletedPhotoIds());
+		}
 
 		// 사진이 있는 경우 업데이트
-		if (projectUpdateDto.getPhotoMultipartFiles() != null && projectUpdateDto.getPhotoMultipartFiles().length > 0) {
+		if (projectUpdateDto.getPhotoMultipartFiles() != null 
+				&& projectUpdateDto.getPhotoMultipartFiles().length > 0) {
 			photoService.updatePhotos(projectUpdateDto);
 		}
 
@@ -124,11 +132,8 @@ public class ProjectService {
 	// 프로젝트 디테일 정보 가져오기
 	public ProjectDetailDto getAdminProject(Long projectId) {
 		ProjectDetailDto projectDetail =  projectRepository.findProjectDetailByProjectId(projectId);
-		List<String> photoImageUrls = photoRepository.findByProjectId(projectId)
-                .stream()
-                .map(Photo::getImageUrl) // 각 Photo에서 imageUrl 추출
-                .toList(); // Java 16 이상에서 사용 가능
-		projectDetail.setPhotos(photoImageUrls);
+		List<PhotoListDto> photoList = photoRepository.findDetailPhotoByProjectId(projectId);
+		projectDetail.setPhotos(photoList);
 		return projectDetail;
 	}
 
