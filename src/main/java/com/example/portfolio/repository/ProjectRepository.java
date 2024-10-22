@@ -20,34 +20,26 @@ import com.example.portfolio.model.Project;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long>{
 
-	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name, s.name, NULL) "
-			+ "FROM Project p "
-			+ "JOIN p.category c "
-			+ "JOIN p.subCategory s ")
+	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, p.category.name,  p.subCategory.name, NULL) "
+			+ "FROM Project p")
 	Slice<ProjectListDto> findAllProject(Pageable pageable);
 	
 
-	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name, s.name, NULL) "
+	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, p.category.name, p.subCategory.name, NULL) "
 			+ "FROM Project p "
-			+ "JOIN p.category c "
-			+ "JOIN p.subCategory s "
-			+ "where c.id= :categoryId ")
+			+ "where p.category.id= :categoryId ")
 	Slice<ProjectListDto> findByCategory_id(Pageable pageable,@Param("categoryId") Long categoryId);
 	
-	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name,s.name, NULL) "
+	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, p.category.name ,p.subCategory.name, NULL) "
 			+ "FROM Project p "
-			+ "JOIN p.category c "
-			+ "JOIN p.subCategory s "
-			+ "where s.id= :subCategoryId " )
+			+ "where p.subCategory.id= :subCategoryId " )
 	Slice<ProjectListDto> findBySubCategory_id(Pageable pageable,@Param("subCategoryId") Long subCategoryId);
 
-	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, c.name, s.name, COUNT(ph)) "
+	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, p.category.name ,p.subCategory.name, COUNT(ph)) "
 	        + "FROM Project p "
-	        + "JOIN p.category c "
-	        + "JOIN p.subCategory s "
 	        + "LEFT JOIN Photo ph ON ph.projectId = p.id "
 	        + "WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyWord, '%')) "
-	        + "GROUP BY p.id, c.name, s.name")
+	        + "GROUP BY p.id,p.category.name ,p.subCategory.name")
 	Page<ProjectListDto> findByKeyWord(Pageable pageable, @Param("keyWord") String keyWord);
 	
 	List<Project> findByCategory_Id(Long categoryId);
@@ -66,13 +58,17 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
 	@Query("UPDATE Project p SET p.view = p.view + 1 WHERE p.id = :projectId")
 	void updateViewCount(@Param("projectId") Long projectId);
 	
+	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, p.category.name,  p.subCategory.name, NULL) "
+			+ "FROM Project p "
+			+ "where p.id= :projectId ")
+	List<ProjectListDto> findByProjectId(@Param("projectId") Long projectId);
+	
+	
 	// 프로젝트 detail 정보 가져오기
 	@Query("SELECT new com.example.portfolio.dto.ProjectDetailDto(p.id, p.title, p.thumbnailUrl, c.id, s.id) "
 			+ "FROM Project p "
-			+ "JOIN p.category c "
-			+ "JOIN p.subCategory s "
 			+ "where p.id= :projectId ")
-	ProjectDetailDto findByProjectId(@Param("projectId") Long projectId);
+	ProjectDetailDto findProjectDetailByProjectId(@Param("projectId") Long projectId);
 	
 }
  

@@ -1,21 +1,14 @@
 package com.example.portfolio.dto;
 
+import java.util.List;
+
 public class ProjectDetailDto {
 	private Long id;
 	private String title;
 	private String imageUrl; // 썸네일 URL
 	private Long categoryId;
 	private Long subCategoryId;
-
-
-	public ProjectDetailDto(Long id, String title, String imageUrl, Long categoryId, Long subCategoryId) {
-		this.id = id;
-		this.title = title;
-		this.imageUrl = imageUrl;
-		this.categoryId = categoryId;
-		this.subCategoryId = subCategoryId;
-	}
-
+	private List<PhotoListDto> photos;
 
 	public Long getId() {
 		return id;
@@ -58,6 +51,13 @@ public class ProjectDetailDto {
 	public void setSubCategoryId(Long subCategoryId) {
 		this.subCategoryId = subCategoryId;
 	}
+	
+    public List<PhotoListDto> getPhotos() {
+        return photos;
+    }
 
+    public void setPhotos(List<PhotoListDto> photos) {
+        this.photos = photos;
+    }
 	
 }

@@ -118,7 +118,7 @@ public class ProjectService {
 	
 	// 프로젝트 디테일 정보 가져오기
 	public ProjectDetailDto getAdminProject(Long projectId) {
-		return projectRepository.findByProjectId(projectId);
+		return projectRepository.findProjectDetailByProjectId(projectId);
 	}
 
 }
