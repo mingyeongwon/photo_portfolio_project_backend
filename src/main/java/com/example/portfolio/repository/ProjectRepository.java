@@ -12,6 +12,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.portfolio.dto.ProjectDetailDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.model.Project;
 
@@ -57,11 +58,19 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
 	@Query("UPDATE Project p SET p.view = p.view + 1 WHERE p.id = :projectId")
 	void updateViewCount(@Param("projectId") Long projectId);
 	
-
 	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, p.category.name,  p.subCategory.name, NULL) "
 			+ "FROM Project p "
 			+ "where p.id= :projectId ")
 	List<ProjectListDto> findByProjectId(@Param("projectId") Long projectId);
+	
+	
+	// 프로젝트 detail 정보 가져오기
+	@Query("SELECT new com.example.portfolio.dto.ProjectDetailDto(p.id, p.title, p.thumbnailUrl, c.id, s.id) "
+			+ "FROM Project p "
+			+ "JOIN p.category c "
+			+ "JOIN p.subCategory s "
+			+ "where p.id= :projectId ")
+	ProjectDetailDto findProjectDetailByProjectId(@Param("projectId") Long projectId);
 	
 }
  

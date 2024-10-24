@@ -3,8 +3,6 @@ package com.example.portfolio.controller;
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.boot.context.properties.bind.DefaultValue;
-import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +28,7 @@ import com.example.portfolio.dto.CategoryDto;
 import com.example.portfolio.dto.CategoryUpdateDto;
 import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
+import com.example.portfolio.dto.ProjectDetailDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.dto.SubCategoryCreateDto;
@@ -103,12 +102,13 @@ public class ProjectController {
 
 	}
 	
-	//admin page 프로젝트 디테일 가져오기 
+	//admin page 프로젝트 디테일 정보 가져오기 
 		@GetMapping("/get/adminProject/{projectId}" )
-		public List<ProjectListDto> getAdminProjectDetail(
+		public ProjectDetailDto getAdminProjectDetail(
 				@PathVariable("projectId") Long projectId ){ 
-			return adminService.getAdminProject(projectId);
+			return projectService.getAdminProject(projectId);
 		}
+		
 	// 프로젝트 삭제
 	@DeleteMapping("/delete/project/{id}")
 	public void deleteProjecct(@PathVariable("id") Long id) {

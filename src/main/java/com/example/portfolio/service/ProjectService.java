@@ -7,11 +7,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
+import com.example.portfolio.dto.ProjectDetailDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
-import com.example.portfolio.mapper.ProjectMapper; 
+import com.example.portfolio.mapper.ProjectMapper;
+import com.example.portfolio.model.Photo;
 import com.example.portfolio.model.Project;
+import com.example.portfolio.repository.PhotoRepository;
 import com.example.portfolio.repository.ProjectRepository;
 
 import jakarta.transaction.Transactional;
@@ -23,14 +27,17 @@ public class ProjectService {
 	private final GcsService gcsService;
 	private final PhotoService photoService;
 	private final ProjectMapper projectMapper;
+	private final PhotoRepository photoRepository;
 
 	// 여러 의존성을 생성자로 주입
 	public ProjectService(ProjectRepository projectRepository,
-							GcsService gcsService, PhotoService photoService, ProjectMapper projectMapper) {
+							GcsService gcsService, PhotoService photoService, 
+							ProjectMapper projectMapper, PhotoRepository photoRepository) {
 		this.projectRepository = projectRepository;
 		this.gcsService = gcsService;
 		this.photoService = photoService;
 		this.projectMapper = projectMapper;
+		this.photoRepository = photoRepository;
 	}
 
 	// 프로젝트 생성
@@ -79,9 +86,16 @@ public class ProjectService {
 				throw new RuntimeException("Failed to upload new thumbnail to GCS", e);
 			}
 		}
+		
+		// 기존 사진 삭제
+		if(projectUpdateDto.getDeletedPhotoIds() != null 
+				&& !projectUpdateDto.getDeletedPhotoIds().isEmpty()) {
+			 photoService.deleteSelectedPhotos(projectUpdateDto.getDeletedPhotoIds());
+		}
 
 		// 사진이 있는 경우 업데이트
-		if (projectUpdateDto.getPhotoMultipartFiles() != null && projectUpdateDto.getPhotoMultipartFiles().length > 0) {
+		if (projectUpdateDto.getPhotoMultipartFiles() != null 
+				&& projectUpdateDto.getPhotoMultipartFiles().length > 0) {
 			photoService.updatePhotos(projectUpdateDto);
 		}
 
@@ -113,6 +127,14 @@ public class ProjectService {
 		}else {
 			return projectRepository.findBySubCategory_id(pageable, subCategoryId).getContent();
 		}
+	}
+	
+	// 프로젝트 디테일 정보 가져오기
+	public ProjectDetailDto getAdminProject(Long projectId) {
+		ProjectDetailDto projectDetail =  projectRepository.findProjectDetailByProjectId(projectId);
+		List<PhotoListDto> photoList = photoRepository.findDetailPhotoByProjectId(projectId);
+		projectDetail.setPhotos(photoList);
+		return projectDetail;
 	}
 
 }

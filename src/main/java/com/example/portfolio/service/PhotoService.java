@@ -54,12 +54,10 @@ public class PhotoService {
 	// 사진 업데이트
 	public void updatePhotos(ProjectUpdateDto projectUpdateDto) {
 		MultipartFile[] multipartFiles = projectUpdateDto.getPhotoMultipartFiles();
-		List<Photo> existingPhotos = photoRepository.findByProjectId(projectUpdateDto.getId());
 
 		for (MultipartFile multipartFile : multipartFiles) {
 			Photo newPhoto = createPhoto(multipartFile, projectUpdateDto.getId());
 
-			if (existingPhotos.stream().noneMatch(p -> p.equals(newPhoto))) {
 				try {
 					String url = gcsService.uploadFile(multipartFile, projectUpdateDto.getId());
 					newPhoto.setImageUrl(url);
@@ -69,19 +67,6 @@ public class PhotoService {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-			}
-		}
-
-		List<Photo> deletePhotos = existingPhotos.stream()
-				.filter(existingPhoto -> !isPhotoInFiles(existingPhoto, multipartFiles, projectUpdateDto.getId()))
-				.collect(Collectors.toList());
-
-		photoRepository.deleteAll(deletePhotos);
-
-		try {
-			gcsService.deletePhotoToGcs(deletePhotos);
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -125,5 +110,18 @@ public class PhotoService {
 		// view count +1 로직
 		projectRepository.updateViewCount(projectId);
 		return photoRepository.findByPhotosProjectId(projectId,pageable).getContent();
+	}
+	
+	// edit에서 삭제
+	public void deleteSelectedPhotos(List<Long> deletedPhotoIds) {
+		List<Photo> selecetedPhotos = photoRepository.findAllById(deletedPhotoIds);
+		photoRepository.deleteAll(selecetedPhotos);
+
+		try {
+			gcsService.deletePhotoToGcs(selecetedPhotos);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 	}
 }

@@ -42,8 +42,4 @@ public class AdminService {
 	    return projectRepository.findByKeyWord(pageable, keyWord);
 	}
 
-	public List<ProjectListDto> getAdminProject(Long projectId) {
-		return projectRepository.findByProjectId(projectId);
-	}
-
 }

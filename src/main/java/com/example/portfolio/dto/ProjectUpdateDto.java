@@ -1,5 +1,7 @@
 package com.example.portfolio.dto;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
 public class ProjectUpdateDto {
@@ -7,9 +9,9 @@ public class ProjectUpdateDto {
 	private String title;
 	private Long categoryId;
 	private Long subcategoryId;
-		
 	private MultipartFile thumbnailMultipartFile;
 	private MultipartFile[] photoMultipartFiles;
+	private List<Long> deletedPhotoIds;
 	
 	public Long getId() {
 		return id;
@@ -48,6 +50,12 @@ public class ProjectUpdateDto {
 	}
 	public void setSubcategoryId(Long subcategoryId) {
 		this.subcategoryId = subcategoryId;
+	}
+	public List<Long> getDeletedPhotoIds() {
+		return deletedPhotoIds;
+	}
+	public void setDeletedPhotoIds(List<Long> deletedPhotoIds) {
+		this.deletedPhotoIds = deletedPhotoIds;
 	}
 
 	

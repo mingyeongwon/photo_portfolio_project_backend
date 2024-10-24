@@ -5,9 +5,7 @@ public class PhotoListDto {
 	private String imageUrl; 
 	private String title;
 	
-	public PhotoListDto() {
-		super();
-	}
+	public PhotoListDto() {}
 
 	public PhotoListDto(Long id, String imageUrl, String title) {
 		super();
@@ -15,6 +13,12 @@ public class PhotoListDto {
 		this.imageUrl = imageUrl;
 		this.title = title;
 	}
+	
+    public PhotoListDto(Long id, String imageUrl) {
+        super();
+        this.id = id;
+        this.imageUrl = imageUrl;
+    }
 
 
 	public Long getId() {
