@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.portfolio.dto.ProjectDetailDto;
 import com.example.portfolio.dto.ProjectListDto;
+import com.example.portfolio.model.Category;
 import com.example.portfolio.model.Project;
 
 
@@ -52,6 +53,10 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
 	        + "WHERE LOWER(p.title) LIKE LOWER(CONCAT('%', :keyWord, '%')) "
 	        + "GROUP BY p.id,p.category.name ,p.subCategory.name")
 	Page<ProjectListDto> findByKeyWord(Pageable pageable, @Param("keyWord") String keyWord);
+	
+	@Query("SELECT DISTINCT p.category FROM Project p WHERE p.category IS NOT NULL")
+	List<Category> findCategoriesWithProjects();
+
 	
 	List<Project> findByCategory_Id(Long categoryId);
 

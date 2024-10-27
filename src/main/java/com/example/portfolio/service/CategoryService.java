@@ -1,8 +1,8 @@
 package com.example.portfolio.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.example.portfolio.dto.CategoryCreateDto;
@@ -47,6 +47,13 @@ public class CategoryService {
 		return categories.stream().map(this::mapEntityToDto).toList();
 	}
 
+	  public List<CategoryDto> getCategoriesWithProjects() {
+	        List<Category> categoriesWithProjects = projectRepository.findCategoriesWithProjects();
+	        return categoriesWithProjects.stream()
+	                .map(categoryMapper::categoryToDto) // Category 엔티티를 CategoryDto로 매핑
+	                .collect(Collectors.toList());
+	    }
+	
 	public List<SubCategoryDto> getSubCategory(Long categoryId) {
 		List<SubCategory> subCategories = subCategoryRepository.findByCategory_Id(categoryId);
 		return subCategories.stream().map(this::subCategoryEntityToDto).toList();

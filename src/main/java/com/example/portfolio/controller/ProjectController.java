@@ -122,9 +122,13 @@ public class ProjectController {
 		return "회원가입 성공";
 	}
 
-	@GetMapping("/categories")
-	public List<CategoryDto> getAllCategories() {
-		return categoryService.getAllCategories();
+	@GetMapping("/get/categories")
+	public List<CategoryDto> getAllCategories(@RequestParam(name = "view", required = false) String view) {
+	    if ("main".equals(view)) {
+	        return categoryService.getCategoriesWithProjects();
+	    } else {
+	        return categoryService.getAllCategories();
+	    }
 	}
 
 //  @Secured("ROLE_ADMIN")
