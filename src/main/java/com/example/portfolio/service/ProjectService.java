@@ -118,16 +118,16 @@ public class ProjectService {
 
 	//프로젝트 불러오기
 	@Transactional
-	public Slice<ProjectListDto> getProjectList(Pageable pageable, Long CategoryId,Long subCategoryId) {
-		//서브카테고리가 선택되지 않았을 때 카테고리로 찾아오기 
-		if(CategoryId==null) {
-			return projectRepository.findAllProject(pageable);
-		}else if(subCategoryId==null) {
-			return projectRepository.findByCategory_id(pageable, CategoryId);
-		}else {
-			return projectRepository.findBySubCategory_id(pageable, subCategoryId);
-		}
-	}
+
+    public Slice<ProjectListDto> getProjectList(Pageable pageable, Long categoryId, Long subCategoryId) {
+        if (categoryId == null && subCategoryId == null) {
+            return projectRepository.findAllProject(pageable);
+        } else if (categoryId != null) {
+            return projectRepository.findByCategory_id(pageable, categoryId);
+        } else {
+            return projectRepository.findBySubCategory_id(pageable, subCategoryId);
+        }
+    }
 	
 	// 프로젝트 디테일 정보 가져오기
 	public ProjectDetailDto getAdminProject(Long projectId) {
