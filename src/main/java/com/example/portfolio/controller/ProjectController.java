@@ -112,10 +112,18 @@ public class ProjectController {
 		// 로그인된 유저 정보 가져옴
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String id = authentication.getName();
-
 		return ResponseEntity.ok(id);
 	}
 
+	@GetMapping("/check-session")
+	public ResponseEntity<String> isLogin() {
+		// 로그인된 유저 정보 가져옴
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String id = authentication.getName();
+		return ResponseEntity.ok(id);
+	}
+
+	
 	@PostMapping("/signUp")
 	public String signUpAdmin(@RequestBody Admin admin) {
 		adminService.signUpAdmin(admin);
@@ -124,11 +132,11 @@ public class ProjectController {
 
 	@GetMapping("/get/categories")
 	public List<CategoryDto> getAllCategories(@RequestParam(name = "view", required = false) String view) {
-	    if ("main".equals(view)) {
-	        return categoryService.getCategoriesWithProjects();
-	    } else {
-	        return categoryService.getAllCategories();
-	    }
+		if ("main".equals(view)) {
+			return categoryService.getCategoriesWithProjects();
+		} else {
+			return categoryService.getAllCategories();
+		}
 	}
 
 //  @Secured("ROLE_ADMIN")
