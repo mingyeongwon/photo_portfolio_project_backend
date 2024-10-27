@@ -96,5 +96,6 @@ public class ProjectListDto {
 		this.subCategoryName = subCategoryName;
 	}
 
+
 	
 }

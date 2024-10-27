@@ -3,9 +3,9 @@ package com.example.portfolio.controller;
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -29,6 +29,7 @@ import com.example.portfolio.dto.CategoryUpdateDto;
 import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectDetailDto;
+import com.example.portfolio.dto.ProjectListCustomDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.dto.SubCategoryCreateDto;
@@ -80,7 +81,7 @@ public class ProjectController {
 	
 	//프로젝트 가져오기 
 	@GetMapping("/get/project")
-	public List<ProjectListDto> getProject( @PageableDefault( sort = "createdAt" , direction = Direction.DESC) Pageable pageable, 
+	public Slice<ProjectListDto> getProject( @PageableDefault( sort = "createdAt" , direction = Direction.DESC) Pageable pageable, 
 			@RequestParam( name="categoryId", required = false) Long categoryId,
 			@RequestParam(name = "subCategoryId", required = false) Long subCategoryId){
 		return projectService.getProjectList(pageable,categoryId,subCategoryId);
@@ -89,7 +90,7 @@ public class ProjectController {
 	
 	//admin page 프로젝트 가져오기 
 	@GetMapping("/get/adminProject")
-	public Page<ProjectListDto> getAdminProject(
+	public ProjectListCustomDto getAdminProject(
 	        @RequestParam(value = "page", defaultValue = "0") int page,
 	        @RequestParam(value = "size", defaultValue = "5") int size,
 	        @RequestParam(value = "sort", defaultValue = "id") String sort,
@@ -183,10 +184,9 @@ public class ProjectController {
 	}
 	
 	@GetMapping("/photos/{id}")
-	public List<PhotoListDto> getPhotos(
+	public Slice<PhotoListDto> getPhotos(
 			@PageableDefault( size = 12) Pageable pageable,
 			@PathVariable("id") Long projectId) {
-		System.out.println("page"+pageable.getPageNumber());
 		return photoService.getPhotoList(pageable, projectId);
 	}
 
