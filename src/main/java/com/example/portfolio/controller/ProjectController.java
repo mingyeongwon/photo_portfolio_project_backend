@@ -109,20 +109,10 @@ public class ProjectController {
 
 	@GetMapping("/loginSucess")
 	public ResponseEntity<String> loginSucess() {
-		// 로그인된 유저 정보 가져옴
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String id = authentication.getName();
 		return ResponseEntity.ok(id);
 	}
-
-	@GetMapping("/check-session")
-	public ResponseEntity<String> isLogin() {
-		// 로그인된 유저 정보 가져옴
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		String id = authentication.getName();
-		return ResponseEntity.ok(id);
-	}
-
 	
 	@PostMapping("/signUp")
 	public String signUpAdmin(@RequestBody Admin admin) {
