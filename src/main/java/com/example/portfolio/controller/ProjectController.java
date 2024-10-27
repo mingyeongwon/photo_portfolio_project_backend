@@ -6,8 +6,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -53,8 +53,8 @@ public class ProjectController {
 	private final PhotoService photoService;
 
 	// 생성자 주입
-	public ProjectController(CategoryService categoryService, ProjectService projectService,
-			AdminService adminService, AdminDetailsService adminDetailsService, PhotoService photoService) {
+	public ProjectController(CategoryService categoryService, ProjectService projectService, AdminService adminService,
+			AdminDetailsService adminDetailsService, PhotoService photoService) {
 		this.categoryService = categoryService;
 		this.projectService = projectService;
 		this.adminService = adminService;
@@ -62,13 +62,11 @@ public class ProjectController {
 		this.photoService = photoService;
 	}
 
-	// 프로젝트 생성
 	@PostMapping("/create/project")
 	public void createProject(@ModelAttribute ProjectCreateDto projectCreateDtos) {
 		projectService.createProject(projectCreateDtos);
 	}
 
-	// 프로젝트 수정
 	@PutMapping("/update/project/{id}")
 	public void updateProject(@ModelAttribute ProjectUpdateDto projectUpdateDto, @PathVariable("id") Long id)
 			throws IOException {
@@ -77,81 +75,69 @@ public class ProjectController {
 		// 프로젝트 업데이트 서비스 호출
 		projectService.updateProject(projectUpdateDto);
 	}
-	
-	//프로젝트 가져오기 
+
 	@GetMapping("/get/project")
-	public List<ProjectListDto> getProject( @PageableDefault( sort = "createdAt" , direction = Direction.DESC) Pageable pageable, 
-			@RequestParam( name="categoryId", required = false) Long categoryId,
-			@RequestParam(name = "subCategoryId", required = false) Long subCategoryId){
-		return projectService.getProjectList(pageable,categoryId,subCategoryId);
+	public Slice<ProjectListDto> getProjectListForMainPage(
+			@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+			@RequestParam(name = "categoryId", required = false) Long categoryId,
+			@RequestParam(name = "subCategoryId", required = false) Long subCategoryId) {
+		return projectService.getProjectList(pageable, categoryId, subCategoryId);
 	}
 
-	
-	//admin page 프로젝트 가져오기 
 	@GetMapping("/get/adminProject")
-	public Page<ProjectListDto> getAdminProject(
-	        @RequestParam(value = "page", defaultValue = "0") int page,
-	        @RequestParam(value = "size", defaultValue = "5") int size,
-	        @RequestParam(value = "sort", defaultValue = "id") String sort,
-	        @RequestParam(value = "direction", defaultValue = "desc") String direction,
-	        @RequestParam(value = "keyWord", defaultValue = "") String keyWord) {
-	    Sort sortOrder = direction.equalsIgnoreCase("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
-	    Pageable pageable = PageRequest.of(page, size, sortOrder);
+	public Page<ProjectListDto> getProjectListForAdmin(@RequestParam(value = "page", defaultValue = "0") int page,
+			@RequestParam(value = "size", defaultValue = "5") int size,
+			@RequestParam(value = "sort", defaultValue = "id") String sort,
+			@RequestParam(value = "direction", defaultValue = "desc") String direction,
+			@RequestParam(value = "keyWord", defaultValue = "") String keyWord) {
+		Sort sortOrder = direction.equalsIgnoreCase("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
+		Pageable pageable = PageRequest.of(page, size, sortOrder);
 
-	    return adminService.getAdminProjectList(pageable, keyWord);
+		return adminService.getAdminProjectList(pageable, keyWord);
 
 	}
-	
-	//admin page 프로젝트 디테일 정보 가져오기 
-		@GetMapping("/get/adminProject/{projectId}" )
-		public ProjectDetailDto getAdminProjectDetail(
-				@PathVariable("projectId") Long projectId ){ 
-			return projectService.getAdminProject(projectId);
-		}
-		
-	// 프로젝트 삭제
+
+	@GetMapping("/get/adminProject/{projectId}")
+	public ProjectDetailDto getAdminProjectDetail(@PathVariable("projectId") Long projectId) {
+		return projectService.getAdminProject(projectId);
+	}
+
 	@DeleteMapping("/delete/project/{id}")
 	public void deleteProjecct(@PathVariable("id") Long id) {
 		projectService.deleteProject(id);
 	}
-	
-	// 로그인
+
 	@GetMapping("/loginSucess")
 	public ResponseEntity<String> loginSucess() {
 		// 로그인된 유저 정보 가져옴
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		String id = authentication.getName();
-		
+
 		return ResponseEntity.ok(id);
 	}
 
-	// 아이디 만들기
 	@PostMapping("/signUp")
 	public String signUpAdmin(@RequestBody Admin admin) {
 		adminService.signUpAdmin(admin);
 		return "회원가입 성공";
 	}
 
-	// 카테고리 전체 목록 가져오기
 	@GetMapping("/categories")
 	public List<CategoryDto> getAllCategories() {
 		return categoryService.getAllCategories();
 	}
 
-	// 카테고리 생성
 //  @Secured("ROLE_ADMIN")
 	@PostMapping("/categories")
 	public CategoryCreateDto createCategories(@RequestBody CategoryCreateDto categoryCreateDtos) {
 		return categoryService.createCategories(categoryCreateDtos);
 	}
 
-	// 카테고리 삭제
 	@DeleteMapping("/categories/{id}")
 	public void deleteCategories(@PathVariable("id") Long categoryId) {
 		categoryService.deleteCategory(categoryId);
 	}
 
-	// 카테고리가 사용 중인지 확인하는 엔드포인트 추가
 	@GetMapping("/categories/{id}/used")
 	public boolean isCategoryUsed(@PathVariable("id") Long categoryId) {
 		return categoryService.isCategoryUsed(categoryId);
@@ -162,7 +148,6 @@ public class ProjectController {
 		return categoryService.getCategory();
 	}
 
-	// 카테고리 수정
 	@PutMapping("/categories/{id}")
 	public void updateCategory(@PathVariable("id") Long categoryId, @RequestBody CategoryUpdateDto categoryUpdateDto) {
 		categoryUpdateDto.setId(categoryId);
@@ -181,12 +166,11 @@ public class ProjectController {
 	public List<SubCategoryDto> getSubCategory(@PathVariable("id") Long categoryId) {
 		return categoryService.getSubCategory(categoryId);
 	}
-	
+
 	@GetMapping("/photos/{id}")
-	public List<PhotoListDto> getPhotos(
-			@PageableDefault( size = 12) Pageable pageable,
+	public List<PhotoListDto> getPhotos(@PageableDefault(size = 12) Pageable pageable,
 			@PathVariable("id") Long projectId) {
-		System.out.println("page"+pageable.getPageNumber());
+		System.out.println("page" + pageable.getPageNumber());
 		return photoService.getPhotoList(pageable, projectId);
 	}
 
@@ -207,4 +191,3 @@ public class ProjectController {
 		categoryService.updateSubCategory(subCategoryId, subCategoryUpdateDto);
 	}
 }
-

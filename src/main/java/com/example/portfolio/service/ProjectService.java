@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,7 +14,6 @@ import com.example.portfolio.dto.ProjectDetailDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.mapper.ProjectMapper;
-import com.example.portfolio.model.Photo;
 import com.example.portfolio.model.Project;
 import com.example.portfolio.repository.PhotoRepository;
 import com.example.portfolio.repository.ProjectRepository;
@@ -118,16 +118,15 @@ public class ProjectService {
 
 	//프로젝트 불러오기
 	@Transactional
-	public List<ProjectListDto> getProjectList(Pageable pageable, Long CategoryId,Long subCategoryId) {
-		//서브카테고리가 선택되지 않았을 때 카테고리로 찾아오기 
-		if(CategoryId==null) {
-			return projectRepository.findAllProject(pageable).getContent();
-		}else if(subCategoryId==null) {
-			return projectRepository.findByCategory_id(pageable, CategoryId).getContent();
-		}else {
-			return projectRepository.findBySubCategory_id(pageable, subCategoryId).getContent();
-		}
-	}
+    public Slice<ProjectListDto> getProjectList(Pageable pageable, Long categoryId, Long subCategoryId) {
+        if (categoryId == null && subCategoryId == null) {
+            return projectRepository.findAllProject(pageable);
+        } else if (categoryId != null) {
+            return projectRepository.findByCategory_id(pageable, categoryId);
+        } else {
+            return projectRepository.findBySubCategory_id(pageable, subCategoryId);
+        }
+    }
 	
 	// 프로젝트 디테일 정보 가져오기
 	public ProjectDetailDto getAdminProject(Long projectId) {

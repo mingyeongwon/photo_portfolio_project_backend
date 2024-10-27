@@ -20,20 +20,31 @@ import com.example.portfolio.model.Project;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, Long>{
 
-	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, p.category.name,  p.subCategory.name, NULL) "
-			+ "FROM Project p")
-	Slice<ProjectListDto> findAllProject(Pageable pageable);
-	
+	   @Query("SELECT new com.example.portfolio.dto.ProjectListDto(" +
+	           "p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, " +
+	           "p.category.name, p.subCategory.name, NULL) " +
+	           "FROM Project p " +
+	           "JOIN p.category c " +
+	           "LEFT JOIN p.subCategory s")
+	    Slice<ProjectListDto> findAllProject(Pageable pageable);
 
-	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, p.category.name, p.subCategory.name, NULL) "
-			+ "FROM Project p "
-			+ "where p.category.id= :categoryId ")
-	Slice<ProjectListDto> findByCategory_id(Pageable pageable,@Param("categoryId") Long categoryId);
-	
-	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, p.category.name ,p.subCategory.name, NULL) "
-			+ "FROM Project p "
-			+ "where p.subCategory.id= :subCategoryId " )
-	Slice<ProjectListDto> findBySubCategory_id(Pageable pageable,@Param("subCategoryId") Long subCategoryId);
+	    @Query("SELECT new com.example.portfolio.dto.ProjectListDto(" +
+	           "p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, " +
+	           "p.category.name, p.subCategory.name, NULL) " +
+	           "FROM Project p " +
+	           "JOIN p.category c " +
+	           "LEFT JOIN p.subCategory s " +
+	           "WHERE c.id = :categoryId")
+	    Slice<ProjectListDto> findByCategory_id(Pageable pageable, @Param("categoryId") Long categoryId);
+
+	    @Query("SELECT new com.example.portfolio.dto.ProjectListDto(" +
+	           "p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, " +
+	           "p.category.name, p.subCategory.name, NULL) " +
+	           "FROM Project p " +
+	           "JOIN p.category c " +
+	           "LEFT JOIN p.subCategory s " +
+	           "WHERE s.id = :subCategoryId")
+	    Slice<ProjectListDto> findBySubCategory_id(Pageable pageable, @Param("subCategoryId") Long subCategoryId);
 
 	@Query("SELECT new com.example.portfolio.dto.ProjectListDto(p.id, p.title, p.thumbnailUrl, p.createdAt, p.view, p.category.name ,p.subCategory.name, COUNT(ph)) "
 	        + "FROM Project p "
