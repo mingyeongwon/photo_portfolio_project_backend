@@ -92,7 +92,6 @@ public class ProjectController {
 			@RequestParam(value = "keyWord", defaultValue = "") String keyWord) {
 		Sort sortOrder = direction.equalsIgnoreCase("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
 		Pageable pageable = PageRequest.of(page, size, sortOrder);
-
 		return adminService.getAdminProjectList(pageable, keyWord);
 
 	}
