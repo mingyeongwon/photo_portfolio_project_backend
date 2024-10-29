@@ -166,7 +166,7 @@ public class ProjectController {
 
 	@GetMapping("/subCategory/{id}")
 	public List<SubCategoryDto> getSubCategory(@PathVariable("id") Long categoryId) {
-		return categoryService.getSubCategory(categoryId);
+		return categoryService.getSubCategoriesWithProjects(categoryId);
 	}
 
 	@GetMapping("/photos/{id}")

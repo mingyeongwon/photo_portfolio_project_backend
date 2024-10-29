@@ -54,8 +54,8 @@ public class CategoryService {
 	                .collect(Collectors.toList());
 	    }
 	
-	public List<SubCategoryDto> getSubCategory(Long categoryId) {
-		List<SubCategory> subCategories = subCategoryRepository.findByCategory_Id(categoryId);
+	public List<SubCategoryDto> getSubCategoriesWithProjects(Long categoryId) {
+		List<SubCategory> subCategories = projectRepository.findSubCategoriesWithProjects(categoryId);
 		return subCategories.stream().map(this::subCategoryEntityToDto).toList();
 	}
 

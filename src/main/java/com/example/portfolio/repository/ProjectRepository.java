@@ -16,6 +16,7 @@ import com.example.portfolio.dto.ProjectDetailDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.model.Project;
+import com.example.portfolio.model.SubCategory;
 
 
 @Repository
@@ -51,10 +52,13 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
 	@Query("SELECT DISTINCT p.category FROM Project p WHERE p.category IS NOT NULL")
 	List<Category> findCategoriesWithProjects();
 
-	
-	List<Project> findByCategory_Id(Long categoryId);
+	@Query("SELECT DISTINCT p.subCategory FROM Project p WHERE p.subCategory IS NOT NULL AND p.category.id = :categoryId")
+	List<SubCategory> findSubCategoriesWithProjects(@Param("categoryId") Long categoryId);
 
-	List<Project> findBySubCategory_Id(Long subCategory);
+	
+	//List<Project> findByCategory_Id(Long categoryId);
+
+	//List<Project> findBySubCategory_Id(Long subCategory);
 
 	// 카테고리 사용 유무 확인
 	boolean existsByCategory_Id(Long Categoryid);
