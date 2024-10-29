@@ -122,7 +122,7 @@ public class ProjectService {
     public Slice<ProjectListDto> getProjectList(Pageable pageable, Long categoryId, Long subCategoryId) {
         if (categoryId == null && subCategoryId == null) {
             return projectRepository.findAllProject(pageable);
-        } else if (categoryId != null) {
+        } else if (subCategoryId == null) {
             return projectRepository.findByCategory_id(pageable, categoryId);
         } else {
             return projectRepository.findBySubCategory_id(pageable, subCategoryId);

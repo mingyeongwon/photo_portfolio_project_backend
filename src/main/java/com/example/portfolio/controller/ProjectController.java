@@ -171,7 +171,7 @@ public class ProjectController {
 
 	@GetMapping("/photos/{id}")
 	public Slice<PhotoListDto> getPhotos(
-			@PageableDefault( size = 12) Pageable pageable,
+			@PageableDefault( size = 10) Pageable pageable,
 			@PathVariable("id") Long projectId) {
 		return photoService.getPhotoList(pageable, projectId);
 	}
