@@ -17,7 +17,7 @@ public interface PhotoRepository extends JpaRepository<Photo, Long>{
 	List<Photo> findByProjectId(Long id);
 	List<Photo> findAllByProjectId(Long id);
 	
-	@Query("SELECT new com.example.portfolio.dto.PhotoListDto(ph.id, ph.imageUrl, p.title) "
+	@Query("SELECT new com.example.portfolio.dto.PhotoListDto(ph.id, ph.imageUrl) "
 			+ "FROM Photo ph "
 			+ "LEFT JOIN Project p ON p.id=ph.projectId "
 			+ "WHERE ph.projectId = :projectId")
