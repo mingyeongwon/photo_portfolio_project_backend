@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
+import com.example.portfolio.dto.ProjectDetailPageDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.model.Photo;
 import com.example.portfolio.repository.PhotoRepository;
@@ -103,19 +104,6 @@ public class PhotoService {
 		photo.setProjectId(projectId);
 		photo.setImgtype(file.getContentType());
 		return photo;
-	}
-
-	@Transactional
-	public Slice<PhotoListDto> getPhotoList(Pageable pageable, Long projectId) {
-		// view count +1 로직
-		projectRepository.updateViewCount(projectId);
-		
-		Slice<PhotoListDto> photos = photoRepository.findByPhotosProjectId(projectId,pageable);
-		String thumbnailUrl = projectRepository.findById(projectId).get().getThumbnailUrl();
-		List<PhotoListDto> totalPhotos = new ArrayList<>();
-		totalPhotos.add(new PhotoListDto(null, thumbnailUrl));
-		totalPhotos.addAll(photos.getContent());
-		return new SliceImpl<>(totalPhotos, pageable, false);
 	}
 	
 	// edit에서 삭제

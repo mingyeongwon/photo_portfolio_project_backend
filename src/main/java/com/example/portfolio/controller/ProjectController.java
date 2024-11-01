@@ -28,6 +28,7 @@ import com.example.portfolio.dto.CategoryUpdateDto;
 import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectDetailDto;
+import com.example.portfolio.dto.ProjectDetailPageDto;
 import com.example.portfolio.dto.ProjectListCustomDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
@@ -170,10 +171,10 @@ public class ProjectController {
 	}
 
 	@GetMapping("/photos/{id}")
-	public Slice<PhotoListDto> getPhotos(
+	public ProjectDetailPageDto getPhotos(
 			@PageableDefault( size = 10) Pageable pageable,
 			@PathVariable("id") Long projectId) {
-		return photoService.getPhotoList(pageable, projectId);
+		return projectService.getPhotoList(pageable, projectId);
 	}
 
 	@DeleteMapping("/subcategory/{id}")
