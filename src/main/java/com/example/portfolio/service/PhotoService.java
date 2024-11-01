@@ -1,10 +1,12 @@
 package com.example.portfolio.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -105,12 +107,15 @@ public class PhotoService {
 
 	@Transactional
 	public Slice<PhotoListDto> getPhotoList(Pageable pageable, Long projectId) {
-//		Project project = projectRepository.findById(projectId).get();
-//		project.setView(project.getView() +1);
-		
 		// view count +1 로직
 		projectRepository.updateViewCount(projectId);
-		return photoRepository.findByPhotosProjectId(projectId,pageable);
+		
+		Slice<PhotoListDto> photos = photoRepository.findByPhotosProjectId(projectId,pageable);
+		String thumbnailUrl = projectRepository.getById(projectId).getThumbnailUrl();
+		List<PhotoListDto> totalPhotos = new ArrayList<>();
+		totalPhotos.add(new PhotoListDto(null, thumbnailUrl));
+		totalPhotos.addAll(photos.getContent());
+		return new SliceImpl<>(totalPhotos, pageable, false);
 	}
 	
 	// edit에서 삭제
