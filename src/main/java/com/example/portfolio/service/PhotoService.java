@@ -111,7 +111,7 @@ public class PhotoService {
 		projectRepository.updateViewCount(projectId);
 		
 		Slice<PhotoListDto> photos = photoRepository.findByPhotosProjectId(projectId,pageable);
-		String thumbnailUrl = projectRepository.getById(projectId).getThumbnailUrl();
+		String thumbnailUrl = projectRepository.findById(projectId).get().getThumbnailUrl();
 		List<PhotoListDto> totalPhotos = new ArrayList<>();
 		totalPhotos.add(new PhotoListDto(null, thumbnailUrl));
 		totalPhotos.addAll(photos.getContent());
