@@ -81,7 +81,7 @@ class PhotoServiceTest {
 	    
 	    // GcsService mock 설정
 	    // eq는 모키토 라이브러리에서 제공하는 인자 매처로 정확하게 일치하는 값만 인정함
-			when(gcsService.uploadFile(any(MultipartFile.class), eq(projectId)))
+			when(gcsService.uploadWebpFile(any(MultipartFile.class), eq(projectId)))
 			    .thenReturn("http://example.com/photo1.jpg")
 			    .thenReturn("http://example.com/photo2.jpg");
 
@@ -117,7 +117,7 @@ class PhotoServiceTest {
         assertThat(secondPhoto.getProjectId()).isEqualTo(projectId);
         
         // GcsService 호출 확인
-        verify(gcsService, times(2)).uploadFile(any(MultipartFile.class), eq(projectId));
+        verify(gcsService, times(2)).uploadWebpFile(any(MultipartFile.class), eq(projectId));
 	    
 	    
 		} catch (IOException e) {

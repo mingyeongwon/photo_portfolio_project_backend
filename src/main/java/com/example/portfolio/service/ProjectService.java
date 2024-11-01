@@ -42,25 +42,25 @@ public class ProjectService {
 
 	// 프로젝트 생성
 	@Transactional
-	public void  createProject(ProjectCreateDto projectCreateDtos) {
-		
-		Project project = projectMapper.createDtoToProject(projectCreateDtos);
-		
-		Long projectId = projectRepository.save(project).getId();
-		
-		// 썸네일 생성
-		MultipartFile multipartFile = projectCreateDtos.getThumbnailMultipartFile();
-		try {
-			String url = gcsService.uploadFile(multipartFile, projectId); // GCS에 파일 업로드
-			project.setThumbnailUrl(url);
-		} catch (IOException e) {
-			throw new RuntimeException("Failed to upload thumbnail to GCS", e); // 예외 처리
-		}
-		// 사진 생성
-		photoService.createPhotos(projectCreateDtos, projectId);
+	public void createProject(ProjectCreateDto projectCreateDtos) {
+	    Project project = projectMapper.createDtoToProject(projectCreateDtos);
+	    Long projectId = projectRepository.save(project).getId();
 
-		// 최종적으로 프로젝트 업데이트
-		projectRepository.save(project);
+	    // 썸네일 생성 및 변환
+	    MultipartFile multipartFile = projectCreateDtos.getThumbnailMultipartFile();
+	    try {
+	        // WebP로 변환한 이미지를 GCS에 업로드
+	        String url = gcsService.uploadWebpFile(multipartFile, projectId);
+	        project.setThumbnailUrl(url);
+	    } catch (IOException e) {
+	        throw new RuntimeException("Failed to upload thumbnail to GCS", e);
+	    }
+
+	    // 사진 생성
+	    photoService.createPhotos(projectCreateDtos, projectId);
+
+	    // 최종적으로 프로젝트 업데이트
+	    projectRepository.save(project);
 	}
 
 	// 프로젝트 업데이트
@@ -80,7 +80,7 @@ public class ProjectService {
 				gcsService.deleteThumbnailFile(project.getThumbnailUrl());
 
 				// 새 썸네일 업로드
-				String url = gcsService.uploadFile(projectUpdateDto.getThumbnailMultipartFile(), project.getId());
+				String url = gcsService.uploadWebpFile(projectUpdateDto.getThumbnailMultipartFile(), project.getId());
 				project.setThumbnailUrl(url);
 			} catch (IOException e) {
 				throw new RuntimeException("Failed to upload new thumbnail to GCS", e);

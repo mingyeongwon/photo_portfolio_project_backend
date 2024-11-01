@@ -87,8 +87,8 @@ class ProjectServiceTest {
 	    
 		 // When
 		 // 사진 업로드 및 url 리턴 코드
-		when(gcsService.uploadFile(thumbnailFile, projectId)).thenReturn("http:localhost8181/thumbnail.jpg");
-		String url = gcsService.uploadFile(thumbnailFile, projectId);
+		when(gcsService.uploadWebpFile(thumbnailFile, projectId)).thenReturn("http:localhost8181/thumbnail.jpg");
+		String url = gcsService.uploadWebpFile(thumbnailFile, projectId);
 		project.setThumbnailUrl("http:localhost:8181/image.jpg");
 		
 		// Then

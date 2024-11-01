@@ -33,22 +33,24 @@ public class PhotoService {
 
 	// 사진 생성
 	public void createPhotos(ProjectCreateDto projectCreateDto, Long projectId) {
-		MultipartFile[] multipartFiles = projectCreateDto.getPhotoMultipartFiles();
+	    MultipartFile[] multipartFiles = projectCreateDto.getPhotoMultipartFiles();
 
-		for (MultipartFile multipartFile : multipartFiles) {
-			try {
-				Photo photo = new Photo();
-				String url = gcsService.uploadFile(multipartFile, projectId);
-				photo.setImageUrl(url);
-				photo.setImgoname(multipartFile.getOriginalFilename());
-				photo.setImgtype(multipartFile.getContentType());
-				photo.setProjectId(projectId);
-				photoRepository.save(photo);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+	    for (MultipartFile multipartFile : multipartFiles) {
+	        try {
+	            Photo photo = new Photo();
+	            // WebP 형식으로 변환된 이미지를 GCS에 업로드
+	            String url = gcsService.uploadWebpFile(multipartFile, projectId); // WebP 형식 업로드 메서드 호출
+	            photo.setImageUrl(url);
+	            photo.setImgoname(multipartFile.getOriginalFilename());
+	            photo.setImgtype("image/webp"); // 변환 후 이미지 형식을 webp로 설정
+	            photo.setProjectId(projectId);
+	            photoRepository.save(photo);
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    }
 	}
+
 
 	// 사진 업데이트
 	public void updatePhotos(ProjectUpdateDto projectUpdateDto) {
@@ -58,7 +60,7 @@ public class PhotoService {
 			Photo newPhoto = createPhoto(multipartFile, projectUpdateDto.getId());
 
 				try {
-					String url = gcsService.uploadFile(multipartFile, projectUpdateDto.getId());
+					String url = gcsService.uploadWebpFile(multipartFile, projectUpdateDto.getId());
 					newPhoto.setImageUrl(url);
 					newPhoto.setImgoname(multipartFile.getOriginalFilename());
 					newPhoto.setImgtype(multipartFile.getContentType());
