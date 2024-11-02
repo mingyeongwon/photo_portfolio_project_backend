@@ -3,19 +3,14 @@ package com.example.portfolio.service;
 import java.io.IOException;
 import java.util.List;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.model.Photo;
 import com.example.portfolio.repository.PhotoRepository;
 import com.example.portfolio.repository.ProjectRepository;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class PhotoService {
@@ -101,16 +96,6 @@ public class PhotoService {
 		photo.setProjectId(projectId);
 		photo.setImgtype(file.getContentType());
 		return photo;
-	}
-
-	@Transactional
-	public Slice<PhotoListDto> getPhotoList(Pageable pageable, Long projectId) {
-//		Project project = projectRepository.findById(projectId).get();
-//		project.setView(project.getView() +1);
-		
-		// view count +1 로직
-		projectRepository.updateViewCount(projectId);
-		return photoRepository.findByPhotosProjectId(projectId,pageable);
 	}
 	
 	// edit에서 삭제
