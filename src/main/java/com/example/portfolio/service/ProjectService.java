@@ -1,19 +1,16 @@
 package com.example.portfolio.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectDetailDto;
-import com.example.portfolio.dto.ProjectDetailPageDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.mapper.ProjectMapper;
@@ -141,22 +138,11 @@ public class ProjectService {
 	}
 	
 	@Transactional
-	public ProjectDetailPageDto getPhotoList(Pageable pageable, Long projectId) {
+	public Slice<PhotoListDto> getPhotoList(Pageable pageable, Long projectId) {
 		// view count +1 로직
 		projectRepository.updateViewCount(projectId);
 		
-		Project project = projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
-		String title = project.getTitle();
-		String thumbnailUrl = project.getThumbnailUrl();
-		
-		Slice<PhotoListDto> photos= photoRepository.findByPhotosProjectId(projectId, pageable);
-		List<PhotoListDto> totalPhotos = new ArrayList<>();
-		
-		if (pageable.getPageNumber() == 0) {
-			totalPhotos.add(new PhotoListDto(null, thumbnailUrl));
-		}
-		totalPhotos.addAll(photos.getContent());
-		return new ProjectDetailPageDto(title, totalPhotos, photos.isLast());
+		return photoRepository.findByPhotosProjectId(projectId, pageable);
 	}
 
 }

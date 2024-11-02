@@ -1,42 +1,44 @@
-package com.example.portfolio.dto;
-
-import java.util.List;
-
-public class ProjectDetailPageDto {
-	
-	private String title;
-	private List<PhotoListDto> photos;
-	private boolean last;
-	
-	public ProjectDetailPageDto(String title, List<PhotoListDto> photos, boolean last) {
-		super();
-		this.title = title;
-		this.photos = photos;
-		this.last = last;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public void setTitle(String title) {
-		this.title = title;
-	}
-
-	public List<PhotoListDto> getPhotos() {
-		return photos;
-	}
-
-	public void setPhotos(List<PhotoListDto> photos) {
-		this.photos = photos;
-	}
-
-	public boolean isLast() {
-		return last;
-	}
-
-	public void setLast(boolean last) {
-		this.last = last;
-	}
-	
-}
+//package com.example.portfolio.dto;
+//
+//import java.util.List;
+//
+//import org.springframework.data.domain.Slice;
+//
+//public class ProjectDetailPageDto {
+//	
+//	private String title;
+//	private String thumbnailUrl;
+//	private Slice<PhotoListDto> photos;
+//	
+//	public ProjectDetailPageDto(String title, String thumbnailUrl, Slice<PhotoListDto> photos) {
+//		super();
+//		this.title = title;
+//		this.thumbnailUrl = thumbnailUrl;
+//		this.photos = photos;
+//	}
+//
+//	public String getTitle() {
+//		return title;
+//	}
+//
+//	public void setTitle(String title) {
+//		this.title = title;
+//	}
+//
+//	public Slice<PhotoListDto> getPhotos() {
+//		return photos;
+//	}
+//
+//	public void setPhotos(Slice<PhotoListDto> photos) {
+//		this.photos = photos;
+//	}
+//
+//	public String getThumbnailUrl() {
+//		return thumbnailUrl;
+//	}
+//
+//	public void setThumbnailUrl(String thumbnailUrl) {
+//		this.thumbnailUrl = thumbnailUrl;
+//	}
+//	
+//}

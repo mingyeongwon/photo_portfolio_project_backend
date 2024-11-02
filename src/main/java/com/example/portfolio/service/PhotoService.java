@@ -1,24 +1,16 @@
 package com.example.portfolio.service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
-import com.example.portfolio.dto.ProjectDetailPageDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.model.Photo;
 import com.example.portfolio.repository.PhotoRepository;
 import com.example.portfolio.repository.ProjectRepository;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class PhotoService {
