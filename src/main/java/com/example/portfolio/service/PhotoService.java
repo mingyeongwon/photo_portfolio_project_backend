@@ -41,7 +41,7 @@ public class PhotoService {
 	            photo.setProjectId(projectId);
 	            photoRepository.save(photo);
 	        } catch (IOException e) {
-	            e.printStackTrace();
+	        	throw new RuntimeException("Failed to upload photo to GCS", e);
 	        }
 	    }
 	}
