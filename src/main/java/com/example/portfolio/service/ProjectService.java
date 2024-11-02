@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectDetailDto;
+import com.example.portfolio.dto.ProjectDetailPageDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.mapper.ProjectMapper;
@@ -138,11 +139,14 @@ public class ProjectService {
 	}
 	
 	@Transactional
-	public Slice<PhotoListDto> getPhotoList(Pageable pageable, Long projectId) {
+	public ProjectDetailPageDto getPhotoList(Pageable pageable, Long projectId) {
 		// view count +1 로직
 		projectRepository.updateViewCount(projectId);
 		
-		return photoRepository.findByPhotosProjectId(projectId, pageable);
+		Project project = projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+		
+		Slice<PhotoListDto> photos = photoRepository.findByPhotosProjectId(projectId, pageable);
+		return new ProjectDetailPageDto(project.getTitle(), project.getThumbnailUrl(), photos);
 	}
 
 }
