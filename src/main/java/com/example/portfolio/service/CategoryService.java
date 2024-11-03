@@ -63,6 +63,7 @@ public class CategoryService {
 	}
 
 	@Transactional
+	@CacheEvict(value = "category", key = "'categoryList'")
 	public CategoryCreateDto createCategories(CategoryCreateDto categoryCreateDto) {
 		Category category = categoryMapper.createDtoToEntity(categoryCreateDto);
 		return CategoryMapper.INSTANCE.categoryToCreateDto(categoryRepository.save(category));
