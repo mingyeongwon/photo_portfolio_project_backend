@@ -8,6 +8,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
+import com.example.portfolio.exception.CustomException;
 import com.example.portfolio.model.Photo;
 import com.example.portfolio.repository.PhotoRepository;
 import com.example.portfolio.repository.ProjectRepository;
@@ -31,21 +32,18 @@ public class PhotoService {
 	    MultipartFile[] multipartFiles = projectCreateDto.getPhotoMultipartFiles();
 
 	    for (MultipartFile multipartFile : multipartFiles) {
-	        try {
 	            Photo photo = new Photo();
 	            // WebP 형식으로 변환된 이미지를 GCS에 업로드
+	            // uploadWebpFile 안에서 try catch로 예외 잡고 있어서 여기서는 예외 처리 불필요
 	            String url = gcsService.uploadWebpFile(multipartFile, projectId); // WebP 형식 업로드 메서드 호출
 	            photo.setImageUrl(url);
 	            photo.setImgoname(multipartFile.getOriginalFilename());
 	            photo.setImgtype("image/webp"); // 변환 후 이미지 형식을 webp로 설정
 	            photo.setProjectId(projectId);
 	            photoRepository.save(photo);
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
+	       
 	    }
 	}
-
 
 	// 사진 업데이트
 	public void updatePhotos(ProjectUpdateDto projectUpdateDto) {
@@ -53,16 +51,12 @@ public class PhotoService {
 
 		for (MultipartFile multipartFile : multipartFiles) {
 			Photo newPhoto = createPhoto(multipartFile, projectUpdateDto.getId());
-
-				try {
-					String url = gcsService.uploadWebpFile(multipartFile, projectUpdateDto.getId());
-					newPhoto.setImageUrl(url);
-					newPhoto.setImgoname(multipartFile.getOriginalFilename());
-					newPhoto.setImgtype(multipartFile.getContentType());
-					photoRepository.save(newPhoto);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			String url = gcsService.uploadWebpFile(multipartFile, projectUpdateDto.getId());
+			newPhoto.setImageUrl(url);
+			newPhoto.setImgoname(multipartFile.getOriginalFilename());
+			newPhoto.setImgtype(multipartFile.getContentType());
+			photoRepository.save(newPhoto);
+		
 		}
 	}
 
@@ -70,12 +64,7 @@ public class PhotoService {
 	public void deletePhotosByProjectId(Long projectId) {
 		List<Photo> photos = photoRepository.findAllByProjectId(projectId);
 		photoRepository.deleteAll(photos);
-
-		try {
-			gcsService.deletePhotoToGcs(photos);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		gcsService.deletePhotoToGcs(photos);
 	}
 
 	// 있다면 true, 없다면 false
@@ -102,12 +91,6 @@ public class PhotoService {
 	public void deleteSelectedPhotos(List<Long> deletedPhotoIds) {
 		List<Photo> selecetedPhotos = photoRepository.findAllById(deletedPhotoIds);
 		photoRepository.deleteAll(selecetedPhotos);
-
-		try {
-			gcsService.deletePhotoToGcs(selecetedPhotos);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
+		gcsService.deletePhotoToGcs(selecetedPhotos);
 	}
 }
