@@ -125,6 +125,7 @@ public class ProjectController {
 		if ("main".equals(view)) {
 			return categoryService.getCategoriesWithProjects();
 		} else {
+			System.out.println("main X 실행");
 			return categoryService.getAllCategories();
 		}
 	}

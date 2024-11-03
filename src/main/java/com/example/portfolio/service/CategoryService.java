@@ -3,6 +3,8 @@ package com.example.portfolio.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.example.portfolio.dto.CategoryCreateDto;
@@ -46,7 +48,8 @@ public class CategoryService {
 		List<Category> categories = categoryRepository.findAll();
 		return categories.stream().map(this::mapEntityToDto).toList();
 	}
-
+	
+	@Cacheable(value = "category", key = "'categoryList'")
 	  public List<CategoryDto> getCategoriesWithProjects() {
 	        List<Category> categoriesWithProjects = projectRepository.findCategoriesWithProjects();
 	        return categoriesWithProjects.stream()
@@ -66,6 +69,7 @@ public class CategoryService {
 	}
 
 	@Transactional
+	@CacheEvict(value = "category", key = "'categoryList'")
 	public void deleteCategory(Long categoryId) {
 		if (isCategoryUsed(categoryId)) {
 			throw new RuntimeException("Category is in use by a project and cannot be deleted.");
@@ -137,6 +141,7 @@ public class CategoryService {
 	}
 
 	@Transactional
+	@CacheEvict(value = "category", key = "'categoryList'")
 	public void updateCategory(CategoryUpdateDto categoryUpdateDto) {
 		Category category = categoryRepository.findById(categoryUpdateDto.getId()).orElseThrow(
 				() -> new IllegalArgumentException("Category not found with id: " + categoryUpdateDto.getId()));
