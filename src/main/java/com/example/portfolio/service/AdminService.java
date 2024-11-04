@@ -36,7 +36,6 @@ public class AdminService {
 	
 	//admin page 프로젝트 불러오기 
 	@Transactional
-	@Cacheable("projects")
 	public ProjectListCustomDto getAdminProjectList(Pageable pageable, String keyWord) {
 		Page<ProjectListDto> projectListDto =projectRepository.findByKeyWord(pageable, keyWord);
 		ProjectListCustomDto pojectListCustomDto = new ProjectListCustomDto();

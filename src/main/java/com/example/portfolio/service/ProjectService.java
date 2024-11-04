@@ -1,10 +1,10 @@
 package com.example.portfolio.service;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +14,8 @@ import com.example.portfolio.dto.ProjectDetailDto;
 import com.example.portfolio.dto.ProjectDetailPageDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
+import com.example.portfolio.exception.CustomException;
+import com.example.portfolio.exception.ErrorCode;
 import com.example.portfolio.mapper.ProjectMapper;
 import com.example.portfolio.model.Project;
 import com.example.portfolio.repository.PhotoRepository;
@@ -49,14 +51,10 @@ public class ProjectService {
 
 	    // 썸네일 생성 및 변환
 	    MultipartFile multipartFile = projectCreateDtos.getThumbnailMultipartFile();
-	    try {
-	        // WebP로 변환한 이미지를 GCS에 업로드
-	        String url = gcsService.uploadWebpFile(multipartFile, projectId);
-	        project.setThumbnailUrl(url);
-	    } catch (IOException e) {
-	        throw new RuntimeException("Failed to upload thumbnail to GCS", e);
-	    }
-
+        // WebP로 변환한 이미지를 GCS에 업로드
+        String url = gcsService.uploadWebpFile(multipartFile, projectId);
+        project.setThumbnailUrl(url);
+	
 	    // 사진 생성
 	    photoService.createPhotos(projectCreateDtos, projectId);
 
@@ -76,16 +74,12 @@ public class ProjectService {
 		if (projectUpdateDto.getThumbnailMultipartFile() != null
 				&& !projectUpdateDto.getThumbnailMultipartFile().isEmpty()) {
 			
-			try {
-				// 기존 썸네일 삭제
-				gcsService.deleteThumbnailFile(project.getThumbnailUrl());
+			// 기존 썸네일 삭제
+			gcsService.deleteThumbnailFile(project.getThumbnailUrl());
 
-				// 새 썸네일 업로드
-				String url = gcsService.uploadWebpFile(projectUpdateDto.getThumbnailMultipartFile(), project.getId());
-				project.setThumbnailUrl(url);
-			} catch (IOException e) {
-				throw new RuntimeException("Failed to upload new thumbnail to GCS", e);
-			}
+			// 새 썸네일 업로드
+			String url = gcsService.uploadWebpFile(projectUpdateDto.getThumbnailMultipartFile(), project.getId());
+			project.setThumbnailUrl(url);
 		}
 		
 		// 기존 사진 삭제
@@ -108,12 +102,9 @@ public class ProjectService {
 	public void deleteProject(Long id) {
 		Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project not found"));
 		// GCS 썸네일과 관련 사진들 삭제
-		try {
-			gcsService.deleteThumbnailFile(project.getThumbnailUrl());
-			photoService.deletePhotosByProjectId(id);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		gcsService.deleteThumbnailFile(project.getThumbnailUrl());
+		photoService.deletePhotosByProjectId(id);
+		
 		projectRepository.delete(project);
 	}
 
@@ -143,7 +134,12 @@ public class ProjectService {
 		// view count +1 로직
 		projectRepository.updateViewCount(projectId);
 		
-		Project project = projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+		Project project = projectRepository.findById(projectId)
+				.orElseThrow(() -> new CustomException(
+			            HttpStatus.NOT_FOUND,
+			            ErrorCode.NOT_FIND_PROJECT,
+			            "Project not found with id: " + projectId
+			        ));
 		
 		Slice<PhotoListDto> photos = photoRepository.findByPhotosProjectId(projectId, pageable);
 		return new ProjectDetailPageDto(project.getTitle(), project.getThumbnailUrl(), photos);

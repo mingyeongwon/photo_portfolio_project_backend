@@ -61,7 +61,7 @@ public class ProjectController {
 		this.adminDetailsService = adminDetailsService;
 		this.photoService = photoService;
 	}
-
+ 
 	@PostMapping("/create/project")
 	public void createProject(@ModelAttribute ProjectCreateDto projectCreateDtos) {
 		projectService.createProject(projectCreateDtos);
