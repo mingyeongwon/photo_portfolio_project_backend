@@ -40,10 +40,7 @@ class PhotoServiceTest {
 	private PhotoRepository photoRepository;
 	
 	@Test
-	void testname() {
-		try {
-		// Given
-		
+	void testname() throws IOException {
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto();
 		projectCreateDto.setTitle("서비스테스트제목");
 		projectCreateDto.setCategoryId(1L);
@@ -118,11 +115,5 @@ class PhotoServiceTest {
         
         // GcsService 호출 확인
         verify(gcsService, times(2)).uploadWebpFile(any(MultipartFile.class), eq(projectId));
-	    
-	    
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 }
