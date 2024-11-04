@@ -3,6 +3,7 @@ package com.example.portfolio.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import com.example.portfolio.dto.CategoryCreateDto;
@@ -11,6 +12,8 @@ import com.example.portfolio.dto.CategoryUpdateDto;
 import com.example.portfolio.dto.SubCategoryCreateDto;
 import com.example.portfolio.dto.SubCategoryDto;
 import com.example.portfolio.dto.SubCategoryUpdateDto;
+import com.example.portfolio.exception.CustomException;
+import com.example.portfolio.exception.ErrorCode;
 import com.example.portfolio.mapper.CategoryMapper;
 import com.example.portfolio.model.Category;
 import com.example.portfolio.model.SubCategory;
@@ -55,6 +58,12 @@ public class CategoryService {
 	    }
 	
 	public List<SubCategoryDto> getSubCategoriesWithProjects(Long categoryId) {
+		categoryRepository.findById(categoryId).orElseThrow(() -> new CustomException(
+            HttpStatus.NOT_FOUND,
+            ErrorCode.CATEGORY_NOT_FOUND,
+            "Category with ID: " + categoryId + " not found when retrieving subcategories")
+				);
+		
 		List<SubCategory> subCategories = projectRepository.findSubCategoriesWithProjects(categoryId);
 		return subCategories.stream().map(this::subCategoryEntityToDto).toList();
 	}
@@ -68,10 +77,18 @@ public class CategoryService {
 	@Transactional
 	public void deleteCategory(Long categoryId) {
 		if (isCategoryUsed(categoryId)) {
-			throw new RuntimeException("Category is in use by a project and cannot be deleted.");
+			throw new CustomException(
+		            HttpStatus.CONFLICT, 
+		            ErrorCode.CATEGORY_IN_USE,
+		            "Category ID: " + categoryId + " is referenced by existing projects"
+		            );
 		}
 		Category category = categoryRepository.findById(categoryId)
-				.orElseThrow(() -> new RuntimeException("Category not found"));
+				.orElseThrow(() -> new CustomException(
+		                HttpStatus.NOT_FOUND, 
+		                ErrorCode.CATEGORY_NOT_FOUND,
+		                "Category with ID: " + categoryId + " does not exist")
+						);
 		categoryRepository.delete(category);
 	}
 
@@ -126,7 +143,11 @@ public class CategoryService {
 	@Transactional
 	public void deleteSubCategory(Long subCategoryId) {
 		if (isSubCategoryUsed(subCategoryId)) {
-			throw new RuntimeException("SubCategory is in use by a project and cannot be deleted.");
+			throw new CustomException(
+		            HttpStatus.CONFLICT, 
+		            ErrorCode.SUBCATEGORY_IN_USE,
+		            "Subcategory ID: " + subCategoryId + " is referenced by existing projects"
+		        );
 		}
 		subCategoryRepository.deleteById(subCategoryId);
 	}
@@ -139,7 +160,11 @@ public class CategoryService {
 	@Transactional
 	public void updateCategory(CategoryUpdateDto categoryUpdateDto) {
 		Category category = categoryRepository.findById(categoryUpdateDto.getId()).orElseThrow(
-				() -> new IllegalArgumentException("Category not found with id: " + categoryUpdateDto.getId()));
+				() -> new CustomException(
+			            HttpStatus.NOT_FOUND,
+			            ErrorCode.CATEGORY_NOT_FOUND,
+			            "Category with ID: " + categoryUpdateDto.getId() + " not found for update")
+				);
 		category.setName(categoryUpdateDto.getName());
 		// subCategories 리스트를 변경하지 않음
 		categoryRepository.save(category);
@@ -149,7 +174,11 @@ public class CategoryService {
     @Transactional
     public void updateSubCategory(Long subCategoryId, SubCategoryUpdateDto subCategoryUpdateDto) {
         SubCategory subCategory = subCategoryRepository.findById(subCategoryId)
-                .orElseThrow(() -> new IllegalArgumentException("SubCategory not found with id: " + subCategoryId));
+                .orElseThrow(() -> new CustomException(
+                        HttpStatus.NOT_FOUND,
+                        ErrorCode.SUBCATEGORY_NOT_FOUND,
+                        "Subcategory with ID: " + subCategoryId + " not found for update")
+                		);
         subCategory.setName(subCategoryUpdateDto.getName());
         subCategoryRepository.save(subCategory);
     }
