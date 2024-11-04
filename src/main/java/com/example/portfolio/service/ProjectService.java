@@ -2,6 +2,8 @@ package com.example.portfolio.service;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -45,6 +47,7 @@ public class ProjectService {
 
 	// 프로젝트 생성
 	@Transactional
+	@CacheEvict(value = "projectList", allEntries = true)
 	public void createProject(ProjectCreateDto projectCreateDtos) {
 	    Project project = projectMapper.createDtoToProject(projectCreateDtos);
 	    Long projectId = projectRepository.save(project).getId();
@@ -64,6 +67,7 @@ public class ProjectService {
 
 	// 프로젝트 업데이트
 	@Transactional
+	@CacheEvict(value = "projectList", allEntries = true)
 	public void updateProject(ProjectUpdateDto projectUpdateDto) {
 		
 		Project project = projectMapper.upadateDtoToProject(projectUpdateDto);
@@ -99,6 +103,7 @@ public class ProjectService {
 
 	// 프로젝트 삭제
 	@Transactional
+	@CacheEvict(value = "projectList", allEntries = true)
 	public void deleteProject(Long id) {
 		Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project not found"));
 		// GCS 썸네일과 관련 사진들 삭제
@@ -110,7 +115,7 @@ public class ProjectService {
 
 	//프로젝트 불러오기
 	@Transactional
-
+	@Cacheable(value = "projectList", key = "(#categoryId != null ? #categoryId : 'all') + '-' + (#subCategoryId != null ? #subCategoryId : 'all') + '-' + #pageable.pageNumber")
     public Slice<ProjectListDto> getProjectList(Pageable pageable, Long categoryId, Long subCategoryId) {
         if (categoryId == null && subCategoryId == null) {
             return projectRepository.findAllProject(pageable);
