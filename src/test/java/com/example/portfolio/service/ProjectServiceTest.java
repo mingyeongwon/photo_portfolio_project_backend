@@ -42,9 +42,8 @@ class ProjectServiceTest {
 	
 	@Test
 	@DisplayName("프로젝트서비스 전체 성공 테스트")
-	void ProjectServiceSuccessTest() {
+	void ProjectServiceSuccessTest() throws IOException {
 		
-		try {
 		// Given
 		ProjectCreateDto projectCreateDto = new ProjectCreateDto();
 		projectCreateDto.setTitle("서비스테스트제목");
@@ -100,10 +99,6 @@ class ProjectServiceTest {
 	   
 		assertThat(projectId).isEqualTo(1L);
 		assertThat(url).isEqualTo("http:localhost8181/thumbnail.jpg");
-		
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	    
 	}
 
