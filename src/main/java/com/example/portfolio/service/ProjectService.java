@@ -70,9 +70,12 @@ public class ProjectService {
 	@CacheEvict(value = "projectList", allEntries = true)
 	public void updateProject(ProjectUpdateDto projectUpdateDto) {
 		
+		Project existingProject = projectRepository.findById(projectUpdateDto.getId())
+				.orElseThrow(() -> new RuntimeException("Project not found"));
+		
 		Project project = projectMapper.upadateDtoToProject(projectUpdateDto);
-		String thumbnailurl = projectRepository.findById(projectUpdateDto.getId()).get().getThumbnailUrl();
-		project.setThumbnailUrl(thumbnailurl);
+		project.setCreatedAt(existingProject.getCreatedAt());
+		project.setThumbnailUrl(existingProject.getThumbnailUrl());
 		
 		// 썸네일이 있는 경우에만 업데이트
 		if (projectUpdateDto.getThumbnailMultipartFile() != null
