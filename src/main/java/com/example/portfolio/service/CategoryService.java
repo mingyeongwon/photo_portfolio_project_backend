@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -163,7 +164,12 @@ public class CategoryService {
 	}
 
 	@Transactional
-	@CacheEvict(value = "category", key = "'categoryList'")
+	@Caching(
+			evict = {
+					@CacheEvict(value = "category", key = "'categoryList'"),
+					@CacheEvict(value = "projectList", allEntries = true)
+			}
+	)
 	public void updateCategory(CategoryUpdateDto categoryUpdateDto) {
 		Category category = categoryRepository.findById(categoryUpdateDto.getId()).orElseThrow(
 				() -> new CustomException(
