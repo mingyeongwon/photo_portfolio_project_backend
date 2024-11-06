@@ -76,7 +76,8 @@ public class ProjectService {
 			evict = {
 					@CacheEvict(value = "project", allEntries = true),
 					@CacheEvict(value = "projectList", allEntries = true),
-					@CacheEvict(value = "adminProjectList", allEntries = true)
+					@CacheEvict(value = "adminProjectList", allEntries = true),
+					@CacheEvict(value = "adminProject", key = "#projectUpdateDto.id")
 			}
 	)
 	public void updateProject(ProjectUpdateDto projectUpdateDto) {
@@ -121,7 +122,8 @@ public class ProjectService {
 			evict = {
 					@CacheEvict(value = "project", allEntries = true),
 					@CacheEvict(value = "projectList", allEntries = true),
-					@CacheEvict(value = "adminProjectList", allEntries = true)
+					@CacheEvict(value = "adminProjectList", allEntries = true),
+					@CacheEvict(value = "adminProject", key = "id")
 			}
 	)
 	public void deleteProject(Long id) {
@@ -158,7 +160,9 @@ public class ProjectService {
 	    return pojectListCustomDto;
 	}
 	
-	// 프로젝트 디테일 정보 가져오기
+	// admin 프로젝트 디테일 정보 가져오기
+	@Transactional(readOnly = true)
+	@Cacheable(value = "adminProject", key = "#projectId")
 	public ProjectDetailDto getAdminProject(Long projectId) {
 		ProjectDetailDto projectDetail =  projectRepository.findProjectDetailByProjectId(projectId);
 		List<PhotoListDto> photoList = photoRepository.findDetailPhotoByProjectId(projectId);
