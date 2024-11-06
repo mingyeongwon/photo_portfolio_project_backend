@@ -25,6 +25,6 @@ public interface ProjectMapper {
 	// Update Dto -> Entity
 	@Mapping(source = "categoryId", target = "category.id")
     @Mapping(source = "subcategoryId", target = "subCategory.id")
-	@Mapping(target = "createdAt", expression = "java(new java.util.Date())")
+//	@Mapping(target = "createdAt", expression = "java(new java.util.Date())")
 	Project upadateDtoToProject(ProjectUpdateDto projectToUpdateDto);
 }

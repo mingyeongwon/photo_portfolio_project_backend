@@ -92,7 +92,7 @@ public class ProjectController {
 			@RequestParam(value = "keyWord", defaultValue = "") String keyWord) {
 		Sort sortOrder = direction.equalsIgnoreCase("asc") ? Sort.by(sort).ascending() : Sort.by(sort).descending();
 		Pageable pageable = PageRequest.of(page, size, sortOrder);
-		return adminService.getAdminProjectList(pageable, keyWord);
+		return projectService.getAdminProjectList(pageable, keyWord);
 
 	}
 
@@ -125,6 +125,7 @@ public class ProjectController {
 		if ("main".equals(view)) {
 			return categoryService.getCategoriesWithProjects();
 		} else {
+			System.out.println("main X 실행");
 			return categoryService.getAllCategories();
 		}
 	}
@@ -173,6 +174,7 @@ public class ProjectController {
 	public ProjectDetailPageDto getPhotos(
 			@PageableDefault( size = 10) Pageable pageable,
 			@PathVariable("id") Long projectId) {
+		projectService.updateViewCount(projectId);
 		return projectService.getPhotoList(pageable, projectId);
 	}
 

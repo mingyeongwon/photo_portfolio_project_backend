@@ -2,18 +2,24 @@ package com.example.portfolio.service;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectDetailDto;
 import com.example.portfolio.dto.ProjectDetailPageDto;
+import com.example.portfolio.dto.ProjectListCustomDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.exception.CustomException;
@@ -22,8 +28,6 @@ import com.example.portfolio.mapper.ProjectMapper;
 import com.example.portfolio.model.Project;
 import com.example.portfolio.repository.PhotoRepository;
 import com.example.portfolio.repository.ProjectRepository;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class ProjectService {
@@ -46,6 +50,12 @@ public class ProjectService {
 	}
 
 	@Transactional
+	@Caching(
+			evict = {
+					@CacheEvict(value = "projectList", allEntries = true),
+					@CacheEvict(value = "adminProjectList", allEntries = true)
+			}
+	)
 	public void createProject(ProjectCreateDto projectCreateDtos) {
 	    Project project = projectMapper.createDtoToProject(projectCreateDtos);
 
@@ -60,14 +70,24 @@ public class ProjectService {
 	    projectRepository.save(project);
 	}
 
-
 	// 프로젝트 업데이트
 	@Transactional
+	@Caching(
+			evict = {
+					@CacheEvict(value = "project", allEntries = true),
+					@CacheEvict(value = "projectList", allEntries = true),
+					@CacheEvict(value = "adminProjectList", allEntries = true),
+					@CacheEvict(value = "adminProject", key = "#projectUpdateDto.id")
+			}
+	)
 	public void updateProject(ProjectUpdateDto projectUpdateDto) {
 		
+		Project existingProject = projectRepository.findById(projectUpdateDto.getId())
+				.orElseThrow(() -> new RuntimeException("Project not found"));
+		
 		Project project = projectMapper.upadateDtoToProject(projectUpdateDto);
-		String thumbnailurl = projectRepository.findById(projectUpdateDto.getId()).get().getThumbnailUrl();
-		project.setThumbnailUrl(thumbnailurl);
+		project.setCreatedAt(existingProject.getCreatedAt());
+		project.setThumbnailUrl(existingProject.getThumbnailUrl());
 		
 		// 썸네일이 있는 경우에만 업데이트
 		if (projectUpdateDto.getThumbnailMultipartFile() != null
@@ -98,6 +118,14 @@ public class ProjectService {
 
 	// 프로젝트 삭제
 	@Transactional
+	@Caching(
+			evict = {
+					@CacheEvict(value = "project", allEntries = true),
+					@CacheEvict(value = "projectList", allEntries = true),
+					@CacheEvict(value = "adminProjectList", allEntries = true),
+					@CacheEvict(value = "adminProject", key = "id")
+			}
+	)
 	public void deleteProject(Long id) {
 		Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project not found"));
 		// GCS 썸네일과 관련 사진들 삭제
@@ -109,7 +137,7 @@ public class ProjectService {
 
 	//프로젝트 불러오기
 	@Transactional
-
+	@Cacheable(value = "projectList", key = "(#categoryId != null ? #categoryId : 'all') + '-' + (#subCategoryId != null ? #subCategoryId : 'all') + '-' + #pageable.pageNumber")
     public Slice<ProjectListDto> getProjectList(Pageable pageable, Long categoryId, Long subCategoryId) {
         if (categoryId == null && subCategoryId == null) {
             return projectRepository.findAllProject(pageable);
@@ -120,7 +148,21 @@ public class ProjectService {
         }
     }
 	
-	// 프로젝트 디테일 정보 가져오기
+	
+	//admin page 프로젝트 불러오기 
+	@Transactional
+	@Cacheable(value = "adminProjectList", key = "#keyWord + '-' + #pageable.pageNumber + #pageable.sort.toString()")
+	public ProjectListCustomDto getAdminProjectList(Pageable pageable, String keyWord) {
+		Page<ProjectListDto> projectListDto =projectRepository.findByKeyWord(pageable, keyWord);
+		ProjectListCustomDto pojectListCustomDto = new ProjectListCustomDto();
+		pojectListCustomDto.setContent(projectListDto.getContent());
+		pojectListCustomDto.setTotalPages(projectListDto.getTotalPages());
+	    return pojectListCustomDto;
+	}
+	
+	// admin 프로젝트 디테일 정보 가져오기
+	@Transactional(readOnly = true)
+	@Cacheable(value = "adminProject", key = "#projectId")
 	public ProjectDetailDto getAdminProject(Long projectId) {
 		ProjectDetailDto projectDetail =  projectRepository.findProjectDetailByProjectId(projectId);
 		List<PhotoListDto> photoList = photoRepository.findDetailPhotoByProjectId(projectId);
@@ -128,10 +170,9 @@ public class ProjectService {
 		return projectDetail;
 	}
 	
-	@Transactional
+	@Transactional(readOnly = true)
+	@Cacheable(value = "project", key = "#projectId + '-' + #pageable.pageNumber")
 	public ProjectDetailPageDto getPhotoList(Pageable pageable, Long projectId) {
-		// view count +1 로직
-		projectRepository.updateViewCount(projectId);
 		
 		Project project = projectRepository.findById(projectId)
 				.orElseThrow(() -> new CustomException(
@@ -142,6 +183,11 @@ public class ProjectService {
 		
 		Slice<PhotoListDto> photos = photoRepository.findByPhotosProjectId(projectId, pageable);
 		return new ProjectDetailPageDto(project.getTitle(), project.getThumbnailUrl(), photos);
+	}
+	
+	@CacheEvict(value = "adminProjectList", allEntries = true)
+	public void updateViewCount(Long projectId) {
+		projectRepository.updateViewCount(projectId);
 	}
 
 }

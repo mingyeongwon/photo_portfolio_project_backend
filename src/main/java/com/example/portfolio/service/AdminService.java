@@ -19,12 +19,10 @@ public class AdminService {
 
 	private final AdminRepository adminRepository;
 	private final PasswordEncoder passwordEncoder;
-	private final ProjectRepository projectRepository;
 
-	public AdminService(AdminRepository adminRepository, PasswordEncoder passwordEncoder,ProjectRepository projectRepository) {
+	public AdminService(AdminRepository adminRepository, PasswordEncoder passwordEncoder) {
 		this.adminRepository = adminRepository;
 		this.passwordEncoder = passwordEncoder;
-		this.projectRepository= projectRepository;
 	}
 
 	// 회원가입
@@ -32,17 +30,6 @@ public class AdminService {
 		// 비밀번호 암호화
 		admin.setPassword(passwordEncoder.encode(admin.getPassword()));
 		adminRepository.save(admin);
-	}
-	
-	//admin page 프로젝트 불러오기 
-	@Transactional
-	@Cacheable("projects")
-	public ProjectListCustomDto getAdminProjectList(Pageable pageable, String keyWord) {
-		Page<ProjectListDto> projectListDto =projectRepository.findByKeyWord(pageable, keyWord);
-		ProjectListCustomDto pojectListCustomDto = new ProjectListCustomDto();
-		pojectListCustomDto.setContent(projectListDto.getContent());
-		pojectListCustomDto.setTotalPages(projectListDto.getTotalPages());
-	    return pojectListCustomDto;
 	}
 
 }
