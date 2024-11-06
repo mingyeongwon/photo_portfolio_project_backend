@@ -7,6 +7,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import com.example.portfolio.dto.PhotoListDto;
 import com.example.portfolio.dto.ProjectCreateDto;
 import com.example.portfolio.dto.ProjectDetailDto;
 import com.example.portfolio.dto.ProjectDetailPageDto;
+import com.example.portfolio.dto.ProjectListCustomDto;
 import com.example.portfolio.dto.ProjectListDto;
 import com.example.portfolio.dto.ProjectUpdateDto;
 import com.example.portfolio.exception.CustomException;
@@ -62,6 +64,17 @@ public class ProjectService {
 	    photoService.createPhotos(projectCreateDtos, projectId);
 
 	    projectRepository.save(project);
+	}
+	
+	//admin page 프로젝트 불러오기 
+	@Transactional
+	@Cacheable(value = "project", key = "#projectId + '-' + #pageable.pageNumber")
+	public ProjectListCustomDto getAdminProjectList(Pageable pageable, String keyWord) {
+		Page<ProjectListDto> projectListDto =projectRepository.findByKeyWord(pageable, keyWord);
+		ProjectListCustomDto pojectListCustomDto = new ProjectListCustomDto();
+		pojectListCustomDto.setContent(projectListDto.getContent());
+		pojectListCustomDto.setTotalPages(projectListDto.getTotalPages());
+	    return pojectListCustomDto;
 	}
 
 
