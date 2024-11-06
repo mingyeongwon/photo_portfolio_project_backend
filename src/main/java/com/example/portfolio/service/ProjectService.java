@@ -51,7 +51,12 @@ public class ProjectService {
 	}
 
 	@Transactional
-	@CacheEvict(value = "projectList", allEntries = true)
+	@Caching(
+			evict = {
+					@CacheEvict(value = "projectList", allEntries = true),
+					@CacheEvict(value = "adminProjectList", allEntries = true)
+			}
+	)
 	public void createProject(ProjectCreateDto projectCreateDtos) {
 	    Project project = projectMapper.createDtoToProject(projectCreateDtos);
 
@@ -65,25 +70,14 @@ public class ProjectService {
 
 	    projectRepository.save(project);
 	}
-	
-	//admin page 프로젝트 불러오기 
-	@Transactional
-	@Cacheable(value = "project", key = "#projectId + '-' + #pageable.pageNumber")
-	public ProjectListCustomDto getAdminProjectList(Pageable pageable, String keyWord) {
-		Page<ProjectListDto> projectListDto =projectRepository.findByKeyWord(pageable, keyWord);
-		ProjectListCustomDto pojectListCustomDto = new ProjectListCustomDto();
-		pojectListCustomDto.setContent(projectListDto.getContent());
-		pojectListCustomDto.setTotalPages(projectListDto.getTotalPages());
-	    return pojectListCustomDto;
-	}
-
 
 	// 프로젝트 업데이트
 	@Transactional
 	@Caching(
 			evict = {
 					@CacheEvict(value = "project", allEntries = true),
-					@CacheEvict(value = "projectList", allEntries = true)
+					@CacheEvict(value = "projectList", allEntries = true),
+					@CacheEvict(value = "adminProjectList", allEntries = true)
 			}
 	)
 	public void updateProject(ProjectUpdateDto projectUpdateDto) {
@@ -127,7 +121,8 @@ public class ProjectService {
 	@Caching(
 			evict = {
 					@CacheEvict(value = "project", allEntries = true),
-					@CacheEvict(value = "projectList", allEntries = true)
+					@CacheEvict(value = "projectList", allEntries = true),
+					@CacheEvict(value = "adminProjectList", allEntries = true)
 			}
 	)
 	public void deleteProject(Long id) {
@@ -151,6 +146,18 @@ public class ProjectService {
             return projectRepository.findBySubCategory_id(pageable, subCategoryId);
         }
     }
+	
+	
+	//admin page 프로젝트 불러오기 
+	@Transactional
+	@Cacheable(value = "adminProjectList", key = "#keyWord + '-' + #pageable.pageNumber + #pageable.sort.toString()")
+	public ProjectListCustomDto getAdminProjectList(Pageable pageable, String keyWord) {
+		Page<ProjectListDto> projectListDto =projectRepository.findByKeyWord(pageable, keyWord);
+		ProjectListCustomDto pojectListCustomDto = new ProjectListCustomDto();
+		pojectListCustomDto.setContent(projectListDto.getContent());
+		pojectListCustomDto.setTotalPages(projectListDto.getTotalPages());
+	    return pojectListCustomDto;
+	}
 	
 	// 프로젝트 디테일 정보 가져오기
 	public ProjectDetailDto getAdminProject(Long projectId) {

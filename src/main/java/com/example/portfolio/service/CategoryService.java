@@ -167,7 +167,8 @@ public class CategoryService {
 	@Caching(
 			evict = {
 					@CacheEvict(value = "category", key = "'categoryList'"),
-					@CacheEvict(value = "projectList", allEntries = true)
+					@CacheEvict(value = "projectList", allEntries = true),
+					@CacheEvict(value = "adminProjectList", allEntries = true)
 			}
 	)
 	public void updateCategory(CategoryUpdateDto categoryUpdateDto) {
