@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -27,7 +30,7 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class ProjectService {
-
+	
 	private final ProjectRepository projectRepository;
 	private final GcsService gcsService;
 	private final PhotoService photoService;
@@ -45,29 +48,31 @@ public class ProjectService {
 		this.photoRepository = photoRepository;
 	}
 
-	// 프로젝트 생성
 	@Transactional
 	@CacheEvict(value = "projectList", allEntries = true)
 	public void createProject(ProjectCreateDto projectCreateDtos) {
 	    Project project = projectMapper.createDtoToProject(projectCreateDtos);
+
 	    Long projectId = projectRepository.save(project).getId();
 
-	    // 썸네일 생성 및 변환
 	    MultipartFile multipartFile = projectCreateDtos.getThumbnailMultipartFile();
-        // WebP로 변환한 이미지를 GCS에 업로드
-        String url = gcsService.uploadWebpFile(multipartFile, projectId);
-        project.setThumbnailUrl(url);
-	
-	    // 사진 생성
+	    String url = gcsService.uploadWebpFile(multipartFile, projectId);
+	    project.setThumbnailUrl(url);
+
 	    photoService.createPhotos(projectCreateDtos, projectId);
 
-	    // 최종적으로 프로젝트 업데이트
 	    projectRepository.save(project);
 	}
 
+
 	// 프로젝트 업데이트
 	@Transactional
-	@CacheEvict(value = "projectList", allEntries = true)
+	@Caching(
+			evict = {
+					@CacheEvict(value = "project", allEntries = true),
+					@CacheEvict(value = "projectList", allEntries = true)
+			}
+	)
 	public void updateProject(ProjectUpdateDto projectUpdateDto) {
 		
 		Project existingProject = projectRepository.findById(projectUpdateDto.getId())
@@ -106,7 +111,12 @@ public class ProjectService {
 
 	// 프로젝트 삭제
 	@Transactional
-	@CacheEvict(value = "projectList", allEntries = true)
+	@Caching(
+			evict = {
+					@CacheEvict(value = "project", allEntries = true),
+					@CacheEvict(value = "projectList", allEntries = true)
+			}
+	)
 	public void deleteProject(Long id) {
 		Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project not found"));
 		// GCS 썸네일과 관련 사진들 삭제
@@ -138,6 +148,7 @@ public class ProjectService {
 	}
 	
 	@Transactional
+	@Cacheable(value = "project", key = "#projectId + '-' + #pageable.pageNumber")
 	public ProjectDetailPageDto getPhotoList(Pageable pageable, Long projectId) {
 		// view count +1 로직
 		projectRepository.updateViewCount(projectId);
