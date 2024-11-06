@@ -2,6 +2,8 @@ package com.example.portfolio.service;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -25,7 +27,7 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class ProjectService {
-
+	
 	private final ProjectRepository projectRepository;
 	private final GcsService gcsService;
 	private final PhotoService photoService;
@@ -43,24 +45,21 @@ public class ProjectService {
 		this.photoRepository = photoRepository;
 	}
 
-	// 프로젝트 생성
 	@Transactional
 	public void createProject(ProjectCreateDto projectCreateDtos) {
 	    Project project = projectMapper.createDtoToProject(projectCreateDtos);
+
 	    Long projectId = projectRepository.save(project).getId();
 
-	    // 썸네일 생성 및 변환
 	    MultipartFile multipartFile = projectCreateDtos.getThumbnailMultipartFile();
-        // WebP로 변환한 이미지를 GCS에 업로드
-        String url = gcsService.uploadWebpFile(multipartFile, projectId);
-        project.setThumbnailUrl(url);
-	
-	    // 사진 생성
+	    String url = gcsService.uploadWebpFile(multipartFile, projectId);
+	    project.setThumbnailUrl(url);
+
 	    photoService.createPhotos(projectCreateDtos, projectId);
 
-	    // 최종적으로 프로젝트 업데이트
 	    projectRepository.save(project);
 	}
+
 
 	// 프로젝트 업데이트
 	@Transactional
