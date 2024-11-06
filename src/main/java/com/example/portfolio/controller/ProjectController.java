@@ -174,6 +174,7 @@ public class ProjectController {
 	public ProjectDetailPageDto getPhotos(
 			@PageableDefault( size = 10) Pageable pageable,
 			@PathVariable("id") Long projectId) {
+		projectService.updateViewCount(projectId);
 		return projectService.getPhotoList(pageable, projectId);
 	}
 

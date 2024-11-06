@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.portfolio.dto.PhotoListDto;
@@ -27,8 +28,6 @@ import com.example.portfolio.mapper.ProjectMapper;
 import com.example.portfolio.model.Project;
 import com.example.portfolio.repository.PhotoRepository;
 import com.example.portfolio.repository.ProjectRepository;
-
-import jakarta.transaction.Transactional;
 
 @Service
 public class ProjectService {
@@ -167,11 +166,9 @@ public class ProjectService {
 		return projectDetail;
 	}
 	
-	@Transactional
+	@Transactional(readOnly = true)
 	@Cacheable(value = "project", key = "#projectId + '-' + #pageable.pageNumber")
 	public ProjectDetailPageDto getPhotoList(Pageable pageable, Long projectId) {
-		// view count +1 로직
-		projectRepository.updateViewCount(projectId);
 		
 		Project project = projectRepository.findById(projectId)
 				.orElseThrow(() -> new CustomException(
@@ -182,6 +179,11 @@ public class ProjectService {
 		
 		Slice<PhotoListDto> photos = photoRepository.findByPhotosProjectId(projectId, pageable);
 		return new ProjectDetailPageDto(project.getTitle(), project.getThumbnailUrl(), photos);
+	}
+	
+	@CacheEvict(value = "adminProjectList", allEntries = true)
+	public void updateViewCount(Long projectId) {
+		projectRepository.updateViewCount(projectId);
 	}
 
 }
