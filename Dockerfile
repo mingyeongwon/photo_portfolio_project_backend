@@ -16,6 +16,8 @@ RUN ./gradlew build --exclude-task test
 
 RUN cp ./build/libs/*.jar ./portfolio_project.jar
 
+RUN sed -i 's/\r$//' gradlew
+
 WORKDIR /app
 
 EXPOSE 8080
