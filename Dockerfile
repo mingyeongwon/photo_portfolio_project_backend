@@ -16,6 +16,6 @@ RUN ./gradlew build --exclude-task test
 
 RUN cp ./build/libs/*.jar ./portfolio_project.jar
 
-EXPOSE 8181
+EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar","-Dspring.profiles.active=prod" ,"/portfolio_project.jar"]
