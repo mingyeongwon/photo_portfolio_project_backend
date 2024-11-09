@@ -35,12 +35,15 @@ public class GcsService {
     private final Storage storage;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-    public GcsService(@Value("${spring.cloud.gcp.storage.credentials.location}") String keyFileName) throws IOException {
-        InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
-        this.storage = StorageOptions.newBuilder()
-                .setCredentials(GoogleCredentials.fromStream(keyFile))
-                .build()
-                .getService();
+//    public GcsService(@Value("${spring.cloud.gcp.storage.credentials.location}") String keyFileName) throws IOException {
+//        InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
+//        this.storage = StorageOptions.newBuilder()
+//                .setCredentials(GoogleCredentials.fromStream(keyFile))
+//                .build()
+//                .getService();
+//    }
+    public GcsService() {
+        this.storage = StorageOptions.getDefaultInstance().getService();
     }
 
     // WebP 파일 업로드 메서드
