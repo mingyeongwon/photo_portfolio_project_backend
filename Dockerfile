@@ -16,7 +16,11 @@ RUN chmod +x ./gradlew
 ENV GRADLE_OPTS="-Dorg.gradle.daemon=false"
 ENV PORT=8080
 
-RUN ./gradlew build --exclude-task test
+# GCS 인증을 위한 설정 추가
+RUN echo "${GCS_KEY}" > /app/gcs-key.json
+ENV GOOGLE_APPLICATION_CREDENTIALS=/app/gcs-key.json
+
+RUN ./gradlew build --exclude-task test 
 RUN ls -la ./build/libs/
 
 RUN cp ./build/libs/portfolio_project-0.0.1-SNAPSHOT.jar app.jar
