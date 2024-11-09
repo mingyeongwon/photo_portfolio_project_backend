@@ -27,7 +27,7 @@ availableSecrets:
       env: 'DB_URL'
     - versionName: projects/$PROJECT_ID/secrets/DB_USERNAME/versions/latest
       env: 'DB_USERNAME'
-    - versionName: projects/$PROJECT_ID/secrets/DB_PASSWORD/versions/latest
+    - versionName: projects/$PROJECT_ID/secrets/DB_PASSWORD/versions/latest 
       env: 'DB_PASSWORD'
     - versionName: projects/$PROJECT_ID/secrets/GCS_KEY/versions/latest
       env: 'GCS_KEY'
