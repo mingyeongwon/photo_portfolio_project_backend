@@ -17,6 +17,8 @@ steps:
       - '--region'
       - 'us-central1'
       - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'DB_URL=${DB_URL},DB_USERNAME=${DB_USERNAME},DB_PASSWORD=${DB_PASSWORD},GCS_KEY_JSON=${GCS_KEY},PROJECT_ID=${PROJECT_ID},BUCKET=${BUCKET}'
  
 # Secret Manager 설정
 availableSecrets:
