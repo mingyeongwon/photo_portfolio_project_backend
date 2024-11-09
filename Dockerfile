@@ -1,5 +1,9 @@
 FROM azul/zulu-openjdk-alpine:17-latest
 
+RUN apk add --no-cache findutils
+
+WORKDIR /app
+
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
@@ -9,12 +13,12 @@ COPY src src
 RUN sed -i 's/\r$//' gradlew
 RUN chmod +x ./gradlew
 
-RUN ./gradlew clean build -x test
+ENV GRADLE_OPTS="-Dorg.gradle.daemon=false"
 
-RUN mkdir /app && cp ./build/libs/*.jar /app/app.jar
+RUN ./gradlew build --exclude-task test
+RUN ls -la ./build/libs/
 
-WORKDIR /app
+RUN cp ./build/libs/portfolio_project-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "/app/app.jar"]
+ENTRYPOINT ["java", "-jar","-Dspring.profiles.active=prod" ,"/portfolio_project.jar"]
