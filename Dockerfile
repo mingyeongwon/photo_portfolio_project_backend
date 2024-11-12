@@ -16,9 +16,7 @@ RUN chmod +x ./gradlew
 ENV GRADLE_OPTS="-Dorg.gradle.daemon=false"
 ENV PORT=8080
 
-# GCS 인증을 위한 설정 추가
-RUN echo "${GCS_KEY}" > /app/gcs-key.json
-ENV GOOGLE_APPLICATION_CREDENTIALS=/app/gcs-key.json
+# GCS 인증 설정 부분 제거
 
 RUN ./gradlew build --exclude-task test 
 RUN ls -la ./build/libs/
