@@ -45,8 +45,7 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
     
     // Image Processing
-    implementation "com.sksamuel.scrimage:scrimage-core:4.0.32"
-    implementation "com.sksamuel.scrimage:scrimage-webp:4.0.32"
+	implementation 'com.twelvemonkeys.imageio:imageio-webp:3.9.4'
     
     // Spring Cache
     implementation 'org.springframework.boot:spring-boot-starter-cache'
