@@ -67,16 +67,22 @@ public class GcsService {
                     .setContentType("image/webp")
                     .build();
 
-            // 비동기 업로드 및 예외 처리
-            CompletableFuture<Void> uploadFuture = CompletableFuture.runAsync(() -> storage.create(blobInfo, webpBytes), executorService);
-            uploadFuture.exceptionally(ex -> {
-                System.err.println("Failed to upload file: " + ex.getMessage());
-                throw new CustomException(
-                        HttpStatus.INTERNAL_SERVER_ERROR,
-                        ErrorCode.STORAGE_IO_ERROR,
-                        "Failed to upload file: " + ex.getMessage()
-                );
-            }).join();  // join()을 통해 비동기 예외를 호출 스레드에서 처리
+            // 비동기 업로드 및 예외 확인
+            CompletableFuture<Void> uploadFuture = CompletableFuture.runAsync(() -> {
+                try {
+                    storage.create(blobInfo, webpBytes);
+                } catch (Exception ex) {
+                    System.err.println("Error uploading to GCS: " + ex.getMessage());
+                    throw new CustomException(
+                            HttpStatus.INTERNAL_SERVER_ERROR,
+                            ErrorCode.STORAGE_IO_ERROR,
+                            "Failed to upload file in async: " + ex.getMessage()
+                    );
+                }
+            }, executorService);
+
+            // 비동기 작업의 완료 및 예외 확인
+            uploadFuture.get(); // 예외가 있으면 이 줄에서 던져짐
 
             return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
 
@@ -86,8 +92,15 @@ public class GcsService {
                     ErrorCode.STORAGE_IO_ERROR,
                     "Failed to upload file: " + e.getMessage()
             );
+        } catch (Exception e) {
+            throw new CustomException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    ErrorCode.STORAGE_IO_ERROR,
+                    "File upload failed due to async exception: " + e.getMessage()
+            );
         }
     }
+
 
 
     // 썸네일 파일 삭제
