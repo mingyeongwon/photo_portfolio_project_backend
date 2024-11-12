@@ -123,7 +123,7 @@ public class ProjectService {
 					@CacheEvict(value = "project", allEntries = true),
 					@CacheEvict(value = "projectList", allEntries = true),
 					@CacheEvict(value = "adminProjectList", allEntries = true),
-					@CacheEvict(value = "adminProject", key = "id")
+					@CacheEvict(value = "adminProject", key = "#id")
 			}
 	)
 	public void deleteProject(Long id) {
