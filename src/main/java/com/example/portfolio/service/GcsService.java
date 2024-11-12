@@ -1,5 +1,6 @@
 package com.example.portfolio.service;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
@@ -54,6 +55,13 @@ public class GcsService {
         try {
             String uuid = UUID.randomUUID().toString();
             String objectName = projectId + "/" + uuid + ".webp";
+            // cwebp 파일 확인 로그
+            File cwebpFile = new File("/tmp/cwebp");
+            if (cwebpFile.exists() && cwebpFile.canExecute()) {
+                System.out.println("cwebp 파일이 존재하며 실행 가능합니다.");
+            } else {
+                System.out.println("cwebp 파일이 없거나 실행 불가능합니다.");
+            }
 
             // WebP 이미지 변환
             ImmutableImage image = ImmutableImage.loader().fromStream(multipartFile.getInputStream());
