@@ -1,9 +1,6 @@
 package com.example.portfolio.service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -23,6 +20,8 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.sksamuel.scrimage.ImmutableImage;
+import com.sksamuel.scrimage.webp.WebpWriter;
 
 @Service
 public class GcsService {
@@ -44,7 +43,6 @@ public class GcsService {
         try {
             GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
             this.storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-            System.setProperty("webp.binary", "/usr/bin/cwebp");
         } catch (IOException e) {
             throw new RuntimeException("Failed to initialize GCS credentials", e);
         }
@@ -57,31 +55,16 @@ public class GcsService {
             String uuid = UUID.randomUUID().toString();
             String objectName = projectId + "/" + uuid + ".webp";
 
-            // 원본 이미지 바이트 배열 추출
-            byte[] originalBytes = multipartFile.getBytes();
+            // WebP 이미지 변환
+            ImmutableImage image = ImmutableImage.loader().fromStream(multipartFile.getInputStream());
+            WebpWriter writer = WebpWriter.DEFAULT.withQ(80).withM(4).withZ(9);
+            byte[] webpBytes = image.bytes(writer);
 
-            // cwebp 명령어 실행을 위한 ProcessBuilder 설정
-            ProcessBuilder processBuilder = new ProcessBuilder("/usr/bin/cwebp", "-q", "80", "-", "-o", "-");
-            Process process = processBuilder.start();
-
-            // 입력 스트림을 통해 원본 이미지를 `cwebp` 프로세스에 전달
-            try (OutputStream os = process.getOutputStream()) {
-                os.write(originalBytes);
-            }
-
-            // 프로세스의 출력 스트림에서 변환된 WebP 이미지 데이터를 읽어오기
-            ByteArrayOutputStream webpOutputStream = new ByteArrayOutputStream();
-            try (InputStream is = process.getInputStream()) {
-                is.transferTo(webpOutputStream);
-            }
-
-            byte[] webpBytes = webpOutputStream.toByteArray();
-
-            // 변환된 WebP 이미지를 GCS에 업로드
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
                     .setContentType("image/webp")
                     .build();
 
+            // GCS에 업로드 (동기 처리)
             storage.create(blobInfo, webpBytes);
 
             return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
@@ -90,7 +73,7 @@ public class GcsService {
             throw new CustomException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     ErrorCode.STORAGE_IO_ERROR,
-                    "Failed to upload file: " + e.getMessage()
+                    "파일 업로드 실패: " + e.getMessage()
             );
         }
     }
