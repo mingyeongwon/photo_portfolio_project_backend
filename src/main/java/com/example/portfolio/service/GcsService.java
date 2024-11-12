@@ -67,8 +67,16 @@ public class GcsService {
                     .setContentType("image/webp")
                     .build();
 
-            // GCS에 비동기 업로드
-            CompletableFuture.runAsync(() -> storage.create(blobInfo, webpBytes), executorService);
+            // 비동기 업로드 및 예외 처리
+            CompletableFuture<Void> uploadFuture = CompletableFuture.runAsync(() -> storage.create(blobInfo, webpBytes), executorService);
+            uploadFuture.exceptionally(ex -> {
+                System.err.println("Failed to upload file: " + ex.getMessage());
+                throw new CustomException(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        ErrorCode.STORAGE_IO_ERROR,
+                        "Failed to upload file: " + ex.getMessage()
+                );
+            }).join();  // join()을 통해 비동기 예외를 호출 스레드에서 처리
 
             return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
 
@@ -80,6 +88,7 @@ public class GcsService {
             );
         }
     }
+
 
     // 썸네일 파일 삭제
     public void deleteThumbnailFile(String thumbnailUrl) {
