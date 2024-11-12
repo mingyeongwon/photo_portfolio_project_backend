@@ -1,8 +1,7 @@
-# Base image: Java 17 on Alpine Linux
 FROM azul/zulu-openjdk-alpine:17-latest
 
-# Install cwebp (webp package) for image processing
-RUN apk add --no-cache findutils webp
+# cwebp 설치를 위해 libwebp-tools 사용
+RUN apk add --no-cache findutils libwebp-tools
 
 WORKDIR /app
 
@@ -18,7 +17,7 @@ RUN chmod +x ./gradlew
 ENV GRADLE_OPTS="-Dorg.gradle.daemon=false"
 ENV PORT=8080
 
-# Build the Spring Boot application
+# Spring Boot 애플리케이션 빌드
 RUN ./gradlew build --exclude-task test
 RUN ls -la ./build/libs/
 
