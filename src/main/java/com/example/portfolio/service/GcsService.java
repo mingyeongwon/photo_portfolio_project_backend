@@ -1,12 +1,19 @@
 package com.example.portfolio.service;
 
-import java.io.File;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -21,8 +28,6 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import com.sksamuel.scrimage.ImmutableImage;
-import com.sksamuel.scrimage.webp.WebpWriter;
 
 @Service
 public class GcsService {
@@ -55,24 +60,30 @@ public class GcsService {
         try {
             String uuid = UUID.randomUUID().toString();
             String objectName = projectId + "/" + uuid + ".webp";
-            // cwebp 파일 확인 로그
-            File cwebpFile = new File("/tmp/cwebp");
-            if (cwebpFile.exists() && cwebpFile.canExecute()) {
-                System.out.println("cwebp 파일이 존재하며 실행 가능합니다.");
-            } else {
-                System.out.println("cwebp 파일이 없거나 실행 불가능합니다.");
+
+            // Load the image
+            BufferedImage image = ImageIO.read(multipartFile.getInputStream());
+
+            // Configure WebP writer
+            ImageWriter writer = ImageIO.getImageWritersByFormatName("webp").next();
+            ImageWriteParam param = writer.getDefaultWriteParam();
+
+            // Convert to WebP
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            try (ImageOutputStream ios = ImageIO.createImageOutputStream(outputStream)) {
+                writer.setOutput(ios);
+                writer.write(null, new IIOImage(image, null, null), param);
+            } finally {
+                writer.dispose();
             }
 
-            // WebP 이미지 변환
-            ImmutableImage image = ImmutableImage.loader().fromStream(multipartFile.getInputStream());
-            WebpWriter writer = WebpWriter.DEFAULT.withQ(80).withM(4).withZ(9);
-            byte[] webpBytes = image.bytes(writer);
-
+            // Prepare for GCS upload
+            byte[] webpBytes = outputStream.toByteArray();
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
                     .setContentType("image/webp")
                     .build();
 
-            // GCS에 업로드 (동기 처리)
+            // Upload to GCS
             storage.create(blobInfo, webpBytes);
 
             return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
@@ -81,7 +92,7 @@ public class GcsService {
             throw new CustomException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     ErrorCode.STORAGE_IO_ERROR,
-                    "파일 업로드 실패: " + e.getMessage()
+                    "Failed to upload file: " + e.getMessage()
             );
         }
     }
