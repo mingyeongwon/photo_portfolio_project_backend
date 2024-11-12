@@ -125,7 +125,6 @@ public class ProjectController {
 		if ("main".equals(view)) {
 			return categoryService.getCategoriesWithProjects();
 		} else {
-			System.out.println("main X 실행");
 			return categoryService.getAllCategories();
 		}
 	}
@@ -154,7 +153,6 @@ public class ProjectController {
 	@PutMapping("/categories/{id}")
 	public void updateCategory(@PathVariable("id") Long categoryId, @RequestBody CategoryUpdateDto categoryUpdateDto) {
 		categoryUpdateDto.setId(categoryId);
-		System.out.println("디티오 이름입니다.: " + categoryUpdateDto.getName());
 		categoryService.updateCategory(categoryUpdateDto);
 	}
 

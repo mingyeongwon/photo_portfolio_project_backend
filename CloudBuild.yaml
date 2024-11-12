@@ -1,10 +1,19 @@
 steps:
-  # 도커 빌드 단계
+  # Secret Manager에서 필요한 비밀 정보 불러오기
+  # (GOOGLE_APPLICATION_CREDENTIALS 관련 설정은 제거)
+  - name: 'ubuntu'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        echo "$GCS_KEY" > /workspace/gcs-key.json
+
+  # Docker 빌드 단계
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/photo-portfolio', '.']
-    secretEnv: ['DB_URL', 'DB_USERNAME', 'DB_PASSWORD', 'GCS_KEY', 'PROJECT_ID', 'BUCKET']
+    secretEnv: ['DB_URL', 'DB_USERNAME', 'DB_PASSWORD', 'PROJECT_ID', 'BUCKET']
 
-  # Cloud Run 배포 단계
+  # Cloud Run 배포 단계 (GOOGLE_APPLICATION_CREDENTIALS 관련 설정 제거)
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'run'
@@ -18,8 +27,8 @@ steps:
       - 'us-central1'
       - '--allow-unauthenticated'
       - '--set-env-vars'
-      - 'DB_URL=${DB_URL},DB_USERNAME=${DB_USERNAME},DB_PASSWORD=${DB_PASSWORD},GCS_KEY_JSON=${GCS_KEY},PROJECT_ID=${PROJECT_ID},BUCKET=${BUCKET}'
- 
+      - 'DB_URL=${DB_URL},DB_USERNAME=${DB_USERNAME},DB_PASSWORD=${DB_PASSWORD},PROJECT_ID=${PROJECT_ID},BUCKET=${BUCKET}'
+
 # Secret Manager 설정
 availableSecrets:
   secretManager:
