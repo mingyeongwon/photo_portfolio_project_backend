@@ -1,7 +1,7 @@
 FROM azul/zulu-openjdk-alpine:17-latest
 
 # cwebp 설치를 위해 libwebp-tools 사용 및 /tmp 경로에 심볼릭 링크 생성
-RUN apk add --no-cache findutils libwebp-tools && ln -s /usr/bin/cwebp /tmp/cwebp
+RUN apk add --no-cache libwebp-tools && ln -sf $(which cwebp) /tmp/cwebp
 
 WORKDIR /app
 
