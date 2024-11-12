@@ -2,6 +2,7 @@ FROM azul/zulu-openjdk-alpine:17-latest
 
 # libwebp-tools 설치하여 `cwebp` 바이너리 추가
 RUN apk add --no-cache libwebp-tools
+RUN which cwebp
 
 WORKDIR /app
 
