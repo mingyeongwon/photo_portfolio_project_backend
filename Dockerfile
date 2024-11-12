@@ -1,6 +1,6 @@
 FROM azul/zulu-openjdk-alpine:17-latest
 
-# cwebp 설치 (심볼릭 링크 생성을 제거)
+# libwebp-tools 설치하여 `cwebp` 바이너리 추가
 RUN apk add --no-cache libwebp-tools
 
 WORKDIR /app
