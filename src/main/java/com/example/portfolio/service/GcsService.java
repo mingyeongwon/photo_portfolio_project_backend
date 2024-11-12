@@ -43,8 +43,14 @@ public class GcsService {
 //                .getService();
 //    }
     public GcsService() {
-        this.storage = StorageOptions.getDefaultInstance().getService();
+        try {
+            GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
+            this.storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to initialize GCS credentials", e);
+        }
     }
+
 
     // WebP 파일 업로드 메서드
     public String uploadWebpFile(MultipartFile multipartFile, Long projectId) {
