@@ -146,10 +146,10 @@ public class CategoryService {
 	}
 
 	@Transactional
-	@CacheEvict(value = "subCategory", key = "#subCategoryDto.id")
-	public SubCategoryCreateDto createSubCategory(Long categoryId, SubCategoryCreateDto subCategoryDto) {
-		subCategoryDto.setCategoryId(categoryId);
-		SubCategory subCategory = categoryMapper.createSubCategoryToSubCategory(subCategoryDto);
+	@CacheEvict(value = "subCategory", key = "#subCategoryCreateDto.id")
+	public SubCategoryCreateDto createSubCategory(Long categoryId, SubCategoryCreateDto subCategoryCreateDto) {
+		subCategoryCreateDto.setCategoryId(categoryId);
+		SubCategory subCategory = categoryMapper.createSubCategoryToSubCategory(subCategoryCreateDto);
 		return CategoryMapper.INSTANCE.createSubCategoryToSubCategoryDto(subCategoryRepository.save(subCategory));
 	}
 
