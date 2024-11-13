@@ -1,6 +1,5 @@
 package com.example.portfolio.service;
 
-import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -8,12 +7,6 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageOutputStream;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -28,6 +21,8 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.sksamuel.scrimage.ImmutableImage;
+import com.sksamuel.scrimage.webp.WebpWriter;
 
 @Service
 public class GcsService {
@@ -61,43 +56,30 @@ public class GcsService {
             String uuid = UUID.randomUUID().toString();
             String objectName = projectId + "/" + uuid + ".webp";
 
-            // Load the image
-            BufferedImage image = ImageIO.read(multipartFile.getInputStream());
+            // ImmutableImage로 이미지 로드
+            ImmutableImage image = ImmutableImage.loader().fromStream(multipartFile.getInputStream());
 
-            // Configure WebP writer
-            ImageWriter writer = ImageIO.getImageWritersByFormatName("webp").next();
-            ImageWriteParam param = writer.getDefaultWriteParam();
+            // 압축 설정된 WebpWriter로 WebP 데이터 생성 (Q: 80, M: 4, Z: 9)
+            WebpWriter writer = WebpWriter.DEFAULT.withQ(80).withM(4).withZ(9);
+            byte[] webpBytes = image.bytes(writer);
 
-            // Convert to WebP
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            try (ImageOutputStream ios = ImageIO.createImageOutputStream(outputStream)) {
-                writer.setOutput(ios);
-                writer.write(null, new IIOImage(image, null, null), param);
-            } finally {
-                writer.dispose();
-            }
-
-            // Prepare for GCS upload
-            byte[] webpBytes = outputStream.toByteArray();
+            // Blob 정보 구성
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
                     .setContentType("image/webp")
                     .build();
 
-            // Upload to GCS
+            // Google Cloud Storage에 업로드
             storage.create(blobInfo, webpBytes);
 
             return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
-
         } catch (IOException e) {
             throw new CustomException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    ErrorCode.STORAGE_IO_ERROR,
-                    "Failed to upload file: " + e.getMessage()
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                ErrorCode.STORAGE_IO_ERROR,
+                "Failed to upload file: " + e.getMessage()
             );
         }
     }
-
-
 
     // 썸네일 파일 삭제
     public void deleteThumbnailFile(String thumbnailUrl) {
