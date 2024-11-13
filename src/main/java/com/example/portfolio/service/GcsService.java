@@ -57,21 +57,19 @@ public class GcsService {
 
     // WebP 파일 업로드 메서드
     public String uploadWebpFile(MultipartFile multipartFile, Long projectId) {
-        String uuid = UUID.randomUUID().toString();
-        String objectName = projectId + "/" + uuid + ".webp";
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
         try {
+            String uuid = UUID.randomUUID().toString();
+            String objectName = projectId + "/" + uuid + ".webp";
+
+            // Load the image
             BufferedImage image = ImageIO.read(multipartFile.getInputStream());
 
-            ImageWriter writer = ImageIO.getImageWritersByFormatName("webp").hasNext() ? 
-                                 ImageIO.getImageWritersByFormatName("webp").next() : null;
-
-            if (writer == null) {
-                throw new UnsupportedOperationException("No WebP writer found");
-            }
-
+            // Configure WebP writer
+            ImageWriter writer = ImageIO.getImageWritersByFormatName("webp").next();
             ImageWriteParam param = writer.getDefaultWriteParam();
+
+            // Convert to WebP
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             try (ImageOutputStream ios = ImageIO.createImageOutputStream(outputStream)) {
                 writer.setOutput(ios);
                 writer.write(null, new IIOImage(image, null, null), param);
@@ -79,10 +77,14 @@ public class GcsService {
                 writer.dispose();
             }
 
+            // Prepare for GCS upload
+            byte[] webpBytes = outputStream.toByteArray();
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
                     .setContentType("image/webp")
                     .build();
-            storage.create(blobInfo, outputStream.toByteArray());
+
+            // Upload to GCS
+            storage.create(blobInfo, webpBytes);
 
             return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
 
@@ -92,15 +94,8 @@ public class GcsService {
                     ErrorCode.STORAGE_IO_ERROR,
                     "Failed to upload file: " + e.getMessage()
             );
-        } finally {
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                // Log or handle close exception if necessary
-            }
         }
     }
-
 
 
 

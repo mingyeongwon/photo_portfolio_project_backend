@@ -45,7 +45,7 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
     
     // Image Processing
-	implementation 'com.twelvemonkeys.imageio:imageio-webp:3.9.4'
+	implementation 'org.sejda.imageio:webp-imageio:0.1.6'
     
     // Spring Cache
     implementation 'org.springframework.boot:spring-boot-starter-cache'
