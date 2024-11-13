@@ -46,13 +46,7 @@ dependencies {
     
     // Image Processing
 	implementation 'com.twelvemonkeys.imageio:imageio-webp:3.9.4'
-    implementation 'com.twelvemonkeys.imageio:imageio-core:3.9.4'
-    implementation 'com.twelvemonkeys.imageio:imageio-metadata:3.9.4'
-    implementation 'com.twelvemonkeys.common:common-lang:3.9.4'
-    implementation 'com.twelvemonkeys.common:common-io:3.9.4'
-    implementation 'com.twelvemonkeys.common:common-image:3.9.4'
     
-     implementation 'com.luciad.imageio:webp-imageio:0.3.0' 
     // Spring Cache
     implementation 'org.springframework.boot:spring-boot-starter-cache'
 }
