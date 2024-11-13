@@ -3,10 +3,9 @@ package com.example.portfolio.service;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 import javax.imageio.IIOImage;
@@ -33,68 +32,100 @@ public class GcsService {
     private String bucketName;
 
     private final Storage storage;
-    private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
     public GcsService() {
         try {
             GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
             this.storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
+            
+            // Verify WebP support at startup
+            verifyWebPSupport();
         } catch (IOException e) {
             System.err.println("Failed to initialize GCS credentials: " + e.getMessage());
             throw new RuntimeException("Failed to initialize GCS credentials", e);
         }
     }
 
-    // WebP 파일 업로드 메서드
+    private void verifyWebPSupport() {
+        String[] formats = ImageIO.getWriterFormatNames();
+        boolean hasWebP = false;
+        for (String format : formats) {
+            if (format.equalsIgnoreCase("webp")) {
+                hasWebP = true;
+                break;
+            }
+        }
+        if (!hasWebP) {
+            System.err.println("WebP support not found. Available formats: " + String.join(", ", formats));
+            throw new RuntimeException("WebP support not available. Please check TwelveMonkeys ImageIO installation.");
+        }
+    }
+
     public String uploadWebpFile(MultipartFile multipartFile, Long projectId) {
         try {
             String uuid = UUID.randomUUID().toString();
             String objectName = projectId + "/" + uuid + ".webp";
+            System.out.println("Starting upload process for: " + objectName);
 
-            // Load the image
+            // Load and validate image
             BufferedImage image = ImageIO.read(multipartFile.getInputStream());
             if (image == null) {
-                throw new IOException("Failed to load image from uploaded file.");
+                throw new RuntimeException("Failed to load image from uploaded file.");
             }
-
-            // Configure WebP writer
-            ImageWriter writer = null;
-            try {
-                writer = ImageIO.getImageWritersByFormatName("webp").next();
-            } catch (Exception e) {
-                throw new IOException("No WebP writer available. Ensure TwelveMonkeys library is included.");
-            }
-
-            ImageWriteParam param = writer.getDefaultWriteParam();
 
             // Convert to WebP
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            try (ImageOutputStream ios = ImageIO.createImageOutputStream(outputStream)) {
-                writer.setOutput(ios);
-                writer.write(null, new IIOImage(image, null, null), param);
-            } finally {
-                writer.dispose();
-            }
-
-            // Check for conversion issues
-            byte[] webpBytes = outputStream.toByteArray();
-            if (webpBytes.length == 0) {
-                throw new IOException("Conversion to WebP resulted in empty data.");
-            }
-
-            // Prepare for GCS upload
+            byte[] webpBytes = convertToWebP(image);
+            
+            // Upload to GCS
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
                     .setContentType("image/webp")
                     .build();
 
-            // Upload to GCS
             storage.create(blobInfo, webpBytes);
-            return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
+            
+            String fileUrl = "https://storage.googleapis.com/" + bucketName + "/" + objectName;
+            System.out.println("Successfully uploaded file to: " + fileUrl);
+            return fileUrl;
 
         } catch (IOException e) {
-            System.err.println("Failed to upload file: " + e.getMessage());
+            System.err.println("Failed to process or upload file: " + e.getMessage());
             e.printStackTrace();
             throw new RuntimeException("Failed to upload file", e);
+        }
+    }
+
+    private byte[] convertToWebP(BufferedImage image) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        
+        Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("webp");
+        if (!writers.hasNext()) {
+            throw new RuntimeException("WebP writer not available");
+        }
+
+        ImageWriter writer = writers.next();
+        try {
+            ImageWriteParam writeParam = writer.getDefaultWriteParam();
+            
+            // Optionally set WebP quality
+            if (writeParam.canWriteCompressed()) {
+                writeParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                writeParam.setCompressionQuality(0.8f); // 80% quality
+            }
+
+            try (ImageOutputStream ios = ImageIO.createImageOutputStream(outputStream)) {
+                writer.setOutput(ios);
+                writer.write(null, new IIOImage(image, null, null), writeParam);
+            }
+
+            byte[] webpData = outputStream.toByteArray();
+            if (webpData.length == 0) {
+                throw new RuntimeException("WebP conversion resulted in empty data");
+            }
+
+            return webpData;
+        } finally {
+            writer.dispose();
+            outputStream.close();
         }
     }
 
