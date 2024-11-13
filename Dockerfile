@@ -1,7 +1,8 @@
 FROM azul/zulu-openjdk-alpine:17-latest
 
-# cwebp 설치를 위해 libwebp-tools 사용 및 /tmp 경로에 심볼릭 링크 생성
-RUN apk add --no-cache libwebp-tools && ln -sf $(which cwebp) /tmp/cwebp
+# libwebp-tools 설치하여 `cwebp` 바이너리 추가
+RUN apk add --no-cache libwebp-tools
+RUN which cwebp
 
 WORKDIR /app
 
@@ -24,4 +25,5 @@ RUN ls -la ./build/libs/
 RUN cp ./build/libs/portfolio_project-0.0.1-SNAPSHOT.jar app.jar
 
 EXPOSE ${PORT}
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "-Dserver.port=${PORT}", "app.jar"]
+ENTRYPOINT ["java", "-Xmx1024m", "-Xms512m", "-jar", "-Dspring.profiles.active=prod", "-Dserver.port=${PORT}", "app.jar"]
+
