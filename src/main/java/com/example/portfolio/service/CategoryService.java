@@ -146,7 +146,7 @@ public class CategoryService {
 	}
 
 	@Transactional
-	@CacheEvict(value = "subCategory", key = "#categoryId")
+	@CacheEvict(value = "subCategory", key = "#subCategoryDto.id")
 	public SubCategoryCreateDto createSubCategory(Long categoryId, SubCategoryCreateDto subCategoryDto) {
 		subCategoryDto.setCategoryId(categoryId);
 		SubCategory subCategory = categoryMapper.createSubCategoryToSubCategory(subCategoryDto);
@@ -154,7 +154,7 @@ public class CategoryService {
 	}
 
 	@Transactional
-	@CacheEvict(value = "subCategory", key = "#categoryId")
+	@CacheEvict(value = "subCategory", key = "#subCategoryId")
 	public void deleteSubCategory(Long subCategoryId) {
 		if (isSubCategoryUsed(subCategoryId)) {
 			throw new CustomException(
@@ -193,7 +193,7 @@ public class CategoryService {
 
     // 서브 카테고리 수정
     @Transactional
-    @CacheEvict(value = "subCategory", allEntries = true)
+    @CacheEvict(value = "subCategory", key = "#subCategoryId")
     public void updateSubCategory(Long subCategoryId, SubCategoryUpdateDto subCategoryUpdateDto) {
         SubCategory subCategory = subCategoryRepository.findById(subCategoryId)
                 .orElseThrow(() -> new CustomException(
