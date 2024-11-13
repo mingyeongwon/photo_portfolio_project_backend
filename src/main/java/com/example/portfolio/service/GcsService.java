@@ -53,9 +53,18 @@ public class GcsService {
 
             // Load the image
             BufferedImage image = ImageIO.read(multipartFile.getInputStream());
+            if (image == null) {
+                throw new IOException("Failed to load image from uploaded file.");
+            }
 
             // Configure WebP writer
-            ImageWriter writer = ImageIO.getImageWritersByFormatName("webp").next();
+            ImageWriter writer = null;
+            try {
+                writer = ImageIO.getImageWritersByFormatName("webp").next();
+            } catch (Exception e) {
+                throw new IOException("No WebP writer available. Ensure TwelveMonkeys library is included.");
+            }
+
             ImageWriteParam param = writer.getDefaultWriteParam();
 
             // Convert to WebP
@@ -70,7 +79,6 @@ public class GcsService {
             // Check for conversion issues
             byte[] webpBytes = outputStream.toByteArray();
             if (webpBytes.length == 0) {
-                System.err.println("Conversion to WebP resulted in empty data.");
                 throw new IOException("Conversion to WebP resulted in empty data.");
             }
 
@@ -81,7 +89,6 @@ public class GcsService {
 
             // Upload to GCS
             storage.create(blobInfo, webpBytes);
-
             return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
 
         } catch (IOException e) {
