@@ -16,12 +16,9 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.portfolio.exception.CustomException;
-import com.example.portfolio.exception.ErrorCode;
 import com.example.portfolio.model.Photo;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.storage.Blob;
@@ -38,22 +35,15 @@ public class GcsService {
     private final Storage storage;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-//    public GcsService(@Value("${spring.cloud.gcp.storage.credentials.location}") String keyFileName) throws IOException {
-//        InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
-//        this.storage = StorageOptions.newBuilder()
-//                .setCredentials(GoogleCredentials.fromStream(keyFile))
-//                .build()
-//                .getService();
-//    }
     public GcsService() {
         try {
             GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
             this.storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         } catch (IOException e) {
+            System.err.println("Failed to initialize GCS credentials: " + e.getMessage());
             throw new RuntimeException("Failed to initialize GCS credentials", e);
         }
     }
-
 
     // WebP 파일 업로드 메서드
     public String uploadWebpFile(MultipartFile multipartFile, Long projectId) {
@@ -77,8 +67,14 @@ public class GcsService {
                 writer.dispose();
             }
 
-            // Prepare for GCS upload
+            // Check for conversion issues
             byte[] webpBytes = outputStream.toByteArray();
+            if (webpBytes.length == 0) {
+                System.err.println("Conversion to WebP resulted in empty data.");
+                throw new IOException("Conversion to WebP resulted in empty data.");
+            }
+
+            // Prepare for GCS upload
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
                     .setContentType("image/webp")
                     .build();
@@ -89,15 +85,11 @@ public class GcsService {
             return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
 
         } catch (IOException e) {
-            throw new CustomException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    ErrorCode.STORAGE_IO_ERROR,
-                    "Failed to upload file: " + e.getMessage()
-            );
+            System.err.println("Failed to upload file: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to upload file", e);
         }
     }
-
-
 
     // 썸네일 파일 삭제
     public void deleteThumbnailFile(String thumbnailUrl) {
@@ -107,11 +99,8 @@ public class GcsService {
         if (blob != null) {
             storage.delete(bucketName, objectName);
         } else {
-            throw new CustomException(
-                    HttpStatus.NOT_FOUND,
-                    ErrorCode.STORAGE_FILE_NOT_FOUND,
-                    "Blob not found: " + objectName
-            );
+            System.err.println("Blob not found: " + objectName);
+            throw new RuntimeException("Blob not found: " + objectName);
         }
     }
 
@@ -128,11 +117,7 @@ public class GcsService {
             if (blob != null) {
                 storage.delete(bucketName, objectName);
             } else {
-                throw new CustomException(
-                        HttpStatus.NOT_FOUND,
-                        ErrorCode.STORAGE_FILE_NOT_FOUND,
-                        "File not found in storage: " + objectName
-                );
+                System.err.println("File not found in storage: " + objectName);
             }
         }
     }
