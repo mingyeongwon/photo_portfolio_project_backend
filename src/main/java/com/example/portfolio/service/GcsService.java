@@ -1,5 +1,6 @@
 package com.example.portfolio.service;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -7,6 +8,8 @@ import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+
+import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -21,8 +24,6 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import com.sksamuel.scrimage.ImmutableImage;
-import com.sksamuel.scrimage.webp.WebpWriter;
 
 @Service
 public class GcsService {
@@ -53,22 +54,24 @@ public class GcsService {
     // WebP 파일 업로드 메서드
     public String uploadWebpFile(MultipartFile multipartFile, Long projectId) {
         try {
+            // 이미지를 BufferedImage로 읽기
+            BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
+            
+            // WebP로 변환
+            ByteArrayOutputStream webpOutputStream = new ByteArrayOutputStream();
+            ImageIO.write(originalImage, "webp", webpOutputStream);
+            byte[] webpBytes = webpOutputStream.toByteArray();
+
+            // 파일명 생성
             String uuid = UUID.randomUUID().toString();
             String objectName = projectId + "/" + uuid + ".webp";
 
-            // ImmutableImage로 이미지 로드
-            ImmutableImage image = ImmutableImage.loader().fromStream(multipartFile.getInputStream());
-
-            // 압축 설정된 WebpWriter로 WebP 데이터 생성 (Q: 80, M: 4, Z: 9)
-            WebpWriter writer = WebpWriter.DEFAULT.withQ(80).withM(4).withZ(9);
-            byte[] webpBytes = image.bytes(writer);
-
-            // Blob 정보 구성
+            // BlobInfo 설정
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
-                    .setContentType("image/webp")
-                    .build();
+                .setContentType("image/webp")
+                .build();
 
-            // Google Cloud Storage에 업로드
+            // GCS에 업로드
             storage.create(blobInfo, webpBytes);
 
             return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
