@@ -3,10 +3,10 @@ package com.example.portfolio.service;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -53,41 +53,55 @@ public class GcsService {
     }
 
 
- // WebP 파일 업로드 메서드
+
+    // WebP 파일 업로드 메서드
     public String uploadWebpFile(MultipartFile multipartFile, Long projectId) {
         try {
-   
-        	   String uuid = UUID.randomUUID().toString();
-               String objectName = projectId + "/" + uuid + ".webp";
-               // cwebp 파일 확인 로그
-               File cwebpFile = new File("/tmp/cwebp");
-               if (cwebpFile.exists() && cwebpFile.canExecute()) {
-                   System.out.println("cwebp 파일이 존재하며 실행 가능합니다.");
-               } else {
-                   System.out.println("cwebp 파일이 없거나 실행 불가능합니다.");
-               }
+            String uuid = UUID.randomUUID().toString();
+            String objectName = projectId + "/" + uuid + ".webp";
 
-               // WebP 이미지 변환
-               ImmutableImage image = ImmutableImage.loader().fromStream(multipartFile.getInputStream());
-               WebpWriter writer = WebpWriter.DEFAULT.withQ(80).withM(4).withZ(9);
-               byte[] webpBytes = image.bytes(writer);
+            // WebP 이미지 변환
+            ImmutableImage image = ImmutableImage.loader().fromStream(multipartFile.getInputStream());
+            WebpWriter writer = WebpWriter.DEFAULT.withQ(80).withM(4).withZ(9);
+            byte[] webpBytes = image.bytes(writer);
 
-               BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
-                       .setContentType("image/webp")
-                       .build();
+            BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
+                    .setContentType("image/webp")
+                    .build();
 
-               // GCS에 업로드 (동기 처리)
-               storage.create(blobInfo, webpBytes);
-        	    return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
+            // 비동기 업로드 및 예외 확인
+            CompletableFuture<Void> uploadFuture = CompletableFuture.runAsync(() -> {
+                try {
+                    storage.create(blobInfo, webpBytes);
+                } catch (Exception ex) {
+                    System.err.println("Error uploading to GCS: " + ex.getMessage());
+                    throw new CustomException(
+                            HttpStatus.INTERNAL_SERVER_ERROR,
+                            ErrorCode.STORAGE_IO_ERROR,
+                            "Failed to upload file in async: " + ex.getMessage()
+                    );
+                }
+            }, executorService);
+
+            // 비동기 작업의 완료 및 예외 확인
+            uploadFuture.get(); // 예외가 있으면 이 줄에서 던져짐
+
+            return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
+
         } catch (IOException e) {
             throw new CustomException(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                ErrorCode.STORAGE_IO_ERROR,
-                "Failed to upload file: " + e.getMessage()
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    ErrorCode.STORAGE_IO_ERROR,
+                    "Failed to upload file: " + e.getMessage()
+            );
+        } catch (Exception e) {
+            throw new CustomException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    ErrorCode.STORAGE_IO_ERROR,
+                    "File upload failed due to async exception: " + e.getMessage()
             );
         }
     }
-
 
     private BufferedImage resizeImage(BufferedImage originalImage) {
         int targetWidth = 1024; // 적절한 크기로 조정
