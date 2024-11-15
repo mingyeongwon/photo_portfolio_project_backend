@@ -1,10 +1,10 @@
 FROM azul/zulu-openjdk-alpine:17-latest
 
 # libwebp-tools 설치하여 `cwebp` 바이너리 추가
-RUN apk add --no-cache libwebp-tools && chmod 1777 /tmp
+RUN apk add --no-cache libwebp-tools 
 
-# 권한 확인 (옵션)
-RUN ls -ld /tmp
+RUN mkdir -p /custom_tmp && chmod 1777 /custom_tmp
+ENV TMPDIR=/custom_tmp
 
 RUN which cwebp
 
