@@ -57,7 +57,7 @@ public class GcsService {
     // WebP 파일 업로드 메서드
     public String uploadWebpFile(MultipartFile multipartFile, Long projectId) {
         try {
-            String uuid = UUID.randomUUID().toString();
+        	String uuid = UUID.randomUUID().toString();
             String objectName = projectId + "/" + uuid + ".webp";
 
             // WebP 이미지 변환
@@ -69,24 +69,11 @@ public class GcsService {
                     .setContentType("image/webp")
                     .build();
 
-            // 비동기 업로드 및 예외 확인
-            CompletableFuture<Void> uploadFuture = CompletableFuture.runAsync(() -> {
-                try {
-                    storage.create(blobInfo, webpBytes);
-                } catch (Exception ex) {
-                    System.err.println("Error uploading to GCS: " + ex.getMessage());
-                    throw new CustomException(
-                            HttpStatus.INTERNAL_SERVER_ERROR,
-                            ErrorCode.STORAGE_IO_ERROR,
-                            "Failed to upload file in async: " + ex.getMessage()
-                    );
-                }
-            }, executorService);
-
-            // 비동기 작업의 완료 및 예외 확인
-            uploadFuture.get(); // 예외가 있으면 이 줄에서 던져짐
+            // 동기적으로 GCS에 업로드
+            storage.create(blobInfo, webpBytes);
 
             return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
+
 
         } catch (IOException e) {
             throw new CustomException(
