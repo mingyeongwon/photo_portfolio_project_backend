@@ -3,15 +3,13 @@ package com.example.portfolio.service;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-
-import javax.imageio.ImageIO;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -26,6 +24,8 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
+import com.sksamuel.scrimage.ImmutableImage;
+import com.sksamuel.scrimage.webp.WebpWriter;
 
 @Service
 public class GcsService {
@@ -56,27 +56,29 @@ public class GcsService {
  // WebP 파일 업로드 메서드
     public String uploadWebpFile(MultipartFile multipartFile, Long projectId) {
         try {
-            // 이미지를 BufferedImage로 읽기
-            BufferedImage originalImage = ImageIO.read(multipartFile.getInputStream());
-            
-            // WebP로 변환
-            ByteArrayOutputStream webpOutputStream = new ByteArrayOutputStream();
-            ImageIO.write(originalImage, "webp", webpOutputStream);
-            byte[] webpBytes = webpOutputStream.toByteArray();
+   
+        	   String uuid = UUID.randomUUID().toString();
+               String objectName = projectId + "/" + uuid + ".webp";
+               // cwebp 파일 확인 로그
+               File cwebpFile = new File("/tmp/cwebp");
+               if (cwebpFile.exists() && cwebpFile.canExecute()) {
+                   System.out.println("cwebp 파일이 존재하며 실행 가능합니다.");
+               } else {
+                   System.out.println("cwebp 파일이 없거나 실행 불가능합니다.");
+               }
 
-            // 파일명 생성
-            String uuid = UUID.randomUUID().toString();
-            String objectName = projectId + "/" + uuid + ".webp";
+               // WebP 이미지 변환
+               ImmutableImage image = ImmutableImage.loader().fromStream(multipartFile.getInputStream());
+               WebpWriter writer = WebpWriter.DEFAULT.withQ(80).withM(4).withZ(9);
+               byte[] webpBytes = image.bytes(writer);
 
-            // BlobInfo 설정
-            BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
-                .setContentType("image/webp")
-                .build();
+               BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
+                       .setContentType("image/webp")
+                       .build();
 
-            // GCS에 업로드
-            storage.create(blobInfo, webpBytes);
-
-            return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
+               // GCS에 업로드 (동기 처리)
+               storage.create(blobInfo, webpBytes);
+        	    return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
         } catch (IOException e) {
             throw new CustomException(
                 HttpStatus.INTERNAL_SERVER_ERROR,
