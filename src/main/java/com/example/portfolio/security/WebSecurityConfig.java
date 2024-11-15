@@ -63,7 +63,7 @@ public class WebSecurityConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
 		config.setAllowCredentials(true); // 쿠키 허용
-		config.setAllowedOrigins(List.of("https://minography.vercel.app/")); // 프론트 port
+		config.setAllowedOrigins(List.of("https://photo-portfolio-project-frontend.vercel.app//")); // 프론트 port
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용 메소드
 		config.setAllowedHeaders(List.of("*"));
 		
