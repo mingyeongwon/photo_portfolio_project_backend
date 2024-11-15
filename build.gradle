@@ -47,6 +47,9 @@ dependencies {
     // Image Processing
 	implementation 'org.sejda.imageio:webp-imageio:0.1.6'
     
+    //redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    
     // Spring Cache
     implementation 'org.springframework.boot:spring-boot-starter-cache'
 }
