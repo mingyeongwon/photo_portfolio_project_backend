@@ -8,7 +8,7 @@ RUN which cwebp
 WORKDIR /app
 
 # Java 파일 복사
-COPY WebPConverter.java /app/
+COPY src/main/java/com.example.portfolio/converter/WebPConverter.java /app/
 
 # 입력 파일을 /tmp/로 복사
 COPY input.png /tmp/input.png
