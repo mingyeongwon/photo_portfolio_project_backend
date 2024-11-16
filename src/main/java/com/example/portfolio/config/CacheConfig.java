@@ -23,6 +23,7 @@ public class CacheConfig {
 	    PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator
 	    		.builder()
 	    		.allowIfSubType("com.example.portfolio.dto")
+	    		.allowIfSubType("java.util")  
 	    		.build();
 	    
 		ObjectMapper objectMapper = new ObjectMapper();
