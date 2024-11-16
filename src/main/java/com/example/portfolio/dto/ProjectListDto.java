@@ -8,17 +8,20 @@ public class ProjectListDto {
 	private Long id;
 	private String title;
 	private String imageUrl; // 썸네일 URL
-	
-	@JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul") //날짜 포멧 바꾸기
+
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul") // 날짜 포멧 바꾸기
 	private Date createdAt;
-	
+
 	private int view;
 	private String categoryName;
 	private String subCategoryName;
 	private Long imageCount;
 
+	public ProjectListDto() {
+	}
 
-	public ProjectListDto(Long id, String title, String imageUrl, Date createdAt, int view, String categoryName, String subCategoryName, Long imageCount) {
+	public ProjectListDto(Long id, String title, String imageUrl, Date createdAt, int view, String categoryName,
+			String subCategoryName, Long imageCount) {
 		this.id = id;
 		this.title = title;
 		this.imageUrl = imageUrl;
@@ -28,7 +31,6 @@ public class ProjectListDto {
 		this.imageCount = imageCount;
 		this.subCategoryName = subCategoryName;
 	}
-
 
 	public Long getId() {
 		return id;
@@ -86,16 +88,12 @@ public class ProjectListDto {
 		this.imageCount = imageCount;
 	}
 
-
 	public String getSubCategoryName() {
 		return subCategoryName;
 	}
-
 
 	public void setSubCategoryName(String subCategoryName) {
 		this.subCategoryName = subCategoryName;
 	}
 
-
-	
 }
