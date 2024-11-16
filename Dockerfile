@@ -5,18 +5,6 @@ RUN apk add --no-cache libwebp-tools
 
 RUN which cwebp
 
-# 작업 디렉터리 설정
-WORKDIR /app
-
-# Step 2: WebP 변환 작업 준비
-# WebP 변환 Java 파일 및 이미지 복사
-COPY WebPConverter.java /app/
-COPY input.png /app/input.png
-
-# WebP 변환 Java 파일 컴파일
-RUN javac WebPConverter.java
-
-
 COPY gradlew .
 COPY gradle gradle
 COPY build.gradle .
