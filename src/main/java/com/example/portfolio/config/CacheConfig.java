@@ -23,6 +23,11 @@ public class CacheConfig {
 	    objectMapper.registerModule(new Jdk8Module()); // Optional: JDK 8 모듈
 	    objectMapper.registerModule(new JavaTimeModule()); // Optional: Java Time 모듈
 	    objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+	    
+	    objectMapper.activateDefaultTyping(
+	            objectMapper.getPolymorphicTypeValidator(),
+	            ObjectMapper.DefaultTyping.NON_FINAL
+	    );
 
 	    GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 		
