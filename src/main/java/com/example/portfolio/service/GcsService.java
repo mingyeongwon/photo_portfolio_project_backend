@@ -53,7 +53,6 @@ public class GcsService {
     }
 
 
-
     // WebP 파일 업로드 메서드
     public String uploadWebpFile(MultipartFile multipartFile, Long projectId) {
         try {
