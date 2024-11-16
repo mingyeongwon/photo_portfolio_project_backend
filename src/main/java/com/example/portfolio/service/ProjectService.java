@@ -49,8 +49,8 @@ public class ProjectService {
 	}
 
 	@Transactional
-	@Caching(evict = { @CacheEvict(value = "projectList", allEntries = true),
-			@CacheEvict(value = "adminProjectList", allEntries = true) })
+//	@Caching(evict = { @CacheEvict(value = "projectList", allEntries = true),
+//			@CacheEvict(value = "adminProjectList", allEntries = true) })
 	public void createProject(ProjectCreateDto projectCreateDtos) {
 		Project project = projectMapper.createDtoToProject(projectCreateDtos);
 
@@ -67,10 +67,10 @@ public class ProjectService {
 
 	// 프로젝트 업데이트
 	@Transactional
-	@Caching(evict = { @CacheEvict(value = "project", allEntries = true),
-			@CacheEvict(value = "projectList", allEntries = true),
-			@CacheEvict(value = "adminProjectList", allEntries = true),
-			@CacheEvict(value = "adminProject", key = "#projectUpdateDto.id") })
+//	@Caching(evict = { @CacheEvict(value = "project", allEntries = true),
+//			@CacheEvict(value = "projectList", allEntries = true),
+//			@CacheEvict(value = "adminProjectList", allEntries = true),
+//			@CacheEvict(value = "adminProject", key = "#projectUpdateDto.id") })
 	public void updateProject(ProjectUpdateDto projectUpdateDto) {
 
 		Project existingProject = projectRepository.findById(projectUpdateDto.getId())
@@ -107,10 +107,10 @@ public class ProjectService {
 
 	// 프로젝트 삭제
 	@Transactional
-	@Caching(evict = { @CacheEvict(value = "project", allEntries = true),
-			@CacheEvict(value = "projectList", allEntries = true),
-			@CacheEvict(value = "adminProjectList", allEntries = true),
-			@CacheEvict(value = "adminProject", key = "#id") })
+//	@Caching(evict = { @CacheEvict(value = "project", allEntries = true),
+//			@CacheEvict(value = "projectList", allEntries = true),
+//			@CacheEvict(value = "adminProjectList", allEntries = true),
+//			@CacheEvict(value = "adminProject", key = "#id") })
 	public void deleteProject(Long id) {
 		Project project = projectRepository.findById(id).orElseThrow(() -> new RuntimeException("Project not found"));
 		// GCS 썸네일과 관련 사진들 삭제
@@ -135,7 +135,7 @@ public class ProjectService {
 
 	// admin page 프로젝트 불러오기
 	@Transactional
-	@Cacheable(value = "adminProjectList", key = "#keyWord + '-' + #pageable.pageNumber + #pageable.sort.toString()")
+	//@Cacheable(value = "adminProjectList", key = "#keyWord + '-' + #pageable.pageNumber + #pageable.sort.toString()")
 	public ProjectListCustomDto getAdminProjectList(Pageable pageable, String keyWord) {
 		Page<ProjectListDto> projectListDto = projectRepository.findByKeyWord(pageable, keyWord);
 		ProjectListCustomDto pojectListCustomDto = new ProjectListCustomDto();
@@ -146,7 +146,7 @@ public class ProjectService {
 
 	// admin 프로젝트 디테일 정보 가져오기
 	@Transactional(readOnly = true)
-	@Cacheable(value = "adminProject", key = "#projectId")
+	//@Cacheable(value = "adminProject", key = "#projectId")
 	public ProjectDetailDto getAdminProject(Long projectId) {
 		ProjectDetailDto projectDetail = projectRepository.findProjectDetailByProjectId(projectId);
 		List<PhotoListDto> photoList = photoRepository.findDetailPhotoByProjectId(projectId);
@@ -155,7 +155,7 @@ public class ProjectService {
 	}
 
 	@Transactional(readOnly = true)
-	@Cacheable(value = "project", key = "#projectId + '-' + #pageable.pageNumber")
+	//@Cacheable(value = "project", key = "#projectId + '-' + #pageable.pageNumber")
 	public ProjectDetailPageDto getPhotoList(Pageable pageable, Long projectId) {
 
 		Project project = projectRepository.findById(projectId)
