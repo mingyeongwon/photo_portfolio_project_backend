@@ -11,7 +11,8 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
+import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @Configuration
@@ -19,15 +20,16 @@ public class CacheConfig {
 	
 	@Bean
 	public RedisCacheManager redisCacheManager (RedisConnectionFactory redisConnectionFactory) {
-	    ObjectMapper objectMapper = new ObjectMapper();
-	    objectMapper.registerModule(new Jdk8Module()); // Optional: JDK 8 모듈
-	    objectMapper.registerModule(new JavaTimeModule()); // Optional: Java Time 모듈
-	    objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+	    PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator
+	    		.builder()
+	    		.allowIfSubType("com.example.portfolio.dto")
+	    		.build();
 	    
-	    objectMapper.activateDefaultTyping(
-	            objectMapper.getPolymorphicTypeValidator(),
-	            ObjectMapper.DefaultTyping.NON_FINAL
-	    );
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new JavaTimeModule()); // Optional: Java Time 모듈
+	    objectMapper.activateDefaultTyping(typeValidator,ObjectMapper.DefaultTyping.NON_FINAL);
+	    
+	    objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
 	    GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 		
