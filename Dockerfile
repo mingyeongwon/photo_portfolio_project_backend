@@ -4,7 +4,6 @@ FROM azul/zulu-openjdk-alpine:17-latest
 RUN apk add --no-cache libwebp-tools
 
 RUN which cwebp
-
 WORKDIR /app
 
 # Java 파일 복사
