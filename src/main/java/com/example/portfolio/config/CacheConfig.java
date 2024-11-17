@@ -28,35 +28,30 @@ public class CacheConfig {
 
     @Bean
     public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
-        // Create a more permissive type validator
         PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder()
-            .allowIfBaseType(Object.class)  // Allow all types but still require explicit typing
+            .allowIfBaseType(Object.class)
             .build();
 
-        // Configure ObjectMapper with necessary modules and settings
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.registerModule(new Jdk8Module());  // For Optional and other JDK 8 types
-        objectMapper.registerModule(new PageableModule());  // Custom module for Spring Data types
+        objectMapper.registerModule(new Jdk8Module());
+        objectMapper.registerModule(new PageableModule());
 
-        // Configure type handling
+        // Use WRAPPER_OBJECT for better handling of complex types
         objectMapper.activateDefaultTyping(
             typeValidator,
             ObjectMapper.DefaultTyping.NON_FINAL,
-            JsonTypeInfo.As.PROPERTY  // Use property instead of wrapper array
+            JsonTypeInfo.As.WRAPPER_OBJECT
         );
 
-        // Disable timestamps for dates and handle empty beans
+        objectMapper.enable(DeserializationFeature.UNWRAP_ROOT_VALUE);
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-        objectMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-        
-        // Create serializer with configured ObjectMapper
+
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
-        // Configure Redis cache
         RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofHours(24))  // Set default TTL
+            .entryTtl(Duration.ofHours(24))
             .serializeKeysWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())
             )

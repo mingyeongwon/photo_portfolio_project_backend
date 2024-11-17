@@ -18,26 +18,32 @@ public class PageableModule extends SimpleModule {
     public PageableModule() {
         super("PageableModule");
 
-        // Add deserializer for SliceImpl
         addDeserializer(SliceImpl.class, new JsonDeserializer<SliceImpl>() {
             @Override
             public SliceImpl deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
                 ObjectMapper mapper = (ObjectMapper) p.getCodec();
                 JsonNode node = mapper.readTree(p);
 
-                // Extract content
-                List<?> content = mapper.convertValue(node.get("content"),
-                    mapper.getTypeFactory().constructCollectionType(List.class, Object.class));
+                try {
+                    // Extract content
+                    List<?> content = mapper.convertValue(
+                        node.has("content") ? node.get("content") : mapper.createArrayNode(),
+                        mapper.getTypeFactory().constructCollectionType(List.class, Object.class)
+                    );
 
-                // Extract pageable information
-                int number = node.get("number").asInt();
-                int size = node.get("size").asInt();
-                boolean hasNext = node.get("hasNext").asBoolean();
+                    // Extract pageable information
+                    int number = node.has("number") ? node.get("number").asInt() : 0;
+                    int size = node.has("size") ? node.get("size").asInt() : 10;
+                    boolean hasNext = node.has("hasNext") && node.get("hasNext").asBoolean();
 
-                // Create pageable
-                Pageable pageable = PageRequest.of(number, size);
+                    // Create pageable
+                    Pageable pageable = PageRequest.of(number, size);
+                    return new SliceImpl<>(content, pageable, hasNext);
 
-                return new SliceImpl<>(content, pageable, hasNext);
+                } catch (Exception e) {
+                    // Add detailed error logging
+                    throw e;
+                }
             }
         });
     }
