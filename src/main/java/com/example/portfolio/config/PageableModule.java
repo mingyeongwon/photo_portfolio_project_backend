@@ -14,45 +14,47 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-
 public class PageableModule extends SimpleModule {
-    public PageableModule() {
-        super("PageableModule");
-        
-        addDeserializer(SliceImpl.class, new JsonDeserializer<SliceImpl>() {
-            @Override
-            public SliceImpl<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-                ObjectMapper mapper = (ObjectMapper) p.getCodec();
-                JsonNode node = mapper.readTree(p);
+public PageableModule() {
+super("PageableModule");
 
-                try {
-                    // 타입 정보가 wrapper array로 올 경우를 처리
-                    JsonNode contentNode = node;
-                    if (node.isArray() && node.size() > 0) {
-                        contentNode = node.get(node.size() - 1);
-                    }
+// Add custom deserializer for SliceImpl
+addDeserializer(SliceImpl.class, new JsonDeserializer<SliceImpl>() {
+@Override
+public SliceImpl deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+ObjectMapper mapper = (ObjectMapper) p.getCodec();
+JsonNode node = mapper.readTree(p);
 
-                    List<?> content;
-                    if (contentNode.has("content")) {
-                        JsonNode contentArray = contentNode.get("content");
-                        content = mapper.convertValue(
-                            contentArray,
-                            mapper.getTypeFactory().constructCollectionType(List.class, Object.class)
-                        );
-                    } else {
-                        throw new IOException("Content node not found in JSON");
-                    }
+try {
+// If the node has @class property, get the actual content node
+JsonNode contentNode = node;
+if (node.has("@class")) {
+// The actual content is in the same node, no need to get a child node
+contentNode = node;
+}
 
-                    int number = contentNode.has("number") ? contentNode.get("number").asInt() : 0;
-                    int size = contentNode.has("size") ? contentNode.get("size").asInt() : content.size();
-                    boolean hasNext = contentNode.has("hasNext") ? contentNode.get("hasNext").asBoolean() : false;
+// Extract content array
+List<?> content = mapper.convertValue(
+contentNode.get("content"),
+mapper.getTypeFactory().constructCollectionType(List.class, Object.class)
+);
 
-                    Pageable pageable = PageRequest.of(number, size);
-                    return new SliceImpl<>(content, pageable, hasNext);
-                } catch (Exception e) {
-                    throw new IOException("Failed to deserialize SliceImpl: " + e.getMessage() + "\nJSON content: " + node.toString(), e);
-                }
-            }
-        });
-    }
+// Extract pagination information
+int number = contentNode.get("number").asInt();
+int size = contentNode.get("size").asInt();
+boolean hasNext = contentNode.get("hasNext").asBoolean();
+
+// Create pageable object
+Pageable pageable = PageRequest.of(number, size);
+
+// Create and return SliceImpl
+return new SliceImpl<>(content, pageable, hasNext);
+} catch (Exception e) {
+System.err.println("Error deserializing SliceImpl: " + e.getMessage());
+System.err.println("JSON content: " + node.toString());
+throw new RuntimeException("Failed to deserialize SliceImpl", e);
+}
+}
+});
+}
 }
