@@ -63,19 +63,15 @@ public class GcsService {
 
             // WebP 변환을 위한 출력 파일 경로 설정
             File webpFile = new File(tempFile.getParent(), uuid + ".webp");
+            System.out.println("tempFile.getParent()"+tempFile.getParent());
+            System.out.println("tempFile.getAbsolutePath()"+tempFile.getAbsolutePath());
+            System.out.println("webpFile.toPath()"+webpFile.toPath());
 
             // cwebp 명령어 실행 (품질 80으로 설정)
             ProcessBuilder processBuilder = new ProcessBuilder(
                 "cwebp", "-q", "80", tempFile.getAbsolutePath(), "-o", webpFile.getAbsolutePath()
             );
             
-            // 프로세스 실행 및 결과 확인
-            Process process = processBuilder.start();
-            int exitCode = process.waitFor();
-            
-            if (exitCode != 0) {
-                throw new IOException("Failed to convert image to WebP format. Exit code: " + exitCode);
-            }
 
             // 변환된 WebP 파일을 GCS에 업로드
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
