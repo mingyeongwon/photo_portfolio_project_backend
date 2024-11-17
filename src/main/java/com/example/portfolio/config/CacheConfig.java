@@ -35,11 +35,14 @@ public class CacheConfig {
 //        objectMapper.registerModule(new Pageable);  // Custom module for Spring Data types
 //
 //        // Configure type handling
-//        objectMapper.activateDefaultTyping(
+        objectMapper.activateDefaultTyping(
+        		BasicPolymorphicTypeValidator.builder()
+        		.allowIfSubType(Object.class)
+        		.build(),
 //            typeValidator,
-//            ObjectMapper.DefaultTyping.NON_FINAL
+            ObjectMapper.DefaultTyping.NON_FINAL
 //            JsonTypeInfo.As.PROPERTY  // Use property instead of wrapper array
-//        );
+        );
 //
 //        // Disable timestamps for dates and handle empty beans
 //        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
