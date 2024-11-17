@@ -52,7 +52,6 @@ public class GcsService {
     }
 
 
-    // WebP 파일 업로드 메서드
     public String uploadWebpFile(MultipartFile multipartFile, Long projectId) {
         try {
             // 임시 파일 생성
@@ -69,7 +68,13 @@ public class GcsService {
                 "cwebp", "-q", "80", tempFile.getAbsolutePath(), "-o", webpFile.getAbsolutePath()
             );
             
-    
+            // 프로세스 실행 및 결과 확인
+            Process process = processBuilder.start();
+            int exitCode = process.waitFor();
+            
+            if (exitCode != 0) {
+                throw new IOException("Failed to convert image to WebP format. Exit code: " + exitCode);
+            }
 
             // 변환된 WebP 파일을 GCS에 업로드
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
@@ -100,20 +105,20 @@ public class GcsService {
             );
         }
     }
-
-    private BufferedImage resizeImage(BufferedImage originalImage) {
-        int targetWidth = 1024; // 적절한 크기로 조정
-        int targetHeight = (int) (originalImage.getHeight() * ((double) targetWidth / originalImage.getWidth()));
-        
-        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-        
-        Graphics2D graphics2D = resizedImage.createGraphics();
-        graphics2D.drawImage(resultingImage, 0, 0, null);
-        graphics2D.dispose();
-        
-        return resizedImage;
-    }
+    
+//    private BufferedImage resizeImage(BufferedImage originalImage) {
+//        int targetWidth = 1024; // 적절한 크기로 조정
+//        int targetHeight = (int) (originalImage.getHeight() * ((double) targetWidth / originalImage.getWidth()));
+//        
+//        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
+//        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+//        
+//        Graphics2D graphics2D = resizedImage.createGraphics();
+//        graphics2D.drawImage(resultingImage, 0, 0, null);
+//        graphics2D.dispose();
+//        
+//        return resizedImage;
+//    }
 
     // 썸네일 파일 삭제
     public void deleteThumbnailFile(String thumbnailUrl) {
