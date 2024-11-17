@@ -61,7 +61,7 @@ public class GcsService {
             multipartFile.transferTo(tempFile);
 
             // WebP 변환을 위한 출력 파일 경로 설정
-            File webpFile = new File(objectName);
+            File webpFile = new File(tempFile.getParent(), uuid + ".webp");
 
             // cwebp 명령어 실행 
             ProcessBuilder processBuilder = new ProcessBuilder(
