@@ -24,44 +24,42 @@ import java.time.Duration;
 @Configuration
 @EnableCaching
 public class CacheConfig {
-@Bean
-public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
-PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder()
-.allowIfBaseType(Object.class)
-.allowIfSubType(Object.class)
-.build();
+    @Bean
+    public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
+        PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder()
+            .allowIfBaseType(Object.class)
+            .allowIfSubType(Object.class)
+            .build();
 
-ObjectMapper objectMapper = new ObjectMapper();
-objectMapper.registerModule(new JavaTimeModule());
-objectMapper.registerModule(new Jdk8Module());
-objectMapper.registerModule(new PageableModule());
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.registerModule(new Jdk8Module());
+        objectMapper.registerModule(new PageableModule());
 
-// Type information as property instead of wrapper
-objectMapper.activateDefaultTyping(
-typeValidator,
-ObjectMapper.DefaultTyping.NON_FINAL,
-JsonTypeInfo.As.PROPERTY
-);
+        objectMapper.activateDefaultTyping(
+            typeValidator,
+            ObjectMapper.DefaultTyping.NON_FINAL,
+            JsonTypeInfo.As.PROPERTY
+        );
 
-objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-objectMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-// Remove UNWRAP_ROOT_VALUE as we're using PROPERTY
-// objectMapper.enable(DeserializationFeature.UNWRAP_ROOT_VALUE);
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        objectMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+        objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
-GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+        GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
-RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-.entryTtl(Duration.ofHours(24))
-.serializeKeysWith(
-RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())
-)
-.serializeValuesWith(
-RedisSerializationContext.SerializationPair.fromSerializer(serializer)
-);
+        RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofHours(24))
+            .serializeKeysWith(
+                RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())
+            )
+            .serializeValuesWith(
+                RedisSerializationContext.SerializationPair.fromSerializer(serializer)
+            );
 
-return RedisCacheManager.builder(redisConnectionFactory)
-.cacheDefaults(cacheConfiguration)
-.build();
-}
+        return RedisCacheManager.builder(redisConnectionFactory)
+            .cacheDefaults(cacheConfiguration)
+            .build();
+    }
 }
