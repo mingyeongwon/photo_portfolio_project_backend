@@ -3,10 +3,11 @@ package com.example.portfolio.service;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -24,8 +25,6 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import com.sksamuel.scrimage.ImmutableImage;
-import com.sksamuel.scrimage.webp.WebpWriter;
 
 @Service
 public class GcsService {
@@ -56,23 +55,42 @@ public class GcsService {
     // WebP 파일 업로드 메서드
     public String uploadWebpFile(MultipartFile multipartFile, Long projectId) {
         try {
-        	String uuid = UUID.randomUUID().toString();
+            // 임시 파일 생성
+            String uuid = UUID.randomUUID().toString();
             String objectName = projectId + "/" + uuid + ".webp";
+            File tempFile = File.createTempFile(uuid, ".png"); // 원본 이미지를 임시 파일로 저장
+            multipartFile.transferTo(tempFile);
 
-            // WebP 이미지 변환
-            ImmutableImage image = ImmutableImage.loader().fromStream(multipartFile.getInputStream());
-            WebpWriter writer = WebpWriter.DEFAULT.withQ(80).withM(4).withZ(9);
-            byte[] webpBytes = image.bytes(writer);
+            // WebP 변환을 위한 출력 파일 경로 설정
+            File webpFile = new File(tempFile.getParent(), uuid + ".webp");
 
+            // cwebp 명령어 실행 (품질 80으로 설정)
+            ProcessBuilder processBuilder = new ProcessBuilder(
+                "cwebp", "-q", "80", tempFile.getAbsolutePath(), "-o", webpFile.getAbsolutePath()
+            );
+            
+            // 프로세스 실행 및 결과 확인
+            Process process = processBuilder.start();
+            int exitCode = process.waitFor();
+            
+            if (exitCode != 0) {
+                throw new IOException("Failed to convert image to WebP format. Exit code: " + exitCode);
+            }
+
+            // 변환된 WebP 파일을 GCS에 업로드
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
                     .setContentType("image/webp")
                     .build();
-
-            // 동기적으로 GCS에 업로드
+            
+            // WebP 파일을 GCS에 업로드
+            byte[] webpBytes = Files.readAllBytes(webpFile.toPath());
             storage.create(blobInfo, webpBytes);
 
-            return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
+            // 임시 파일 삭제
+            tempFile.delete();
+            webpFile.delete();
 
+            return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
 
         } catch (IOException e) {
             throw new CustomException(
