@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.SliceImpl;
+import org.springframework.data.domain.Sort;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,25 +16,25 @@ public class CustomSliceImpl<T> extends SliceImpl<T> {
 
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public CustomSliceImpl(
-            @JsonProperty("content") List<T> content
-            , @JsonProperty("pageable") JsonNode pageable
-            , @JsonProperty("first") boolean first
-            , @JsonProperty("last") boolean last
-            , @JsonProperty("size") int size
-            , @JsonProperty("number") int number
-            , @JsonProperty("sort") JsonNode sort
-            , @JsonProperty("numberOfElements") int numberOfElements
-            , @JsonProperty("empty") boolean empty
+            @JsonProperty("content") List<T> content,
+            @JsonProperty("pageable") Pageable pageable,
+            @JsonProperty("first") boolean first,
+            @JsonProperty("last") boolean last,
+            @JsonProperty("size") int size,
+            @JsonProperty("number") int number,
+            @JsonProperty("sort") Sort sort,
+            @JsonProperty("numberOfElements") int numberOfElements,
+            @JsonProperty("empty") boolean empty
     ) {
-        super(content, PageRequest.of(number, size), !last);
+        super(content, PageRequest.of(number, size, sort), !last);
     }
 
-   public CustomSliceImpl(List<T> content, Pageable pageable, boolean hasNext) {
-       super(content, pageable, hasNext);
-   }
+    public CustomSliceImpl(List<T> content, Pageable pageable, boolean hasNext) {
+        super(content, pageable, hasNext);
+    }
 
-   public CustomSliceImpl() {
-       super(new ArrayList<>());
-   }
+    public CustomSliceImpl() {
+        super(new ArrayList<>());
+    }
 }
        
