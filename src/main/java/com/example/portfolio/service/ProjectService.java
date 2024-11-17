@@ -120,17 +120,19 @@ public class ProjectService {
 		projectRepository.delete(project);
 	}
 
-	// 프로젝트 불러오기
 	@Transactional
-	@Cacheable(value = "projectList", key = "(#categoryId != null ? #categoryId : 'all') + '-' + (#subCategoryId != null ? #subCategoryId : 'all') + '-' + #pageable.pageNumber")
+	@Cacheable(
+	    value = "projectList", 
+	    key = "#categoryId + '_' + (#subCategoryId != null ? #subCategoryId : 'all') + '_' + #pageable.pageNumber + '_' + #pageable.pageSize"
+	)
 	public Slice<ProjectListDto> getProjectList(Pageable pageable, Long categoryId, Long subCategoryId) {
-		if (categoryId == null && subCategoryId == null) {
-			return projectRepository.findAllProject(pageable);
-		} else if (subCategoryId == null) {
-			return projectRepository.findByCategory_id(pageable, categoryId);
-		} else {
-			return projectRepository.findBySubCategory_id(pageable, subCategoryId);
-		}
+	    if (categoryId == null && subCategoryId == null) {
+	        return projectRepository.findAllProject(pageable);
+	    } else if (subCategoryId == null) {
+	        return projectRepository.findByCategory_id(pageable, categoryId);
+	    } else {
+	        return projectRepository.findBySubCategory_id(pageable, subCategoryId);
+	    }
 	}
 
 	// admin page 프로젝트 불러오기
