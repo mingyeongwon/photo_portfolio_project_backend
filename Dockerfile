@@ -22,10 +22,6 @@ ENV PORT=8080
 RUN ./gradlew build --exclude-task test
 RUN ls -la ./build/libs/
 
-WORKDIR /app
-
-# cwebp 바이너리를 다시 설치 (최종 이미지에 포함)
-RUN apk add --no-cache libwebp-tools
 
 RUN cp ./build/libs/portfolio_project-0.0.1-SNAPSHOT.jar app.jar
 
