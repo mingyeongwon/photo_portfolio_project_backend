@@ -10,7 +10,7 @@ public class ObjectMapperUtility {
 	
 	public static void addCustomSliceImplToObjectMapper(ObjectMapper objectMapper) {
 		SimpleModule module = new SimpleModule();
-		module.addAbstractTypeMapping(Slice.class, SliceImpl.class);
+		module.addAbstractTypeMapping(Slice.class, CustomSliceImpl.class);
 		objectMapper.registerModule(module);
 	}
 
