@@ -42,7 +42,8 @@ public class PageableModule extends SimpleModule {
                     // 페이지 정보 추출
                     int number = contentNode.has("number") ? contentNode.get("number").asInt() : 0;
                     int size = contentNode.has("size") ? contentNode.get("size").asInt() : content.size();
-                    boolean hasNext = contentNode.has("hasNext") ? contentNode.get("hasNext").asBoolean() : false;
+                    //boolean hasNext = contentNode.has("hasNext") ? contentNode.get("hasNext").asBoolean() : false;
+                    boolean hasNext = node.get("hasNext").asBoolean(false);
 
                     // Pageable 객체 생성
                     Pageable pageable = PageRequest.of(number, size);
