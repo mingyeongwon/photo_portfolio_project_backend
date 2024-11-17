@@ -14,35 +14,46 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
+
 public class PageableModule extends SimpleModule {
     public PageableModule() {
         super("PageableModule");
-
+        
+        // Add custom deserializer for SliceImpl
         addDeserializer(SliceImpl.class, new JsonDeserializer<SliceImpl>() {
             @Override
             public SliceImpl deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
                 ObjectMapper mapper = (ObjectMapper) p.getCodec();
                 JsonNode node = mapper.readTree(p);
-
+                
                 try {
-                    // Extract content
+                    // If the node has @class property, get the actual content node
+                    JsonNode contentNode = node;
+                    if (node.has("@class")) {
+                        // The actual content is in the same node, no need to get a child node
+                        contentNode = node;
+                    }
+
+                    // Extract content array
                     List<?> content = mapper.convertValue(
-                        node.has("content") ? node.get("content") : mapper.createArrayNode(),
+                        contentNode.get("content"),
                         mapper.getTypeFactory().constructCollectionType(List.class, Object.class)
                     );
 
-                    // Extract pageable information
-                    int number = node.has("number") ? node.get("number").asInt() : 0;
-                    int size = node.has("size") ? node.get("size").asInt() : 10;
-                    boolean hasNext = node.has("hasNext") && node.get("hasNext").asBoolean();
+                    // Extract pagination information
+                    int number = contentNode.get("number").asInt();
+                    int size = contentNode.get("size").asInt();
+                    boolean hasNext = contentNode.get("hasNext").asBoolean();
 
-                    // Create pageable
+                    // Create pageable object
                     Pageable pageable = PageRequest.of(number, size);
+                    
+                    // Create and return SliceImpl
                     return new SliceImpl<>(content, pageable, hasNext);
-
                 } catch (Exception e) {
-                    // Add detailed error logging
-                    throw e;
+                    System.err.println("Error deserializing SliceImpl: " + e.getMessage());
+                    System.err.println("JSON content: " + node.toString());
+                    throw new RuntimeException("Failed to deserialize SliceImpl", e);
                 }
             }
         });

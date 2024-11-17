@@ -24,37 +24,35 @@ import java.time.Duration;
 @Configuration
 @EnableCaching
 public class CacheConfig {
-
     @Bean
     public RedisCacheManager redisCacheManager(RedisConnectionFactory redisConnectionFactory) {
-        // Create a more permissive type validator
         PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder()
-            .allowIfBaseType(Object.class)  // Allow all types but still require explicit typing
+            .allowIfBaseType(Object.class)
+            .allowIfSubType(Object.class)
             .build();
 
-        // Configure ObjectMapper with necessary modules and settings
         ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());  // Handle Java 8 date/time
-        objectMapper.registerModule(new Jdk8Module());      // Handle Optional types
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.registerModule(new Jdk8Module());
+        objectMapper.registerModule(new PageableModule());
 
-        // Enable polymorphic type handling with WRAPPER_OBJECT
+        // Type information as property instead of wrapper
         objectMapper.activateDefaultTyping(
             typeValidator,
             ObjectMapper.DefaultTyping.NON_FINAL,
-            JsonTypeInfo.As.WRAPPER_OBJECT
+            JsonTypeInfo.As.PROPERTY
         );
 
-        // Additional ObjectMapper configurations
-        objectMapper.enable(DeserializationFeature.UNWRAP_ROOT_VALUE);
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        objectMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+        // Remove UNWRAP_ROOT_VALUE as we're using PROPERTY
+        // objectMapper.enable(DeserializationFeature.UNWRAP_ROOT_VALUE);
 
-        // Create serializer with configured ObjectMapper
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
-        // Configure Redis cache
         RedisCacheConfiguration cacheConfiguration = RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofHours(24))  // Set default TTL for cache entries
+            .entryTtl(Duration.ofHours(24))
             .serializeKeysWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer())
             )
