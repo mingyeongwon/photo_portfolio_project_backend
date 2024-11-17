@@ -36,7 +36,6 @@ public class CacheConfig {
         objectMapper.registerModule(new Jdk8Module());
         objectMapper.registerModule(new PageableModule());
 
-        // Type information as property instead of wrapper
         objectMapper.activateDefaultTyping(
             typeValidator,
             ObjectMapper.DefaultTyping.NON_FINAL,
@@ -46,8 +45,7 @@ public class CacheConfig {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         objectMapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
-        // Remove UNWRAP_ROOT_VALUE as we're using PROPERTY
-        // objectMapper.enable(DeserializationFeature.UNWRAP_ROOT_VALUE);
+        objectMapper.enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         GenericJackson2JsonRedisSerializer serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
 
