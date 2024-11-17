@@ -23,22 +23,23 @@ public class CacheConfig {
     @Bean
     public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
 //        // Create a more permissive type validator
-        PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder()
-            .allowIfBaseType(Object.class)  // Allow all types but still require explicit typing
-            .build();
+//        PolymorphicTypeValidator typeValidator = BasicPolymorphicTypeValidator.builder()
+//            .allowIfBaseType(Object.class)  // Allow all types but still require explicit typing
+//            .build();
 //
 //        // Configure ObjectMapper with necessary modules and settings
         ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapperUtility.addCustomSliceImplToObjectMapper(objectMapper);
 //        objectMapper.registerModule(new JavaTimeModule());
 //        objectMapper.registerModule(new Jdk8Module());  // For Optional and other JDK 8 types
 //        objectMapper.registerModule(new Pageable);  // Custom module for Spring Data types
 //
 //        // Configure type handling
-        objectMapper.activateDefaultTyping(
-            typeValidator,
-            ObjectMapper.DefaultTyping.NON_FINAL
+//        objectMapper.activateDefaultTyping(
+//            typeValidator,
+//            ObjectMapper.DefaultTyping.NON_FINAL
 //            JsonTypeInfo.As.PROPERTY  // Use property instead of wrapper array
-        );
+//        );
 //
 //        // Disable timestamps for dates and handle empty beans
 //        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
