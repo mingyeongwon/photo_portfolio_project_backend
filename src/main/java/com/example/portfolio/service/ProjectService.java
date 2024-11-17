@@ -49,7 +49,8 @@ public class ProjectService {
 	}
 
 	@Transactional
-//	@Caching(evict = { @CacheEvict(value = "projectList", allEntries = true),
+//	@Caching(evict = { 
+	@CacheEvict(value = "projectList", allEntries = true)
 //			@CacheEvict(value = "adminProjectList", allEntries = true) })
 	public void createProject(ProjectCreateDto projectCreateDtos) {
 		Project project = projectMapper.createDtoToProject(projectCreateDtos);
@@ -68,7 +69,7 @@ public class ProjectService {
 	// 프로젝트 업데이트
 	@Transactional
 //	@Caching(evict = { @CacheEvict(value = "project", allEntries = true),
-//			@CacheEvict(value = "projectList", allEntries = true),
+			@CacheEvict(value = "projectList", allEntries = true)
 //			@CacheEvict(value = "adminProjectList", allEntries = true),
 //			@CacheEvict(value = "adminProject", key = "#projectUpdateDto.id") })
 	public void updateProject(ProjectUpdateDto projectUpdateDto) {
@@ -108,7 +109,7 @@ public class ProjectService {
 	// 프로젝트 삭제
 	@Transactional
 //	@Caching(evict = { @CacheEvict(value = "project", allEntries = true),
-//			@CacheEvict(value = "projectList", allEntries = true),
+			@CacheEvict(value = "projectList", allEntries = true)
 //			@CacheEvict(value = "adminProjectList", allEntries = true),
 //			@CacheEvict(value = "adminProject", key = "#id") })
 	public void deleteProject(Long id) {
@@ -168,7 +169,7 @@ public class ProjectService {
 		return new ProjectDetailPageDto(project.getTitle(), project.getThumbnailUrl(), photos);
 	}
 
-	@CacheEvict(value = "adminProjectList", allEntries = true)
+	//@CacheEvict(value = "adminProjectList", allEntries = true)
 	public void updateViewCount(Long projectId) {
 		projectRepository.updateViewCount(projectId);
 	}
