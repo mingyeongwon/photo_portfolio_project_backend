@@ -54,7 +54,7 @@ public class GcsService {
 
     public String uploadWebpFile(MultipartFile multipartFile, Long projectId) {
         try {
-            // 임시 파일 생성
+
             String uuid = UUID.randomUUID().toString();
             String objectName = projectId + "/" + uuid + ".webp";
             File tempFile = File.createTempFile(uuid, ".png"); // 원본 이미지를 임시 파일로 저장
@@ -63,22 +63,19 @@ public class GcsService {
             // WebP 변환을 위한 출력 파일 경로 설정
             File webpFile = new File(tempFile.getParent(), uuid + ".webp");
 
-            // cwebp 명령어 실행 (품질 80으로 설정)
+            // cwebp 명령어 실행 
             ProcessBuilder processBuilder = new ProcessBuilder(
-                "cwebp", "-q", "80", tempFile.getAbsolutePath(), "-o", webpFile.getAbsolutePath()
+                "cwebp","-lossless ", "-q", "85", tempFile.getAbsolutePath(), "-o", webpFile.getAbsolutePath()
             );
             
             // 프로세스 실행 
             Process process = processBuilder.start();
             int exitCode = process.waitFor();
            
-
-            // 변환된 WebP 파일을 GCS에 업로드
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
                     .setContentType("image/webp")
                     .build();
             
-            // WebP 파일을 GCS에 업로드
             byte[] webpBytes = Files.readAllBytes(webpFile.toPath());
             storage.create(blobInfo, webpBytes);
 
