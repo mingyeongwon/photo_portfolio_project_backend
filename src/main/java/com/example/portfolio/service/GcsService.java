@@ -69,12 +69,12 @@ public class GcsService {
             );
             
             // 프로세스 실행 및 결과 확인
-            Process process = processBuilder.start();
-            int exitCode = process.waitFor();
-            
-            if (exitCode != 0) {
-                throw new IOException("Failed to convert image to WebP format. Exit code: " + exitCode);
-            }
+//            Process process = processBuilder.start();
+//            int exitCode = process.waitFor();
+//            
+//            if (exitCode != 0) {
+//                throw new IOException("Failed to convert image to WebP format. Exit code: " + exitCode);
+//            }
 
             // 변환된 WebP 파일을 GCS에 업로드
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
