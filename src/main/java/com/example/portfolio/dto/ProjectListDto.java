@@ -2,100 +2,133 @@ package com.example.portfolio.dto;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+@JsonTypeInfo(
+	    use = JsonTypeInfo.Id.CLASS,
+	    include = JsonTypeInfo.As.PROPERTY,
+	    property = "@class"
+	)
+@JsonIgnoreProperties(ignoreUnknown = true) // JSON에서 존재하지 않는 필드 무시
 public class ProjectListDto {
-	private Long id;
-	private String title;
-	private String imageUrl; // 썸네일 URL
-	
-	@JsonFormat(shape= JsonFormat.Shape.STRING, pattern="yyyy-MM-dd", timezone="Asia/Seoul") //날짜 포멧 바꾸기
-	private Date createdAt;
-	
-	private int view;
-	private String categoryName;
-	private String subCategoryName;
-	private Long imageCount;
+    private Long id;
+    private String title;
+    private String imageUrl; // 썸네일 URL
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    private Date createdAt;
 
-	public ProjectListDto(Long id, String title, String imageUrl, Date createdAt, int view, String categoryName, String subCategoryName, Long imageCount) {
-		this.id = id;
-		this.title = title;
-		this.imageUrl = imageUrl;
-		this.createdAt = createdAt;
-		this.view = view;
-		this.categoryName = categoryName;
-		this.imageCount = imageCount;
-		this.subCategoryName = subCategoryName;
-	}
+    private int view;
+    private String categoryName;
+    private String subCategoryName;
+    private Long imageCount;
 
+    // 기본 생성자
+    public ProjectListDto() {
+    }
 
-	public Long getId() {
-		return id;
-	}
+    // Jackson에서 역직렬화를 위한 명시적인 생성자
+    @JsonCreator
+    public ProjectListDto(
+        @JsonProperty("id") Long id,
+        @JsonProperty("title") String title,
+        @JsonProperty("imageUrl") String imageUrl,
+        @JsonProperty("createdAt") Date createdAt,
+        @JsonProperty("view") int view,
+        @JsonProperty("categoryName") String categoryName,
+        @JsonProperty("subCategoryName") String subCategoryName,
+        @JsonProperty("imageCount") Long imageCount
+    ) {
+        this.id = id;
+        this.title = title;
+        this.imageUrl = imageUrl;
+        this.createdAt = createdAt;
+        this.view = view;
+        this.categoryName = categoryName;
+        this.subCategoryName = subCategoryName;
+        this.imageCount = imageCount;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    // Getters and Setters
+    public Long getId() {
+        return id;
+    }
 
-	public String getTitle() {
-		return title;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setTitle(String title) {
-		this.title = title;
-	}
+    public String getTitle() {
+        return title;
+    }
 
-	public String getImageUrl() {
-		return imageUrl;
-	}
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
-	}
+    public String getImageUrl() {
+        return imageUrl;
+    }
 
-	public Date getCreatedAt() {
-		return createdAt;
-	}
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
-	public void setCreatedAt(Date createdAt) {
-		this.createdAt = createdAt;
-	}
+    public Date getCreatedAt() {
+        return createdAt;
+    }
 
-	public int getView() {
-		return view;
-	}
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
 
-	public void setView(int view) {
-		this.view = view;
-	}
+    public int getView() {
+        return view;
+    }
 
-	public String getCategoryName() {
-		return categoryName;
-	}
+    public void setView(int view) {
+        this.view = view;
+    }
 
-	public void setCategoryName(String categoryName) {
-		this.categoryName = categoryName;
-	}
+    public String getCategoryName() {
+        return categoryName;
+    }
 
-	public Long getImageCount() {
-		return imageCount;
-	}
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
 
-	public void setImageCount(Long imageCount) {
-		this.imageCount = imageCount;
-	}
+    public String getSubCategoryName() {
+        return subCategoryName;
+    }
 
+    public void setSubCategoryName(String subCategoryName) {
+        this.subCategoryName = subCategoryName;
+    }
 
-	public String getSubCategoryName() {
-		return subCategoryName;
-	}
+    public Long getImageCount() {
+        return imageCount;
+    }
 
+    public void setImageCount(Long imageCount) {
+        this.imageCount = imageCount;
+    }
 
-	public void setSubCategoryName(String subCategoryName) {
-		this.subCategoryName = subCategoryName;
-	}
-
-
-	
+    @Override
+    public String toString() {
+        return "ProjectListDto{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", createdAt=" + createdAt +
+                ", view=" + view +
+                ", categoryName='" + categoryName + '\'' +
+                ", subCategoryName='" + subCategoryName + '\'' +
+                ", imageCount=" + imageCount +
+                '}';
+    }
 }

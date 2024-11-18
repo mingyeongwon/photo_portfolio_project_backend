@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -41,6 +42,8 @@ import com.example.portfolio.service.AdminService;
 import com.example.portfolio.service.CategoryService;
 import com.example.portfolio.service.PhotoService;
 import com.example.portfolio.service.ProjectService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api")
@@ -192,4 +195,9 @@ public class ProjectController {
 			@RequestBody SubCategoryUpdateDto subCategoryUpdateDto) {
 		categoryService.updateSubCategory(subCategoryId, subCategoryUpdateDto);
 	}
+	
+	 @GetMapping("/favicon.ico")
+	    public void returnNoFavicon(HttpServletResponse response) {
+	        response.setStatus(HttpStatus.NO_CONTENT.value()); // 204 No Content
+	    }
 }
