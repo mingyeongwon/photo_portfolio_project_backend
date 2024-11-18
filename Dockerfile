@@ -2,9 +2,9 @@ FROM azul/zulu-openjdk-alpine:17-latest
 
 # libwebp-tools 설치하여 `cwebp` 바이너리 추가
 RUN apk add --no-cache libwebp-tools
-RUN which cwebp
-
 WORKDIR /app
+
+RUN which cwebp
 
 COPY gradlew .
 COPY gradle gradle
@@ -21,6 +21,7 @@ ENV PORT=8080
 # Spring Boot 애플리케이션 빌드
 RUN ./gradlew build --exclude-task test
 RUN ls -la ./build/libs/
+
 
 RUN cp ./build/libs/portfolio_project-0.0.1-SNAPSHOT.jar app.jar
 
