@@ -160,7 +160,6 @@ public class ProjectService {
 	@Transactional(readOnly = true)
 	//@Cacheable(value = "project", key = "#projectId + '-' + #pageable.pageNumber")
 	public ProjectDetailPageDto getPhotoList(Pageable pageable, Long projectId) {
-
 		Project project = projectRepository.findById(projectId)
 				.orElseThrow(() -> new CustomException(HttpStatus.NOT_FOUND, ErrorCode.NOT_FIND_PROJECT,
 						"Project not found with id: " + projectId));
@@ -170,6 +169,7 @@ public class ProjectService {
 	}
 
 	//@CacheEvict(value = "adminProjectList", allEntries = true)
+	@Transactional
 	public void updateViewCount(Long projectId) {
 		projectRepository.updateViewCount(projectId);
 	}

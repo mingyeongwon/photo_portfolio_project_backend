@@ -1,8 +1,5 @@
 package com.example.portfolio.service;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -35,13 +32,7 @@ public class GcsService {
     private final Storage storage;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-//    public GcsService(@Value("${spring.cloud.gcp.storage.credentials.location}") String keyFileName) throws IOException {
-//        InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
-//        this.storage = StorageOptions.newBuilder()
-//                .setCredentials(GoogleCredentials.fromStream(keyFile))
-//                .build()
-//                .getService();
-//    }
+
     public GcsService() {
         try {
             GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
@@ -100,20 +91,6 @@ public class GcsService {
             );
         }
     }
-    
-//    private BufferedImage resizeImage(BufferedImage originalImage) {
-//        int targetWidth = 1024; // 적절한 크기로 조정
-//        int targetHeight = (int) (originalImage.getHeight() * ((double) targetWidth / originalImage.getWidth()));
-//        
-//        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-//        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-//        
-//        Graphics2D graphics2D = resizedImage.createGraphics();
-//        graphics2D.drawImage(resultingImage, 0, 0, null);
-//        graphics2D.dispose();
-//        
-//        return resizedImage;
-//    }
 
     // 썸네일 파일 삭제
     public void deleteThumbnailFile(String thumbnailUrl) {

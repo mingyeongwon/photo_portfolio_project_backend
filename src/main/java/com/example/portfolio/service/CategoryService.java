@@ -109,24 +109,6 @@ public class CategoryService {
 		return projectRepository.existsByCategory_Id(categoryId);
 	}
 
-	// DTO -> Entity 변환
-//	private Category mapDtoToEntity(CategoryDto categoryDto) {
-//		Category category = new Category();
-//		category.setId(categoryDto.getId());
-//		category.setName(categoryDto.getName());
-//
-//		List<SubCategory> subCategories = categoryDto.getSubCategories().stream().map(subCategoryDto -> {
-//			SubCategory subCategory = new SubCategory();
-//			subCategory.setId(subCategoryDto.getId());
-//			subCategory.setName(subCategoryDto.getName());
-//			subCategory.setCategory(category);
-//			return subCategory;
-//		}).toList();
-//
-//		category.setSubCategories(subCategories);
-//		return category;
-//	}
-
 	// Entity -> DTO 변환
 	private CategoryDto mapEntityToDto(Category category) {
 		CategoryDto categoryDto = new CategoryDto();
