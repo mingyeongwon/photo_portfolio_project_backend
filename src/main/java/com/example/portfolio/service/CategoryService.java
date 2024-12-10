@@ -53,15 +53,15 @@ public class CategoryService {
 		return categories.stream().map(this::mapEntityToDto).toList();
 	}
 	
-	@Cacheable(value = "category", key = "'categoryList'")
-	  public List<CategoryDto> getCategoriesWithProjects() {
-	        List<Category> categoriesWithProjects = projectRepository.findCategoriesWithProjects();
-	        return categoriesWithProjects.stream()
-	                .map(categoryMapper::categoryToDto) // Category 엔티티를 CategoryDto로 매핑
-	                .collect(Collectors.toList());
-	    }
+	//@Cacheable(value = "category", key = "'categoryList'")
+	 public List<CategoryDto> getCategoriesWithProjects() {
+	       List<Category> categoriesWithProjects = projectRepository.findCategoriesWithProjects();
+	       return categoriesWithProjects.stream()
+	               .map(categoryMapper::categoryToDto) // Category 엔티티를 CategoryDto로 매핑
+	               .collect(Collectors.toList());
+	   }
 	
-	@Cacheable(value = "subCategory", key = "#categoryId")
+	//@Cacheable(value = "subCategory", key = "#categoryId")
 	public List<SubCategoryDto> getSubCategoriesWithProjects(Long categoryId) {
 		categoryRepository.findById(categoryId).orElseThrow(() -> new CustomException(
             HttpStatus.NOT_FOUND,
@@ -74,19 +74,19 @@ public class CategoryService {
 	}
 
 	@Transactional
-	@CacheEvict(value = "category", key = "'categoryList'")
+	//@CacheEvict(value = "category", key = "'categoryList'")
 	public CategoryCreateDto createCategories(CategoryCreateDto categoryCreateDto) {
 		Category category = categoryMapper.createDtoToEntity(categoryCreateDto);
 		return CategoryMapper.INSTANCE.categoryToCreateDto(categoryRepository.save(category));
 	}
 
 	@Transactional
-	@Caching(
-			evict = {
-					@CacheEvict(value = "category", key = "'categoryList'"),
-					@CacheEvict(value = "subCategory", key = "#categoryId")
-			}
-	)
+//	@Caching(
+//			evict = {
+//					@CacheEvict(value = "category", key = "'categoryList'"),
+//					@CacheEvict(value = "subCategory", key = "#categoryId")
+//			}
+//	)
 	public void deleteCategory(Long categoryId) {
 		if (isCategoryUsed(categoryId)) {
 			throw new CustomException(
@@ -109,24 +109,6 @@ public class CategoryService {
 		return projectRepository.existsByCategory_Id(categoryId);
 	}
 
-	// DTO -> Entity 변환
-//	private Category mapDtoToEntity(CategoryDto categoryDto) {
-//		Category category = new Category();
-//		category.setId(categoryDto.getId());
-//		category.setName(categoryDto.getName());
-//
-//		List<SubCategory> subCategories = categoryDto.getSubCategories().stream().map(subCategoryDto -> {
-//			SubCategory subCategory = new SubCategory();
-//			subCategory.setId(subCategoryDto.getId());
-//			subCategory.setName(subCategoryDto.getName());
-//			subCategory.setCategory(category);
-//			return subCategory;
-//		}).toList();
-//
-//		category.setSubCategories(subCategories);
-//		return category;
-//	}
-
 	// Entity -> DTO 변환
 	private CategoryDto mapEntityToDto(Category category) {
 		CategoryDto categoryDto = new CategoryDto();
@@ -146,7 +128,7 @@ public class CategoryService {
 	}
 
 	@Transactional
-	@CacheEvict(value = "subCategory", key = "#subCategoryCreateDto.id")
+	//@CacheEvict(value = "subCategory", key = "#subCategoryCreateDto.id")
 	public SubCategoryCreateDto createSubCategory(Long categoryId, SubCategoryCreateDto subCategoryCreateDto) {
 		subCategoryCreateDto.setCategoryId(categoryId);
 		SubCategory subCategory = categoryMapper.createSubCategoryToSubCategory(subCategoryCreateDto);
@@ -154,7 +136,7 @@ public class CategoryService {
 	}
 
 	@Transactional
-	@CacheEvict(value = "subCategory", key = "#subCategoryId")
+	//@CacheEvict(value = "subCategory", key = "#subCategoryId")
 	public void deleteSubCategory(Long subCategoryId) {
 		if (isSubCategoryUsed(subCategoryId)) {
 			throw new CustomException(
@@ -172,13 +154,13 @@ public class CategoryService {
 	}
 
 	@Transactional
-	@Caching(
-			evict = {
-					@CacheEvict(value = "category", key = "'categoryList'"),
-					@CacheEvict(value = "projectList", allEntries = true),
-					@CacheEvict(value = "adminProjectList", allEntries = true)
-			}
-	)
+//	@Caching(
+//			evict = {
+//					@CacheEvict(value = "category", key = "'categoryList'"),
+//					@CacheEvict(value = "projectList", allEntries = true),
+//					@CacheEvict(value = "adminProjectList", allEntries = true)
+//			}
+//	)
 	public void updateCategory(CategoryUpdateDto categoryUpdateDto) {
 		Category category = categoryRepository.findById(categoryUpdateDto.getId()).orElseThrow(
 				() -> new CustomException(
@@ -193,7 +175,7 @@ public class CategoryService {
 
     // 서브 카테고리 수정
     @Transactional
-    @CacheEvict(value = "subCategory", key = "#subCategoryId")
+    //@CacheEvict(value = "subCategory", key = "#subCategoryId")
     public void updateSubCategory(Long subCategoryId, SubCategoryUpdateDto subCategoryUpdateDto) {
         SubCategory subCategory = subCategoryRepository.findById(subCategoryId)
                 .orElseThrow(() -> new CustomException(

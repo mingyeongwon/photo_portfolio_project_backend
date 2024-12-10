@@ -1,22 +1,13 @@
 package com.example.portfolio.service;
 
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-
-import javax.imageio.IIOImage;
-import javax.imageio.ImageIO;
-import javax.imageio.ImageWriter;
-import javax.imageio.stream.ImageOutputStream;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -41,13 +32,7 @@ public class GcsService {
     private final Storage storage;
     private final ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-//    public GcsService(@Value("${spring.cloud.gcp.storage.credentials.location}") String keyFileName) throws IOException {
-//        InputStream keyFile = ResourceUtils.getURL(keyFileName).openStream();
-//        this.storage = StorageOptions.newBuilder()
-//                .setCredentials(GoogleCredentials.fromStream(keyFile))
-//                .build()
-//                .getService();
-//    }
+
     public GcsService() {
         try {
             GoogleCredentials credentials = GoogleCredentials.getApplicationDefault();
@@ -58,58 +43,53 @@ public class GcsService {
     }
 
 
-    // WebP 파일 업로드 메서드
     public String uploadWebpFile(MultipartFile multipartFile, Long projectId) {
-        String uuid = UUID.randomUUID().toString();
-        String objectName = projectId + "/" + uuid + ".webp";
-        
-        try (InputStream inputStream = multipartFile.getInputStream()) {
-            BufferedImage originalImage = ImageIO.read(inputStream);
-            BufferedImage resizedImage = resizeImage(originalImage);
+        try {
+
+            String uuid = UUID.randomUUID().toString();
+            String objectName = projectId + "/" + uuid + ".webp";
+            File tempFile = File.createTempFile(uuid, ".png"); // 원본 이미지를 임시 파일로 저장
+            multipartFile.transferTo(tempFile);
+
+            // WebP 변환을 위한 출력 파일 경로 설정
+            File webpFile = new File(tempFile.getParent(), uuid + ".webp");
+
+            // cwebp 명령어 실행 
+            ProcessBuilder processBuilder = new ProcessBuilder(
+                "cwebp", "-q", "85", tempFile.getAbsolutePath(), "-o", webpFile.getAbsolutePath()
+            );
             
-            // 임시 파일 생성
-            Path tempFile = Files.createTempFile("temp-", ".webp");
-            
-            // WebP 변환 및 임시 파일에 저장
-            ImageWriter writer = ImageIO.getImageWritersByFormatName("webp").next();
-            try (ImageOutputStream ios = ImageIO.createImageOutputStream(tempFile.toFile())) {
-                writer.setOutput(ios);
-                writer.write(null, new IIOImage(resizedImage, null, null), writer.getDefaultWriteParam());
-            } finally {
-                writer.dispose();
-            }
-            
-            // GCP에 업로드
+            // 프로세스 실행 
+            Process process = processBuilder.start();
+            // 프로세스 종료 대기
+            int exitCode = process.waitFor();
+           
             BlobInfo blobInfo = BlobInfo.newBuilder(bucketName, objectName)
                     .setContentType("image/webp")
                     .build();
-            storage.create(blobInfo, Files.readAllBytes(tempFile));
             
+            byte[] webpBytes = Files.readAllBytes(webpFile.toPath());
+            storage.create(blobInfo, webpBytes);
+
             // 임시 파일 삭제
-            Files.delete(tempFile);
-            
+            tempFile.delete();
+            webpFile.delete();
+
             return "https://storage.googleapis.com/" + bucketName + "/" + objectName;
+
         } catch (IOException e) {
             throw new CustomException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     ErrorCode.STORAGE_IO_ERROR,
                     "Failed to upload file: " + e.getMessage()
             );
+        } catch (Exception e) {
+            throw new CustomException(
+                    HttpStatus.INTERNAL_SERVER_ERROR,
+                    ErrorCode.STORAGE_IO_ERROR,
+                    "File upload failed due to async exception: " + e.getMessage()
+            );
         }
-    }
-
-    private BufferedImage resizeImage(BufferedImage originalImage) {
-        int targetWidth = 1024; // 적절한 크기로 조정
-        int targetHeight = (int) (originalImage.getHeight() * ((double) targetWidth / originalImage.getWidth()));
-        
-        Image resultingImage = originalImage.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH);
-        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
-        
-        Graphics2D graphics2D = resizedImage.createGraphics();
-        graphics2D.drawImage(resultingImage, 0, 0, null);
-        graphics2D.dispose();
-        
-        return resizedImage;
     }
 
     // 썸네일 파일 삭제

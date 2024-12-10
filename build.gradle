@@ -43,12 +43,21 @@ dependencies {
 	// mapstruct
     implementation 'org.mapstruct:mapstruct:1.6.2'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
+
+	// Image Processing
+    implementation "com.sksamuel.scrimage:scrimage-core:4.0.32"
+    implementation "com.sksamuel.scrimage:scrimage-webp:4.0.32"
     
-    // Image Processing
-	implementation 'org.sejda.imageio:webp-imageio:0.1.6'
+    //redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
     
     // Spring Cache
     implementation 'org.springframework.boot:spring-boot-starter-cache'
+    
+    //jackson
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
 }
 
 tasks.named('test') {
